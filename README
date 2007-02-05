@@ -26,7 +26,7 @@ Copy the following css into your stylesheet for a good start:
 	text-decoration: none;
 	color: #000099;
 }
-.pagination a:hover, div.pagination a:active {
+.pagination a:hover, .pagination a:active {
 	border: 1px solid #000099;
 	color: #000;
 }
