@@ -1,0 +1,46 @@
+CanPaginate
+
+Ruby port by: PJ Hyett
+Original php source: http://www.strangerstudios.com/sandbox/pagination/diggstyle.php
+
+Example usage: 
+
+app/controllers/posts_controller.rb
+  
+  @page = params[:page].to_i.zero? ? 1 : params[:page].to_i
+  
+app/views/posts/index.rhtml
+
+  <%= will_paginate(Post.count, Post::PER_PAGE) %>
+
+Copy the following css into your stylesheet for a good start:
+
+.pagination {
+	padding: 3px;
+	margin: 3px;
+}
+.pagination a {
+	padding: 2px 5px 2px 5px;
+	margin: 2px;
+	border: 1px solid #aaaadd;
+	text-decoration: none;
+	color: #000099;
+}
+.pagination a:hover, div.pagination a:active {
+	border: 1px solid #000099;
+	color: #000;
+}
+.pagination span.current {
+	padding: 2px 5px 2px 5px;
+	margin: 2px;
+	border: 1px solid #000099;
+	font-weight: bold;
+	background-color: #000099;
+	color: #FFF;
+}
+.pagination span.disabled {
+	padding: 2px 5px 2px 5px;
+	margin: 2px;
+	border: 1px solid #eee;
+	color: #ddd;
+}
