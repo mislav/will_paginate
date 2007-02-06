@@ -19,7 +19,7 @@ module Finder
       args << options
 
       with_scope :find => { :offset => (page - 1) * per_page, :limit => per_page } do
-        send(method_id.to_s.sub(/^paginate/, 'find'), *args)
+        [send(method_id.to_s.sub(/^paginate/, 'find'), *args), page]
       end
     end
   end

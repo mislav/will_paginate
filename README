@@ -17,8 +17,7 @@ app/controller/posts_controller.rb
 
   def index
     @board = Board.find(params[:id])
-    @page  = params[:page].to_i.zero? ? 1 : params[:page].to_i
-    @posts = Post.paginate_all_by_board_id(@board.id, :page => params[:page])
+    @posts, @page = Post.paginate_all_by_board_id(@board.id, :page => params[:page])
   end
 
 app/views/posts/index.rhtml
