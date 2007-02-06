@@ -1,7 +1,8 @@
 WillPaginate
 
 Ruby port by: PJ Hyett
-Original php source: http://www.strangerstudios.com/sandbox/pagination/diggstyle.php
+Original PHP source: http://www.strangerstudios.com/sandbox/pagination/diggstyle.php
+Contributors: K. Adam Christensen, Chris Wanstrath
 
 Example usage: 
 
