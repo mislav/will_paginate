@@ -5,13 +5,25 @@ Original php source: http://www.strangerstudios.com/sandbox/pagination/diggstyle
 
 Example usage: 
 
-app/controllers/posts_controller.rb
-  
-  @page = params[:page].to_i.zero? ? 1 : params[:page].to_i
-  
+app/models/post.rb
+
+  class Post < ActiveRecord::Base
+    cattr_reader :per_page
+    @@per_page = 50
+  end
+
+app/controller/posts_controller.rb
+
+  def index
+    @board = Board.find(params[:id])
+    @page  = params[:page].to_i.zero? ? 1 : params[:page].to_i
+    @posts = Post.paginate_all_by_board_id(@board.id, :page => params[:page])
+  end
+
 app/views/posts/index.rhtml
 
-  <%= will_paginate(Post.count, Post::PER_PAGE) %>
+  <%= will_paginate(@board.topic_count, Post.per_page) %>
+
 
 Copy the following css into your stylesheet for a good start:
 
