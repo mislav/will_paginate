@@ -17,9 +17,11 @@ module WillPaginate
         options = args.last.is_a?(Hash) ? args.pop : {}
         page    = options[:page].to_i.zero? ? 1 : options[:page].to_i
         options.delete(:page)
+        limit_per_page = options[:per_page] || per_page
+        options.delete(:per_page)
         args << options
 
-        with_scope :find => { :offset => (page - 1) * per_page, :limit => per_page } do
+        with_scope :find => { :offset => (page - 1) * limit_per_page, :limit => limit_per_page } do
           [send(method_id.to_s.sub(/^paginate/, 'find'), *args), page]
         end
       end
