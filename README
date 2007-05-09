@@ -1,30 +1,107 @@
 WillPaginate
 ===========
 
-Ruby port by: PJ Hyett
-Contributors: K. Adam Christensen, Chris Wanstrath, Dr. Nic Williams
-Original    : http://www.strangerstudios.com/sandbox/pagination/diggstyle.php
+Quick quiz: Where does pagination logic belong?
 
-Example usage: 
+  a) in the model;
+  b) in the controller;
+  c) in views;
+  d) all of the above.
 
-app/models/post.rb
+We think you know the answer (if you think hard enough).
 
-  class Post < ActiveRecord::Base
-    cattr_reader :per_page
-    @@per_page = 50
-  end
+This plugin makes magic happen. You *will* paginate!
 
-app/controller/posts_controller.rb
 
-  def index
-    @board = Board.find(params[:id])
-    @posts, @page = Post.paginate_all_by_board_id(@board.id, :page => params[:page])
-  end
+## Example usage:
 
-app/views/posts/index.rhtml
+Use a paginate finder in the controller:
 
-  <%= will_paginate(@board.topic_count, Post.per_page) %>
+    @posts = Post.paginate_by_board_id @board.id, :page => params[:page]
 
+Yeah, `paginate` works just like `find` -- it just doesn't fetch all the records.
+Just don't forget to tell it which page you want!
+
+Render the posts in your view like you would normally do. When you need to render
+pagination, just stick this in:
+
+    <%= will_paginate @posts %>
+
+You're done. (Copy and paste the example fancy CSS styles from the bottom.)
+
+How does it know how much items to fetch per page? It asks your model by calling
+`Post.per_page`. You can define it like this:
+
+    class Post < ActiveRecord::Base
+      cattr_reader :per_page
+      @@per_page = 50
+    end
+
+... or like this:
+
+    class Post < ActiveRecord::Base
+      def per_page
+        50
+      end
+    end
+
+... or don't worry about it at all. (WillPaginate defines it to be 30 if missing.)
+You can also specify the count explicitly when calling `paginate`:
+
+    @posts = Post.paginate :page => params[:page], :per_page => 50
+
+Find more options in sections below.
+
+
+## Details
+
+The `paginate` finder wraps the original finder and returns a PaginatedCollection
+instance that's in fact a proxy to the original collection. You can use the collection
+as you would any ActiveRecord resultset, but WillPaginate view helpers also need the
+object to know how to make pagination:
+
+    <ol>
+      <% for post in @posts -%>
+        <li>Render `post` in some nice way.</li>
+      <% end -%>
+    </ol>
+
+    <p>Now let's render us some pagination!</p>
+    <%= will_paginate @posts %>
+
+
+In model finders, "all" is implicit. No sense in paginating a single record, right?
+
+  * Post.paginate                  => Post.find :all
+  * Post.paginate_all_by_something => Post.find_all_by_something
+  * Post.paginate_by_something     => Post.find_all_by_something
+
+Options for `paginate` finders are:
+
+  * page           (default 1)
+  * per_page       (default is read from the model, which is 30 if not overriden)
+  * total entries: ActiveRecord knows how to count, but you can still override it
+  * count:         takes place of "select" for count() statement
+  * distinct:      also just for count() statement
+
+Options for `will_paginate` view helper:
+
+  * class:        CSS class name for the generated DIV (default "pagination")
+  * prev_label:   default '&laquo; Previous',
+  * next_label:   default 'Next &raquo;',
+  * inner_window: how many links are shown around the current page, defaults to 4
+  * outer_window: how many links are around the first and the last page, defaults to 1
+
+
+## Authors, credits
+
+Ruby port by:           PJ Hyett, Mislav Marohnić (Sulien)
+Contributors:           K. Adam Christensen, Chris Wanstrath, Dr. Nic Williams
+Original announcement:  http://errtheblog.com/post/929 
+Original PHP source:    http://www.strangerstudios.com/sandbox/pagination/diggstyle.php
+
+
+## Want Digg style?
 
 Copy the following css into your stylesheet for a good start:
 

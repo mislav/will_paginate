@@ -1,4 +1,7 @@
 require 'will_paginate'
 require 'finder'
-ActionView::Base.send(:include, WillPaginate)
-ActiveRecord::Base.send(:include, WillPaginate::Finder)
+
+ActiveRecord::Base.send     :include, WillPaginate::Finder
+# Controllers will get some love soon
+# ActionController::Base.send :include, WillPaginate::ControllerHelpers
+ActionView::Base.send       :include, WillPaginate::ViewHelpers
