@@ -19,7 +19,7 @@ module WillPaginate
     
           # close to beginning, only hide later pages
           if page < 1 + (adjacents * 2)
-            1.upto(3 + (adjacents * 2)) { |ctr| pgn << (ctr == page ? content_tag(:span, ctr, :class => 'current') : link_to(ctr, :page => ctr)) }
+            1.upto(3 + (adjacents * 2)) { |ctr| pgn << (ctr == page ? content_tag(:span, ctr, :class => 'current') : link_to(ctr, params.merge(:page => ctr))) }
             pgn << "..." + link_to(lpm1, params.merge(:page => lpm1)) + link_to(last_page, params.merge(:page => last_page))
   
           # in middle, hide some from both sides
