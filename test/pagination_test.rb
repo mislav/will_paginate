@@ -74,11 +74,13 @@ class PaginationTest < ActiveRecordTestCase
     assert_equal 4, entries.size
 
     assert_select 'div.pagination', 1, 'no main DIV' do
-      assert_select 'a', 3
+      assert_select 'a[href]', 3 do |elements|
+        assert_equal [2,3,2], elements.map{|e| e['href'] =~ /page=(\d+)/; $1.to_i }
+        assert_select elements.last, ':last-child', "Next &raquo;"
+      end
       assert_select 'span', 2
       assert_select 'span.disabled:first-child', "&laquo; Previous"
       assert_select 'span.current', entries.current_page.to_s
-      assert_select 'a:last-child', "Next &raquo;"
     end
   end
 
@@ -91,11 +93,12 @@ class PaginationTest < ActiveRecordTestCase
     assert_equal 4, entries.size
 
     assert_select 'div.will_paginate', 1, 'no main DIV' do
-      assert_select 'a', 4
-      assert_select 'span', 1
-      assert_select 'a:first-of-type', "Prev"
+      assert_select 'a[href]', 4 do |elements|
+        assert_equal [1,1,3,3], elements.map{|e| e['href'] =~ /page=(\d+)/; $1.to_i }
+        assert_select elements.first, 'a', "Prev"
+        assert_select elements.last, 'a', "Next"
+      end
       assert_select 'span.current', entries.current_page.to_s
-      assert_select 'a:last-child', "Next"
     end
   end
 
@@ -106,6 +109,7 @@ class PaginationTest < ActiveRecordTestCase
     assert_equal Developer.count, entries.size
 
     assert_select 'div', false
+    assert_equal '', @response.body
   end
 
   # def test_simple_paginate
