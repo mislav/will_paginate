@@ -1,8 +1,9 @@
 WillPaginate
+===========
 
 Ruby port by: PJ Hyett
-Original PHP source: http://www.strangerstudios.com/sandbox/pagination/diggstyle.php
 Contributors: K. Adam Christensen, Chris Wanstrath, Dr. Nic Williams
+Original    : http://www.strangerstudios.com/sandbox/pagination/diggstyle.php
 
 Example usage: 
 
