@@ -14,7 +14,7 @@ module WillPaginate
     module ClassMethods
       def method_missing_with_paginate(method, *args, &block)
         # did somebody tried to paginate? if not, let them be
-        unless method.to_s.index('paginate') == 0
+        unless method.to_s.index('paginate').zero?
           return method_missing_without_paginate(method, *args, &block) 
         end
         options = args.last.is_a?(Hash) ? args.pop.symbolize_keys : {}

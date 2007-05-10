@@ -6,7 +6,7 @@ module WillPaginate
     attr_reader :current_page, :per_page, :entries
     attr_accessor :total_entries
 
-    def initialize entries, page, per_page, total
+    def initialize(entries, page, per_page, total)
       @entries       = entries
       @current_page  = page
       @per_page      = per_page
