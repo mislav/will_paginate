@@ -81,8 +81,6 @@ module WillPaginate
         links.push    link_or_span(succ, succ > total_pages, 'disabled', options.delete(:next_label))
         
         content_tag :div, links.join(' '), options
-      else
-        nil
       end
     end
     
