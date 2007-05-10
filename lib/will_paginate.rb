@@ -84,12 +84,12 @@ module WillPaginate
       end
     end
     
-    protected
+  protected
 
-      def link_or_span(page, condition, span_class = nil, text = page.to_s)
-        # page links preserve other (GET) parameters
-        condition ? content_tag(:span, text, :class => span_class) :
-          link_to(text, {:page => page}.reverse_merge(params))
-      end
+    def link_or_span(page, condition, span_class = nil, text = page.to_s)
+      # page links preserve other (GET) parameters
+      condition ? content_tag(:span, text, :class => span_class) :
+        link_to(text, {:page => page}.reverse_merge(params))
+    end
   end
 end
