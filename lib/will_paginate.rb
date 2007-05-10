@@ -51,7 +51,7 @@ module WillPaginate
           :inner_window => 4, # links around the current page
           :outer_window => 1  # links around beginning and end
         
-        inner_window, outer_window = options.delete(:inner_window), options.delete(:outer_window)
+        inner_window, outer_window = options.delete(:inner_window).to_i, options.delete(:outer_window).to_i
         min = page - inner_window
         max = page + inner_window
         
