@@ -23,7 +23,7 @@ module WillPaginate
         entries_per_page = options.delete(:per_page) || per_page
 
         total_entries = unless options[:total_entries]
-          count_options = options.slice :conditions, :joins, :include, :order, :group, :select, :distinct
+          count_options = options.slice :conditions, :joins, :include, :order, :group, :distinct
           count_options[:select] = options[:count]
           count(count_options)
         else
