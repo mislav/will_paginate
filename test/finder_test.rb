@@ -9,11 +9,13 @@ class PaginationTest < ActiveRecordTestCase
     assert_equal 1, @entries.current_page
     assert_equal 1, @entries.page_count
     assert_equal 3, @entries.size
+    assert_equal 0, @entries.offset
 
     @entries = Topic.paginate :page => 2
     assert_equal 2, @entries.current_page
     assert_equal 1, @entries.page_count
     assert @entries.empty?
+    assert_equal 30, @entries.offset
 
     @entries = Reply.paginate_all_by_topic_id(1)
     expected = [replies(:witty_retort), replies(:spam)]

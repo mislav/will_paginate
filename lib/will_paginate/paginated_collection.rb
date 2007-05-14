@@ -27,6 +27,10 @@ module WillPaginate
     def to_a
       @entries
     end
+
+    def offset
+      (current_page - 1) * per_page
+    end
     
   protected
 

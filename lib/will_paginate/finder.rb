@@ -24,7 +24,7 @@ module WillPaginate
 
         total_entries = unless options[:total_entries]
           count_options = options.slice :conditions, :joins, :include, :order, :group, :select, :distinct
-          count_options[:select] = options[:count] if options.key? :count
+          count_options[:select] = options[:count]
           count(count_options)
         else
           options.delete(:total_entries)
