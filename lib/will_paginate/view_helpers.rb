@@ -33,6 +33,7 @@ module WillPaginate
           if visible.include? n
             list << link_or_span(n, n == page, 'current')
           elsif n == beginning.last + 1 || n == tail.first - 1
+            # ellipsis represents the gap between windows
             list << '...'
           end
           list
@@ -49,10 +50,13 @@ module WillPaginate
     
   protected
 
-    def link_or_span(page, condition, span_class = nil, text = page.to_s)
-      # page links preserve other (GET) parameters
-      condition ? content_tag(:span, text, :class => span_class) :
-        link_to(text, {:page => page}.reverse_merge(params))
+    def link_or_span(page, condition_for_span, span_class = nil, text = page.to_s)
+      if condition_for_span
+        content_tag :span, text, :class => span_class
+      else
+        # page links should preserve GET parameters, so we merge params
+        link_to text, params.merge(:page => (page !=1 ? page : nil))
+      end
     end
   end
 end

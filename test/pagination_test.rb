@@ -44,7 +44,7 @@ class PaginationTest < ActiveRecordTestCase
 
     assert_select 'div.pagination', 1, 'no main DIV' do
       assert_select 'a[href]', 3 do |elements|
-        assert_equal [2,3,2], elements.map{|e| e['href'] =~ /page=(\d+)/; $1.to_i }
+        validate_page_numbers [2,3,2], elements
         assert_select elements.last, ':last-child', "Next &raquo;"
       end
       assert_select 'span', 2
@@ -63,7 +63,7 @@ class PaginationTest < ActiveRecordTestCase
 
     assert_select 'div.will_paginate', 1, 'no main DIV' do
       assert_select 'a[href]', 4 do |elements|
-        assert_equal [1,1,3,3], elements.map{|e| e['href'] =~ /page=(\d+)/; $1.to_i }
+        validate_page_numbers [nil,nil,3,3], elements
         assert_select elements.first, 'a', "Prev"
         assert_select elements.last, 'a', "Next"
       end
@@ -81,7 +81,7 @@ class PaginationTest < ActiveRecordTestCase
 
     assert_select 'div.pagination', 1, 'no main DIV' do
       assert_select 'a[href]', 10 do |elements|
-        assert_equal [5,1,2,4,5,7,8,10,11,7], elements.map{|e| e['href'] =~ /page=(\d+)/; $1.to_i }
+        validate_page_numbers [5,nil,2,4,5,7,8,10,11,7], elements
         assert_select elements.first, 'a', "&laquo; Previous"
         assert_select elements.last, 'a', "Next &raquo;"
       end
@@ -97,6 +97,15 @@ class PaginationTest < ActiveRecordTestCase
 
     assert_select 'div', false
     assert_equal '', @response.body
+  end
+
+protected
+
+  def validate_page_numbers expected, links
+    assert_equal(expected, links.map { |e|
+      e['href'] =~ /\Wpage=([^&]*)/
+      $1 ? $1.to_i : $1
+    })
   end
 
 end
