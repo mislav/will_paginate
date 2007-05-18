@@ -1,8 +1,8 @@
 ActiveRecord::Base.send :include, WillPaginate::Finder
 ActionView::Base.send   :include, WillPaginate::ViewHelpers
 
-unless Hash.new.respond_to? :slice
-  class Hash
+unless ::Hash.new.respond_to? :slice
+  class ::Hash
     # Returns a new hash with only the given keys.
     def slice(*keys)
       allowed = Set.new(respond_to?(:convert_key) ? keys.map { |key| convert_key(key) } : keys)
