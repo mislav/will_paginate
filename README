@@ -40,7 +40,7 @@ How does it know how much items to fetch per page? It asks your model by calling
 ... or like this:
 
     class Post < ActiveRecord::Base
-      def per_page
+      def self.per_page
         50
       end
     end
