@@ -1,5 +1,8 @@
 module WillPaginate
   module ViewHelpers
+    # single space is friendly to spiders and non-graphic browsers
+    PAGE_SEPARATOR = ' '
+
     # Renders Digg-style pagination. (We know you wanna!)
     # Returns nil if there is only one page in total (can't paginate that).
     #
@@ -12,7 +15,7 @@ module WillPaginate
           :prev_label   => '&laquo; Previous',
           :next_label   => 'Next &raquo;',
           :inner_window => 4, # links around the current page
-          :outer_window => 1  # links around beginning and end
+          :outer_window => 1 # links around beginning and end
         
         inner_window, outer_window = options.delete(:inner_window).to_i, options.delete(:outer_window).to_i
         min = page - inner_window
@@ -44,7 +47,7 @@ module WillPaginate
         links.unshift link_or_span(prev, prev.zero?,         'disabled', options.delete(:prev_label))
         links.push    link_or_span(succ, succ > total_pages, 'disabled', options.delete(:next_label))
         
-        content_tag :div, links.join, options
+        content_tag :div, links.join(options.delete(:separator) || PAGE_SEPARATOR), options
       end
     end
     

@@ -19,33 +19,42 @@ module WillPaginate
         end
         options = args.last.is_a?(Hash) ? args.pop.symbolize_keys : {}
         
-        page = (options.delete(:page) || 1).to_i
-        entries_per_page = options.delete(:per_page) || per_page
-
+        # :total_entries and :count are mutually exclusive
         total_entries = unless options[:total_entries]
           count_options = options.slice :conditions, :joins, :include, :group, :distinct
-          count_options[:select] = options[:count]
+          # merge the hash found in :count
+          # this allows you to specify :select, :order, or anything else just for the count query
+          count_options.merge(options.delete(:count)) if options[:count]
           count(count_options)
         else
           options.delete(:total_entries)
         end
 
-        # oh, you're not so fun anymore!
-        [:distinct, :count].each {|key| options.delete key } unless options.empty?
-        
         finder = method.to_s.sub /^paginate/, 'find'
         # :all is implicit
         if finder == 'find'
           args.unshift(:all) if args.length < 2
-        elsif finder !~ /^find_all/
+        elsif finder.index('find_all') != 0
           finder.sub! /^find/, 'find_all'
         end
 
-        # do it!!
-        args << options.merge(:offset => (page - 1) * entries_per_page, :limit => entries_per_page)
-        entries = send finder, *args
-        # wrap and return the package
-        PaginatedCollection.new entries, page, entries_per_page, total_entries
+        returning Collection.new(
+            (options.delete(:page) || 1),
+            (options.delete(:per_page) || per_page),
+            total_entries
+        ) do |pager|
+          args << options.merge(:offset => pager.first_index, :limit => pager.per_page)
+          pager.replace(send(finder, *args))
+        end
+      end
+
+      def respond_to? method
+        case method.to_sym
+        when :paginate, :paginate_by_sql
+          true
+        else
+          super method.to_s.sub(/^paginate/, 'find')
+        end
       end
     end
   end

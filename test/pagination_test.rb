@@ -42,7 +42,7 @@ class PaginationTest < ActiveRecordTestCase
     assert entries
     assert_equal 4, entries.size
 
-    assert_select 'div.pagination', 1, 'no main DIV' do
+    assert_select 'div.pagination', 1, 'no main DIV' do |el|
       assert_select 'a[href]', 3 do |elements|
         validate_page_numbers [2,3,2], elements
         assert_select elements.last, ':last-child', "Next &raquo;"
