@@ -38,7 +38,7 @@ module WillPaginate
           finder.sub! /^find/, 'find_all'
         end
 
-        returning Collection.new(
+        returning WillPaginate::Collection.new(
             (options.delete(:page) || 1),
             (options.delete(:per_page) || per_page),
             total_entries
