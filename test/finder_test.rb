@@ -14,20 +14,22 @@ class PaginationTest < ActiveRecordTestCase
     collection.replace entries
 
     assert_equal entries, collection
-    assert_respond_to_all collection, %w(page_count each first_index size current_page per_page total_entries)
+    assert_respond_to_all collection, %w(page_count each offset size current_page per_page total_entries)
     assert_equal Array, collection.entries.class
-
-    assert_equal 3, collection.first_index
+    assert_equal 3, collection.offset
   end
   
   def test_simple_paginate
     entries = Topic.paginate
     assert_equal 1, entries.current_page
+    assert_nil entries.previous_page
+    assert_nil entries.next_page
     assert_equal 1, entries.page_count
     assert_equal 3, entries.size
 
     entries = Topic.paginate :page => 2
     assert_equal 2, entries.current_page
+    assert_equal 1, entries.previous_page
     assert_equal 1, entries.page_count
     assert entries.empty?
 

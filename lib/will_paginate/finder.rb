@@ -43,7 +43,7 @@ module WillPaginate
             (options.delete(:per_page) || per_page),
             total_entries
         ) do |pager|
-          args << options.merge(:offset => pager.first_index, :limit => pager.per_page)
+          args << options.merge(:offset => pager.offset, :limit => pager.per_page)
           pager.replace(send(finder, *args))
         end
       end

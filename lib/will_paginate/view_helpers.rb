@@ -34,7 +34,7 @@ module WillPaginate
         # build the list of the links
         links = (1..total_pages).inject([]) do |list, n|
           if visible.include? n
-            list << link_or_span(n, n == page, 'current')
+            list << page_link_or_span((n != page ? n : nil), 'current', n)
           elsif n == beginning.last + 1 || n == tail.first - 1
             # ellipsis represents the gap between windows
             list << '...'
@@ -43,9 +43,8 @@ module WillPaginate
         end
         
         # next and previous buttons
-        prev, succ  = page - 1, page + 1
-        links.unshift link_or_span(prev, prev.zero?,         'disabled', options.delete(:prev_label))
-        links.push    link_or_span(succ, succ > total_pages, 'disabled', options.delete(:next_label))
+        links.unshift page_link_or_span(entries.previous_page, 'disabled', options.delete(:prev_label))
+        links.push    page_link_or_span(entries.next_page,     'disabled', options.delete(:next_label))
         
         content_tag :div, links.join(options.delete(:separator) || PAGE_SEPARATOR), options
       end
@@ -53,8 +52,8 @@ module WillPaginate
     
   protected
 
-    def link_or_span(page, condition_for_span, span_class = nil, text = page.to_s)
-      if condition_for_span
+    def page_link_or_span(page, span_class = nil, text = page.to_s)
+      unless page
         content_tag :span, text, :class => span_class
       else
         # page links should preserve GET parameters, so we merge params
