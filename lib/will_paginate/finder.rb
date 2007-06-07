@@ -24,8 +24,10 @@ module WillPaginate
           count_options = options.slice :conditions, :joins, :include, :group, :distinct
           # merge the hash found in :count
           # this allows you to specify :select, :order, or anything else just for the count query
-          count_options.merge(options.delete(:count)) if options[:count]
-          count(count_options)
+          count_options.update(options.delete(:count)) if options[:count]
+          count = count(count_options)
+
+          count.respond_to?(:length) ? count.length : count
         else
           options.delete(:total_entries)
         end

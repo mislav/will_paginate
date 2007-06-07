@@ -91,6 +91,12 @@ class PaginationTest < ActiveRecordTestCase
     assert_equal expected, entries.to_a
   end
 
+  def test_paginate_with_group
+    entries = Developer.paginate :per_page => 10, :group => 'salary'
+    expected = [ developers(:david), developers(:jamis), developers(:dev_10), developers(:poor_jamis) ].sort_by(&:salary)
+    assert_equal expected, entries.to_a.sort_by(&:salary)
+  end
+
 protected
 
   def assert_respond_to_all object, methods
