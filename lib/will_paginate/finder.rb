@@ -17,8 +17,20 @@ module WillPaginate
         unless method.to_s.index('paginate') == 0
           return method_missing_without_paginate(method, *args, &block) 
         end
+
         options = args.last.is_a?(Hash) ? args.pop.symbolize_keys : {}
-        
+
+        finder = method.to_s.sub /^paginate/, 'find'
+        # :all is implicit
+        if finder == 'find'
+          args.unshift(:all) if args.length < 2
+        elsif finder.index('find_all') != 0
+          finder.sub! /^find/, 'find_all'
+        end
+
+        # thanks to active record for making us duplicate this code
+        options[:conditions] ||= wp_extract_finder_conditions(finder, args)
+
         # :total_entries and :count are mutually exclusive
         total_entries = unless options[:total_entries]
           count_options = options.slice :conditions, :joins, :include, :group, :distinct
@@ -32,14 +44,6 @@ module WillPaginate
           options.delete(:total_entries)
         end
 
-        finder = method.to_s.sub /^paginate/, 'find'
-        # :all is implicit
-        if finder == 'find'
-          args.unshift(:all) if args.length < 2
-        elsif finder.index('find_all') != 0
-          finder.sub! /^find/, 'find_all'
-        end
-
         returning WillPaginate::Collection.new(
             (options.delete(:page) || 1),
             (options.delete(:per_page) || per_page),
@@ -50,7 +54,15 @@ module WillPaginate
         end
       end
 
-      def respond_to? method
+      def wp_extract_finder_conditions(finder, arguments)
+        return unless match = /^find_(all_by|by)_([_a-zA-Z]\w*)$/.match(finder.to_s)
+
+        attribute_names = extract_attribute_names_from_match(match)
+        raise StandardError, "I can't make sense of #{finder}" unless all_attributes_exists?(attribute_names)
+        construct_attributes_from_arguments(attribute_names, arguments)
+      end
+
+      def respond_to?(method)
         case method.to_sym
         when :paginate, :paginate_by_sql
           true

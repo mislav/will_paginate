@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/helper'
 require File.dirname(__FILE__) + '/../init'
 
-class PaginationTest < ActiveRecordTestCase
+class FinderTest < ActiveRecordTestCase
   fixtures :topics, :replies, :developers, :projects, :developers_projects
 
   def test_new_methods_presence
@@ -95,6 +95,18 @@ class PaginationTest < ActiveRecordTestCase
     entries = Developer.paginate :per_page => 10, :group => 'salary'
     expected = [ developers(:david), developers(:jamis), developers(:dev_10), developers(:poor_jamis) ].sort_by(&:salary)
     assert_equal expected, entries.to_a.sort_by(&:salary)
+  end
+
+  def test_paginate_with_dynamic_finder
+    entries = Developer.paginate :conditions => { :salary => 100000 }, :per_page => 5
+    assert_equal 8, entries.total_entries
+
+    entries = Developer.paginate_by_salary 100000, :per_page => 5
+    assert_equal 8, entries.total_entries
+
+    assert_raises StandardError do
+      Developer.paginate_by_gallery 100000, :per_page => 5
+    end
   end
 
 protected
