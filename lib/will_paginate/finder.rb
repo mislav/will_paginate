@@ -90,12 +90,12 @@ module WillPaginate
         end
       end
 
-      def respond_to?(method)
+      def respond_to?(method, include_priv = false)
         case method.to_sym
         when :paginate, :paginate_by_sql
           true
         else
-          super method.to_s.sub(/^paginate/, 'find')
+          super(method.to_s.sub(/^paginate/, 'find'), include_priv)
         end
       end
 

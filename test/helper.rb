@@ -6,6 +6,9 @@ unless defined?(ActiveRecord)
   require 'action_controller/test_process'
 end
 
+# gem install redgreen for colored test output
+begin require 'redgreen'; rescue LoadError; end
+
 # Test case for inheritance
 class ActiveRecordTestCase < Test::Unit::TestCase
   # Set our fixture path
