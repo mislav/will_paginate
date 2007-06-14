@@ -26,18 +26,12 @@ class FinderTest < ActiveRecordTestCase
     assert_nil entries.next_page
     assert_equal 1, entries.page_count
     assert_equal 3, entries.size
-
+    
     entries = Topic.paginate :page => 2
     assert_equal 2, entries.current_page
     assert_equal 1, entries.previous_page
     assert_equal 1, entries.page_count
     assert entries.empty?
-
-    entries = Reply.paginate_all_by_topic_id(1)
-    expected = [replies(:witty_retort), replies(:spam)]
-    assert_equal expected, entries.to_a
-    entries = Reply.paginate_by_topic_id(1)
-    assert_equal expected, entries.to_a
   end
   
   def test_paginate_with_per_page
@@ -98,14 +92,37 @@ class FinderTest < ActiveRecordTestCase
   end
 
   def test_paginate_with_dynamic_finder
+    expected = [replies(:witty_retort), replies(:spam)]
+    assert_equal expected, Reply.paginate_all_by_topic_id(1)
+    assert_equal expected, Reply.paginate_by_topic_id(1)
+
     entries = Developer.paginate :conditions => { :salary => 100000 }, :per_page => 5
     assert_equal 8, entries.total_entries
-
-    entries = Developer.paginate_by_salary 100000, :per_page => 5
-    assert_equal 8, entries.total_entries
+    assert_equal entries, Developer.paginate_by_salary(100000, :per_page => 5)
 
     assert_raises StandardError do
-      Developer.paginate_by_gallery 100000, :per_page => 5
+      Developer.paginate_by_inexistent_attribute 100000
+    end
+  end
+
+  def test_edge_case_api_madness
+    # explicit :all should not break anything
+    assert_equal Topic.paginate, Topic.paginate(:all)
+
+    # this is a little weird test for issue #37
+    # the Topic model find and count methods accept an extra option, :foo
+    # this checks if that extra option was intact by our paginating finder
+    entries = Topic.paginate(:foo => 'bar')
+    assert_equal 'bar', entries.first
+    assert_equal 100, entries.total_entries
+
+    # Are we on edge? Find out by testing find_all which was removed in [6998]
+    unless Developer.respond_to? :find_all
+      # AR finders also accept arrays of IDs
+      # (this was broken in Rails before [6912])
+      entries = Developer.paginate((1..8).to_a, :per_page => 3, :page => 2)
+      assert_equal (4..6).to_a, entries.map(&:id)
+      assert_equal 8, entries.total_entries
     end
   end
 

@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+irb = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb'
+libs = []
+dirname = File.dirname(__FILE__)
+
+libs << 'irb/completion'
+libs << File.join(dirname, 'lib', 'load_fixtures')
+libs << File.join(dirname, '..', 'init')
+
+exec "#{irb} #{libs.map{|l| " -r #{l}" }.join} --simple-prompt"

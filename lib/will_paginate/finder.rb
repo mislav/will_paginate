@@ -2,6 +2,8 @@ module WillPaginate
   # A mixin for ActiveRecord::Base. Provides `per_page` class method
   # and makes `paginate` finders possible with some method_missing magic.
   #
+  # Find out more in WillPaginate::Finder::ClassMethods
+  #
   module Finder
     def self.included(base)
       base.extend ClassMethods
@@ -11,6 +13,37 @@ module WillPaginate
       end
     end
 
+    # = Paginating finders for ActiveRecord models
+    # 
+    # WillPaginate doesn't really add extra methods to your ActiveRecord models (except +per_page+
+    # unless it's already available). It simply intercepts
+    # the calls to paginating finders such as +paginate+, +paginate_by_user_id+ (and so on) and
+    # translates them to ordinary finders: +find+, +find_by_user_id+, etc. It does so with some
+    # method_missing magic, but you don't need to care for that. You simply use paginating finders
+    # same way you used ordinary ones. You only need to tell them what page you want in options.
+    #
+    #   @topics = Topic.paginate :all, :page => params[:page]
+    # 
+    # In paginating finders, "all" is implicit. No sense in paginating a single record, right? So:
+    # 
+    #   Post.paginate                  => Post.find :all
+    #   Post.paginate_all_by_something => Post.find_all_by_something
+    #   Post.paginate_by_something     => Post.find_all_by_something
+    #
+    # So the above example can really be written simply as:
+    #
+    #   @topics = Topic.paginate :page => params[:page]
+    #
+    # *Don't forget to pass the +:page+ parameter!* Without it, you're forever stuck on page 1. :)
+    #
+    # == Options
+    # Options for paginating finders are:
+    # 
+    #   page           (default 1)
+    #   per_page       (default is read from the model, which is 30 if not overriden)
+    #   total entries  not needed unless you want to count the records yourself somehow
+    #   count          hash of options that are used only for the call to count
+    # 
     module ClassMethods
       def method_missing_with_paginate(method, *args, &block)
         # did somebody tried to paginate? if not, let them be
@@ -18,48 +51,43 @@ module WillPaginate
           return method_missing_without_paginate(method, *args, &block) 
         end
 
-        options = args.last.is_a?(Hash) ? args.pop.symbolize_keys : {}
+        options = args.last.is_a?(Hash) ? args.pop.symbolize_keys! : {}
+        page = options.delete(:page) || 1
+        per_page = options.delete(:per_page) || self.per_page
 
         finder = method.to_s.sub /^paginate/, 'find'
         # :all is implicit
         if finder == 'find'
-          args.unshift(:all) if args.length < 2
+          args.unshift(:all) if args.empty?
         elsif finder.index('find_all') != 0
           finder.sub! /^find/, 'find_all'
         end
 
-        # thanks to active record for making us duplicate this code
-        options[:conditions] ||= wp_extract_finder_conditions(finder, args)
-
-        # :total_entries and :count are mutually exclusive
+        # :total_entries and :count are mutually exclusive!
         total_entries = unless options[:total_entries]
-          count_options = options.slice :conditions, :joins, :include, :group, :distinct
-          # merge the hash found in :count
-          # this allows you to specify :select, :order, or anything else just for the count query
-          count_options.update(options.delete(:count)) if options[:count]
-          count = count(count_options)
+          unless args.first.is_a? Array
+            # count expects (almost) the same options as find
+            count_options = options.reject { |key, value| key == :count }
+            # merge the hash found in :count
+            # this allows you to specify :select, :order, or anything else just for the count query
+            count_options.update(options.delete(:count)) if options[:count]
+            # thanks to active record for making us duplicate this code
+            count_options[:conditions] ||= wp_extract_finder_conditions(finder, args)
 
-          count.respond_to?(:length) ? count.length : count
+            count = count(count_options)
+            count.respond_to?(:length) ? count.length : count
+          else
+            # array of IDs was passed, so its size is the total number
+            args.first.size
+          end
         else
           options.delete(:total_entries)
         end
 
-        returning WillPaginate::Collection.new(
-            (options.delete(:page) || 1),
-            (options.delete(:per_page) || per_page),
-            total_entries
-        ) do |pager|
-          args << options.merge(:offset => pager.offset, :limit => pager.per_page)
+        returning WillPaginate::Collection.new(page, per_page, total_entries) do |pager|
+          args << options.update(:offset => pager.offset, :limit => pager.per_page)
           pager.replace(send(finder, *args))
         end
-      end
-
-      def wp_extract_finder_conditions(finder, arguments)
-        return unless match = /^find_(all_by|by)_([_a-zA-Z]\w*)$/.match(finder.to_s)
-
-        attribute_names = extract_attribute_names_from_match(match)
-        raise StandardError, "I can't make sense of #{finder}" unless all_attributes_exists?(attribute_names)
-        construct_attributes_from_arguments(attribute_names, arguments)
       end
 
       def respond_to?(method)
@@ -70,14 +98,16 @@ module WillPaginate
           super method.to_s.sub(/^paginate/, 'find')
         end
       end
+
+    private
+
+      def wp_extract_finder_conditions(finder, arguments)
+        return unless match = /^find_(all_by|by)_([_a-zA-Z]\w*)$/.match(finder.to_s)
+
+        attribute_names = extract_attribute_names_from_match(match)
+        raise StandardError, "I can't make sense of #{finder}" unless all_attributes_exists?(attribute_names)
+        construct_attributes_from_arguments(attribute_names, arguments)
+      end
     end
   end
-
-  # TODO: Controllers need love, too!
-  # 
-  # module ControllerHelpers
-  #   def totally_awesome_helper
-  #     patience
-  #   end
-  # end
 end

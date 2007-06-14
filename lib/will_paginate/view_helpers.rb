@@ -5,6 +5,17 @@ module WillPaginate
 
     # Renders Digg-style pagination. (We know you wanna!)
     # Returns nil if there is only one page in total (can't paginate that).
+    # 
+    # Options for will_paginate view helper:
+    # 
+    #   class:        CSS class name for the generated DIV (default "pagination")
+    #   prev_label:   default '&laquo; Previous',
+    #   next_label:   default 'Next &raquo;',
+    #   inner_window: how many links are shown around the current page, defaults to 4
+    #   outer_window: how many links are around the first and the last page, defaults to 1
+    #
+    # All extra options are passed to the generated container DIV, so eventually
+    # they become its HTML attributes.
     #
     def will_paginate entries = @entries, options = {}
       total_pages = entries.page_count
