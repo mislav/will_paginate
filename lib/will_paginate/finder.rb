@@ -30,11 +30,11 @@ module WillPaginate
     #   Post.paginate_all_by_something => Post.find_all_by_something
     #   Post.paginate_by_something     => Post.find_all_by_something
     #
-    # So the above example can really be written simply as:
+    # Knowing that, the above example can be written simply as:
     #
     #   @topics = Topic.paginate :page => params[:page]
     #
-    # *Don't forget to pass the +:page+ parameter!* Without it, you're forever stuck on page 1. :)
+    # Don't forget to pass the +page+ parameter! Without it, you're forever stuck on page 1. :)
     #
     # == Options
     # Options for paginating finders are:
