@@ -105,6 +105,15 @@ class FinderTest < ActiveRecordTestCase
     end
   end
 
+  def test_paginate_by_sql
+    assert_respond_to Developer, :paginate_by_sql
+    entries = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
+      :page => 2, :per_page => 3, :total_entries => 9
+
+    assert_equal (5..7).to_a, entries.map(&:id)
+    assert_equal 9, entries.total_entries
+  end
+
   def test_edge_case_api_madness
     # explicit :all should not break anything
     assert_equal Topic.paginate, Topic.paginate(:all)

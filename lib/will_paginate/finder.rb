@@ -86,7 +86,29 @@ module WillPaginate
 
         returning WillPaginate::Collection.new(page, per_page, total_entries) do |pager|
           args << options.update(:offset => pager.offset, :limit => pager.per_page)
-          pager.replace(send(finder, *args))
+          pager.replace send(finder, *args)
+        end
+      end
+
+      # This methods wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
+      # based on the params otherwise used by paginating finds: +page+, +per_page+ and +total_entries+.
+      # The last one is required because paginate_by_sql will not try to count by itself.
+      #
+      # Example:
+      # 
+      #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
+      #                           :page => params[:page], :per_page => 3, :total_entries => 9
+      # 
+      def paginate_by_sql sql, options
+        # TODO: stay DRY with option handling
+        options.symbolize_keys!
+        page = options[:page] || 1
+        per_page = options[:per_page] || self.per_page
+
+        returning WillPaginate::Collection.new(page, per_page, options[:total_entries]) do |pager|
+          options.update(:offset => pager.offset, :limit => pager.per_page)
+          add_limit! (sql.is_a?(Array) ? sql.first : sql), options
+          pager.replace find_by_sql(sql)
         end
       end
 
