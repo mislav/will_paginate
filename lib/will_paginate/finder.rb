@@ -67,7 +67,7 @@ module WillPaginate
         total_entries = unless options[:total_entries]
           unless args.first.is_a? Array
             # count expects (almost) the same options as find
-            count_options = options.reject { |key, value| key == :count }
+            count_options = options.reject { |key, value| key == :count or key == :order }
             # merge the hash found in :count
             # this allows you to specify :select, :order, or anything else just for the count query
             count_options.update(options.delete(:count)) if options[:count]
