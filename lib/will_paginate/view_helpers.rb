@@ -1,7 +1,24 @@
 module WillPaginate
+  # = Global options for pagination helpers
+  #
+  # Options for pagination helpers are optional and get their default values from the
+  # WillPaginate::ViewHelpers.pagination_options hash. You can write to this hash to
+  # override default options on the global level:
+  #
+  #   WillPaginate::ViewHelpers.pagination_options[:prev_label] = 'Previous page'
+  #
+  # By putting this into your environment.rb you can easily localize link texts to previous
+  # and next pages, as well as override some other defaults to your liking.
   module ViewHelpers
-    # single space is friendly to spiders and non-graphic browsers
-    PAGE_SEPARATOR = ' '
+    # default options that can be overriden on the global level
+    @@pagination_options = { :class => 'pagination',
+          :prev_label   => '&laquo; Previous',
+          :next_label   => 'Next &raquo;',
+          :inner_window => 4, # links around the current page
+          :outer_window => 1, # links around beginning and end
+          :separator    => ' ' # single space is friendly to spiders and non-graphic browsers
+          }
+    mattr_reader :pagination_options
 
     # Renders Digg-style pagination. (We know you wanna!)
     # Returns nil if there is only one page in total (can't paginate that).
@@ -13,6 +30,7 @@ module WillPaginate
     #   next_label:   default 'Next &raquo;',
     #   inner_window: how many links are shown around the current page, defaults to 4
     #   outer_window: how many links are around the first and the last page, defaults to 1
+    #   separator:    string separator for page HTML elements, default " " (single space)
     #
     # All extra options are passed to the generated container DIV, so eventually
     # they become its HTML attributes.
@@ -22,12 +40,7 @@ module WillPaginate
 
       if total_pages > 1
         page = entries.current_page
-        options = options.symbolize_keys.reverse_merge :class => 'pagination',
-          :prev_label   => '&laquo; Previous',
-          :next_label   => 'Next &raquo;',
-          :inner_window => 4, # links around the current page
-          :outer_window => 1 # links around beginning and end
-        
+        options = options.symbolize_keys.reverse_merge(pagination_options)
         inner_window, outer_window = options.delete(:inner_window).to_i, options.delete(:outer_window).to_i
         min = page - inner_window
         max = page + inner_window
@@ -57,7 +70,7 @@ module WillPaginate
         links.unshift page_link_or_span(entries.previous_page, 'disabled', options.delete(:prev_label))
         links.push    page_link_or_span(entries.next_page,     'disabled', options.delete(:next_label))
         
-        content_tag :div, links.join(options.delete(:separator) || PAGE_SEPARATOR), options
+        content_tag :div, links.join(options.delete(:separator)), options
       end
     end
     

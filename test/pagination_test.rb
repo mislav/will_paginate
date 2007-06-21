@@ -5,7 +5,6 @@ class PaginationTest < ActiveRecordTestCase
   fixtures :developers
   
   class PaginationController < ActionController::Base
-    
     def list_developers
       @developers = Developer.paginate :page => params[:page], :per_page => (params[:per_page] || 4).to_i
 
@@ -18,12 +17,10 @@ class PaginationTest < ActiveRecordTestCase
 
     def no_pagination
       @developers = Developer.paginate :page => params[:page], :per_page => 15
-
       render :inline => '<%= will_paginate @developers %>'
     end
 
   protected
-
     def rescue_errors(e) raise e end
     def rescue_action(e) raise e end
   end
@@ -107,5 +104,4 @@ protected
       $1 ? $1.to_i : $1
     })
   end
-
 end
