@@ -34,12 +34,12 @@ module WillPaginate
     #
     #   @topics = Topic.paginate :page => params[:page]
     #
-    # Don't forget to pass the +page+ parameter! Without it, you're forever stuck on page 1. :)
+    # Don't forget to pass the +page+ parameter! Without it, paginating finders will raise an error.
     #
     # == Options
     # Options for paginating finders are:
     # 
-    #   page           (default 1)
+    #   page           REQUIRED, but defaults to 1 if false or nil
     #   per_page       (default is read from the model, which is 30 if not overriden)
     #   total entries  not needed unless you want to count the records yourself somehow
     #   count          hash of options that are used only for the call to count
