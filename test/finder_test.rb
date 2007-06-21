@@ -20,7 +20,7 @@ class FinderTest < ActiveRecordTestCase
   end
   
   def test_simple_paginate
-    entries = Topic.paginate
+    entries = Topic.paginate :page => nil
     assert_equal 1, entries.current_page
     assert_nil entries.previous_page
     assert_nil entries.next_page
@@ -32,76 +32,81 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 1, entries.previous_page
     assert_equal 1, entries.page_count
     assert entries.empty?
+
+    # :page parameter in options is required!
+    assert_raise(ArgumentError){ Topic.paginate }
+    assert_raise(ArgumentError){ Topic.paginate({}) }
   end
   
   def test_paginate_with_per_page
-    entries = Topic.paginate :per_page => 1
+    entries = Topic.paginate :page => 1, :per_page => 1
     assert_equal 1, entries.size
     assert_equal 3, entries.page_count
 
     # Developer class has explicit per_page at 10
-    entries = Developer.paginate
+    entries = Developer.paginate :page => 1
     assert_equal 10, entries.size
     assert_equal 2, entries.page_count
 
-    entries = Developer.paginate :per_page => 5
+    entries = Developer.paginate :page => 1, :per_page => 5
     assert_equal 11, entries.total_entries
     assert_equal 5, entries.size
     assert_equal 3, entries.page_count
   end
   
   def test_paginate_with_order
-    entries = Topic.paginate :order => 'created_at asc'
+    entries = Topic.paginate :page => 1, :order => 'created_at asc'
     expected = [topics(:futurama), topics(:harvey_birdman), topics(:rails)]
     assert_equal expected, entries.to_a
     assert_equal 1, entries.page_count
   end
   
   def test_paginate_with_conditions
-    entries = Topic.paginate :conditions => ["created_at > ?", 30.minutes.ago]
+    entries = Topic.paginate :page => 1, :conditions => ["created_at > ?", 30.minutes.ago]
     expected = [topics(:rails)]
     assert_equal expected, entries.to_a
     assert_equal 1, entries.page_count
   end
   
   def test_paginate_with_joins
-    entries = Developer.paginate :joins => 'LEFT JOIN developers_projects ON developers.id = developers_projects.developer_id',
-                                  :conditions => 'project_id=1'        
+    entries = Developer.paginate :page => 1,
+                        :joins => 'LEFT JOIN developers_projects ON developers.id = developers_projects.developer_id',
+                        :conditions => 'project_id=1'        
     assert_equal 2, entries.size
     developer_names = entries.map { |d| d.name }
     assert developer_names.include?('David')
     assert developer_names.include?('Jamis')
 
     expected = entries.to_a
-    entries = Developer.paginate :joins => 'd LEFT JOIN developers_projects ON d.id = developers_projects.developer_id',
-                                  :conditions => 'project_id=1',
-                                  :count => { :select => "d.id" }
+    entries = Developer.paginate :page => 1,
+                        :joins => 'd LEFT JOIN developers_projects ON d.id = developers_projects.developer_id',
+                        :conditions => 'project_id=1', :count => { :select => "d.id" }
     assert_equal expected, entries.to_a
   end
   
   def test_paginate_with_include_and_order
-    entries = Topic.paginate   :include => :replies,  :order => 'replies.created_at asc, topics.created_at asc', :per_page => 10
+    entries = Topic.paginate :page => 1, :include => :replies,  :order => 'replies.created_at asc, topics.created_at asc', :per_page => 10
     expected = Topic.find :all, :include => 'replies', :order => 'replies.created_at asc, topics.created_at asc', :limit => 10
     assert_equal expected, entries.to_a
   end
 
   def test_paginate_with_group
-    entries = Developer.paginate :per_page => 10, :group => 'salary'
+    entries = Developer.paginate :page => 1, :per_page => 10, :group => 'salary'
     expected = [ developers(:david), developers(:jamis), developers(:dev_10), developers(:poor_jamis) ].sort_by(&:salary)
     assert_equal expected, entries.to_a.sort_by(&:salary)
   end
 
   def test_paginate_with_dynamic_finder
     expected = [replies(:witty_retort), replies(:spam)]
-    assert_equal expected, Reply.paginate_all_by_topic_id(1)
-    assert_equal expected, Reply.paginate_by_topic_id(1)
+    assert_equal expected, Reply.paginate_all_by_topic_id(1, :page => 1)
+    assert_equal expected, Reply.paginate_by_topic_id(1, :page => 1)
 
-    entries = Developer.paginate :conditions => { :salary => 100000 }, :per_page => 5
+    entries = Developer.paginate :conditions => { :salary => 100000 }, :page => 1, :per_page => 5
     assert_equal 8, entries.total_entries
-    assert_equal entries, Developer.paginate_by_salary(100000, :per_page => 5)
+    assert_equal entries, Developer.paginate_by_salary(100000, :page => 1, :per_page => 5)
 
     assert_raises StandardError do
-      Developer.paginate_by_inexistent_attribute 100000
+      Developer.paginate_by_inexistent_attribute 100000, :page => 1
     end
   end
 
@@ -116,12 +121,12 @@ class FinderTest < ActiveRecordTestCase
 
   def test_edge_case_api_madness
     # explicit :all should not break anything
-    assert_equal Topic.paginate, Topic.paginate(:all)
+    assert_equal Topic.paginate(:page => nil), Topic.paginate(:all, :page => 1)
 
     # this is a little weird test for issue #37
     # the Topic model find and count methods accept an extra option, :foo
     # this checks if that extra option was intact by our paginating finder
-    entries = Topic.paginate(:foo => 'bar')
+    entries = Topic.paginate(:foo => 'bar', :page => 1)
     assert_equal 'bar', entries.first
     assert_equal 100, entries.total_entries
 
