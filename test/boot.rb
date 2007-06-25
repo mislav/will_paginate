@@ -23,4 +23,4 @@ end
 
 %w(action_pack active_record action_controller active_record/fixtures).each {|f| require f}
 
-Dependencies.load_paths.unshift "#{plugin_root}/lib"
+$:.unshift "#{plugin_root}/lib"
