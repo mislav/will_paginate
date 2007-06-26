@@ -14,6 +14,7 @@ CREATE TABLE 'replies' (
 
 CREATE TABLE 'topics' (
   'id' INTEGER PRIMARY KEY NOT NULL, 
+  'project_id' INTEGER DEFAULT NULL,
   'title' varchar(255), 
   'subtitle' varchar(255), 
   'content' text, 

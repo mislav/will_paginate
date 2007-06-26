@@ -9,7 +9,7 @@ module WillPaginate
       base.extend ClassMethods
       class << base
         alias_method_chain :method_missing, :paginate
-        define_method(:per_page) { 30 } unless respond_to? :per_page
+        define_method(:per_page) { 30 } unless respond_to?(:per_page)
       end
     end
 
@@ -45,6 +45,36 @@ module WillPaginate
     #   count          hash of options that are used only for the call to count
     # 
     module ClassMethods
+      # This methods wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
+      # based on the params otherwise used by paginating finds: +page+, +per_page+ and +total_entries+.
+      # The last one is required because paginate_by_sql will not try to count by itself.
+      #
+      # Example:
+      # 
+      #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
+      #                           :page => params[:page], :per_page => 3, :total_entries => 9
+      # 
+      def paginate_by_sql sql, options
+        options, page, per_page = wp_parse_options options
+
+        returning WillPaginate::Collection.new(page, per_page, options[:total_entries]) do |pager|
+          options.update(:offset => pager.offset, :limit => pager.per_page)
+          add_limit! (sql.is_a?(Array) ? sql.first : sql), options
+          pager.replace find_by_sql(sql)
+        end
+      end
+
+      def respond_to?(method, include_priv = false)
+        case method.to_sym
+        when :paginate, :paginate_by_sql
+          true
+        else
+          super(method.to_s.sub(/^paginate/, 'find'), include_priv)
+        end
+      end
+
+    protected
+      
       def method_missing_with_paginate(method, *args, &block)
         # did somebody tried to paginate? if not, let them be
         unless method.to_s.index('paginate') == 0
@@ -88,36 +118,6 @@ module WillPaginate
         end
       end
 
-      # This methods wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
-      # based on the params otherwise used by paginating finds: +page+, +per_page+ and +total_entries+.
-      # The last one is required because paginate_by_sql will not try to count by itself.
-      #
-      # Example:
-      # 
-      #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
-      #                           :page => params[:page], :per_page => 3, :total_entries => 9
-      # 
-      def paginate_by_sql sql, options
-        options, page, per_page = wp_parse_options options
-
-        returning WillPaginate::Collection.new(page, per_page, options[:total_entries]) do |pager|
-          options.update(:offset => pager.offset, :limit => pager.per_page)
-          add_limit! (sql.is_a?(Array) ? sql.first : sql), options
-          pager.replace find_by_sql(sql)
-        end
-      end
-
-      def respond_to?(method, include_priv = false)
-        case method.to_sym
-        when :paginate, :paginate_by_sql
-          true
-        else
-          super(method.to_s.sub(/^paginate/, 'find'), include_priv)
-        end
-      end
-
-    protected
-      
       def wp_parse_options options
         raise ArgumentError, 'hash parameters expected' unless options.respond_to? :symbolize_keys!
         options.symbolize_keys!

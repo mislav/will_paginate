@@ -1,5 +1,6 @@
 class Topic < ActiveRecord::Base
   has_many :replies, :include => [:user], :dependent => :destroy
+  belongs_to :project
 
   # pretend find and count were extended and accept an extra option
   class << self

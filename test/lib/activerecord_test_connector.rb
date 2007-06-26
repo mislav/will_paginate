@@ -25,6 +25,8 @@ class ActiveRecordTestConnector
     def setup_connection
       if Object.const_defined?(:ActiveRecord)
         defaults = { :database => ':memory:' }
+        # ActiveRecord::Base.logger = Logger.new STDOUT
+        
         begin
           options = defaults.merge :adapter => 'sqlite3', :timeout => 500
           ActiveRecord::Base.establish_connection(options)
@@ -38,7 +40,9 @@ class ActiveRecordTestConnector
           ActiveRecord::Base.connection
         end
 
-        Object.send(:const_set, :QUOTED_TYPE, ActiveRecord::Base.connection.quote_column_name('type')) unless Object.const_defined?(:QUOTED_TYPE)
+        unless Object.const_defined?(:QUOTED_TYPE)
+          Object.send :const_set, :QUOTED_TYPE, ActiveRecord::Base.connection.quote_column_name('type')
+        end
       else
         raise "Can't setup connection since ActiveRecord isn't loaded."
       end
@@ -46,8 +50,10 @@ class ActiveRecordTestConnector
 
     # Load actionpack sqlite tables
     def load_schema
-      File.read(File.dirname(__FILE__) + "/../fixtures/schema.sql").split(';').each do |sql|
-        ActiveRecord::Base.connection.execute(sql) unless sql.blank?
+      ActiveRecord::Base.silence do
+        File.read(File.dirname(__FILE__) + "/../fixtures/schema.sql").split(';').each do |sql|
+          ActiveRecord::Base.connection.execute(sql) unless sql.blank?
+        end
       end
     end
 

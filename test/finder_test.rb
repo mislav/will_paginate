@@ -25,7 +25,7 @@ class FinderTest < ActiveRecordTestCase
     assert_nil entries.previous_page
     assert_nil entries.next_page
     assert_equal 1, entries.page_count
-    assert_equal 3, entries.size
+    assert_equal 4, entries.size
     
     entries = Topic.paginate :page => 2
     assert_equal 2, entries.current_page
@@ -41,7 +41,7 @@ class FinderTest < ActiveRecordTestCase
   def test_paginate_with_per_page
     entries = Topic.paginate :page => 1, :per_page => 1
     assert_equal 1, entries.size
-    assert_equal 3, entries.page_count
+    assert_equal 4, entries.page_count
 
     # Developer class has explicit per_page at 10
     entries = Developer.paginate :page => 1
@@ -55,17 +55,29 @@ class FinderTest < ActiveRecordTestCase
   end
   
   def test_paginate_with_order
-    entries = Topic.paginate :page => 1, :order => 'created_at asc'
-    expected = [topics(:futurama), topics(:harvey_birdman), topics(:rails)]
+    entries = Topic.paginate :page => 1, :order => 'created_at desc'
+    expected = [topics(:futurama), topics(:harvey_birdman), topics(:rails), topics(:ar)].reverse
     assert_equal expected, entries.to_a
     assert_equal 1, entries.page_count
   end
   
   def test_paginate_with_conditions
     entries = Topic.paginate :page => 1, :conditions => ["created_at > ?", 30.minutes.ago]
-    expected = [topics(:rails)]
+    expected = [topics(:rails), topics(:ar)]
     assert_equal expected, entries.to_a
     assert_equal 1, entries.page_count
+  end
+
+  def test_paginate_through_associations
+    dhh = users :david
+    expected = [projects(:active_record), projects(:action_controller)]
+    entries = dhh.projects.paginate(:page => 1, :order => 'projects.id')
+    assert_equal expected, entries
+    assert_equal 2, entries.total_entries
+
+    assert_nothing_raised { dhh.projects.find(:all, :order => 'topics.id', :limit => 4) }
+    entries = dhh.projects.paginate(:page => 1, :order => 'topics.id', :per_page => 4)
+    assert_equal expected.reverse, entries
   end
   
   def test_paginate_with_joins
