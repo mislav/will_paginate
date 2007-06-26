@@ -1,13 +1,14 @@
 require 'test/unit'
-
-unless defined?(ActiveRecord)
-  require File.join(File.dirname(__FILE__), 'boot')
-  require File.join(File.dirname(__FILE__), 'lib', 'activerecord_test_connector')
-  require 'action_controller/test_process'
-end
-
 # gem install redgreen for colored test output
 begin require 'redgreen'; rescue LoadError; end
+
+dirname = File.dirname(__FILE__)
+require File.join(dirname, 'boot') unless defined?(ActiveRecord)
+require 'action_controller/test_process'
+require File.join(dirname, 'lib', 'activerecord_test_connector')
+
+# add plugin's main lib dir to load paths
+$:.unshift(File.join(dirname, '..', 'lib')).uniq!
 
 # Test case for inheritance
 class ActiveRecordTestCase < Test::Unit::TestCase

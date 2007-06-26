@@ -7,7 +7,6 @@ task :default => :test
 
 desc 'Test the will_paginate plugin.'
 Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
   t.pattern = 'test/**/*_test.rb'
   t.verbose = true
 end
