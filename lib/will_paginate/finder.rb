@@ -112,7 +112,7 @@ module WillPaginate
           options.delete(:total_entries)
         end
 
-        returning WillPaginate::Collection.new(page, per_page, total_entries) do |pager|
+        ::Object.returning WillPaginate::Collection.new(page, per_page, total_entries) do |pager|
           args << options.update(:offset => pager.offset, :limit => pager.per_page)
           pager.replace send(finder, *args)
         end
