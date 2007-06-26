@@ -58,7 +58,9 @@ class ActiveRecordTestConnector
     end
 
     def require_fixture_models
-      Dir.glob(File.dirname(__FILE__) + "/../fixtures/*.rb").each {|f| require f}
+      models = Dir.glob(File.dirname(__FILE__) + "/../fixtures/*.rb")
+      models = (models.grep(/user.rb/) + models).uniq
+      models.each {|f| require f}
     end
   end
 end
