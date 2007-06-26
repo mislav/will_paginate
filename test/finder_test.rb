@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/helper'
 require File.dirname(__FILE__) + '/../init'
 
 class FinderTest < ActiveRecordTestCase
-  fixtures :topics, :replies, :developers, :projects, :developers_projects
+  fixtures :topics, :replies, :users, :projects, :developers_projects
 
   def test_new_methods_presence
     assert_respond_to_all Topic, %w(per_page paginate paginate_by_sql)
@@ -70,8 +70,8 @@ class FinderTest < ActiveRecordTestCase
   
   def test_paginate_with_joins
     entries = Developer.paginate :page => 1,
-                        :joins => 'LEFT JOIN developers_projects ON developers.id = developers_projects.developer_id',
-                        :conditions => 'project_id=1'        
+                        :joins => 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id',
+                        :conditions => 'project_id = 1'        
     assert_equal 2, entries.size
     developer_names = entries.map { |d| d.name }
     assert developer_names.include?('David')
@@ -79,8 +79,8 @@ class FinderTest < ActiveRecordTestCase
 
     expected = entries.to_a
     entries = Developer.paginate :page => 1,
-                        :joins => 'd LEFT JOIN developers_projects ON d.id = developers_projects.developer_id',
-                        :conditions => 'project_id=1', :count => { :select => "d.id" }
+                        :joins => 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id',
+                        :conditions => 'project_id = 1', :count => { :select => "users.id" }
     assert_equal expected, entries.to_a
   end
   
@@ -92,7 +92,7 @@ class FinderTest < ActiveRecordTestCase
 
   def test_paginate_with_group
     entries = Developer.paginate :page => 1, :per_page => 10, :group => 'salary'
-    expected = [ developers(:david), developers(:jamis), developers(:dev_10), developers(:poor_jamis) ].sort_by(&:salary)
+    expected = [ users(:david), users(:jamis), users(:dev_10), users(:poor_jamis) ].sort_by(&:salary)
     assert_equal expected, entries.to_a.sort_by(&:salary)
   end
 
@@ -112,7 +112,7 @@ class FinderTest < ActiveRecordTestCase
 
   def test_paginate_by_sql
     assert_respond_to Developer, :paginate_by_sql
-    entries = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
+    entries = Developer.paginate_by_sql ['select * from users where salary > ?', 80000],
       :page => 2, :per_page => 3, :total_entries => 9
 
     assert_equal (5..7).to_a, entries.map(&:id)

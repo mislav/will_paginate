@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/helper'
 require File.dirname(__FILE__) + '/../init'
 
 class PaginationTest < ActiveRecordTestCase
-  fixtures :developers
+  fixtures :users
   
   class PaginationController < ActionController::Base
     def list_developers

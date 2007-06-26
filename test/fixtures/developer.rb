@@ -1,4 +1,4 @@
-class Developer < ActiveRecord::Base
+class Developer < User
   has_and_belongs_to_many :projects
 
   def self.per_page
@@ -6,7 +6,7 @@ class Developer < ActiveRecord::Base
   end
 end
 
-class DeVeLoPeR < ActiveRecord::Base
+class DeVeLoPeR < User
   set_table_name "developers"
 
   def self.per_page
