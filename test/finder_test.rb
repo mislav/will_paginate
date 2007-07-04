@@ -68,16 +68,27 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 1, entries.page_count
   end
 
-  def test_paginate_through_associations
+  def test_paginate_associations
     dhh = users :david
-    expected = [projects(:active_record), projects(:action_controller)]
-    entries = dhh.projects.paginate(:page => 1, :order => 'projects.id')
+    expected = [projects(:action_controller), projects(:active_record)]
+    entries = dhh.projects.paginate(:page => 1)
     assert_equal expected, entries
+    assert_equal 2, entries.total_entries
+
+    # with explicit order
+    entries = dhh.projects.paginate(:page => 1, :order => 'projects.id')
+    assert_equal expected.reverse, entries
     assert_equal 2, entries.total_entries
 
     assert_nothing_raised { dhh.projects.find(:all, :order => 'topics.id', :limit => 4) }
     entries = dhh.projects.paginate(:page => 1, :order => 'topics.id', :per_page => 4)
-    assert_equal expected.reverse, entries
+    assert_equal expected, entries
+
+    # has_many with implicit order
+    topic = Topic.find(1)
+    expected = [replies(:spam), replies(:witty_retort)]
+    assert_equal expected, topic.replies.paginate(:page => 1)
+    assert_equal expected.reverse, topic.replies.paginate(:page => 1, :order => 'replies.id ASC')
   end
   
   def test_paginate_with_joins

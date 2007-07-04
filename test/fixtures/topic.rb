@@ -1,5 +1,5 @@
 class Topic < ActiveRecord::Base
-  has_many :replies, :include => [:user], :dependent => :destroy
+  has_many :replies, :dependent => :destroy, :order => 'replies.created_at DESC'
   belongs_to :project
 
   # pretend find and count were extended and accept an extra option
