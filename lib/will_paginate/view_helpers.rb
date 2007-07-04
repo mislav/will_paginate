@@ -53,7 +53,8 @@ module WillPaginate
         current   = min..max
         beginning = 1..(1 + outer_window)
         tail      = (total_pages - outer_window)..total_pages
-        visible   = [current, beginning, tail].map(&:to_a).sum
+        visible   = [current, beginning, tail].map(&:to_a).flatten
+        visible  &= (1..total_pages).to_a
         
         # build the list of the links
         links = (1..total_pages).inject([]) do |list, n|
