@@ -70,7 +70,7 @@ class FinderTest < ActiveRecordTestCase
 
   def test_paginate_associations
     dhh = users :david
-    expected = [projects(:active_record), projects(:action_controller)]
+    expected = [projects(:action_controller), projects(:active_record)]
 
     # should this pull in the order from the association?  cuz it don't.
     entries = dhh.projects.paginate(:page => 1)
