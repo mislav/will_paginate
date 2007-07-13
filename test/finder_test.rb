@@ -166,6 +166,12 @@ class FinderTest < ActiveRecordTestCase
     end
   end
 
+  def test_count_doesnt_use_select_options
+    assert_nothing_raised do
+      Developer.paginate :select => 'users.*', :page => 1
+    end
+  end
+
 protected
 
   def assert_respond_to_all object, methods
