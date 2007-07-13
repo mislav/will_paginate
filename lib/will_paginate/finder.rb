@@ -54,7 +54,7 @@ module WillPaginate
       #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
       #                           :page => params[:page], :per_page => 3, :total_entries => 9
       # 
-      def paginate_by_sql sql, options
+      def paginate_by_sql(sql, options)
         options, page, per_page = wp_parse_options options
 
         returning WillPaginate::Collection.new(page, per_page, options[:total_entries]) do |pager|
@@ -95,12 +95,17 @@ module WillPaginate
         total_entries = unless options[:total_entries]
           unless args.first.is_a? Array
             # count expects (almost) the same options as find
-            count_options = options.except :count, :order
+            count_options = options.dup
+
             # merge the hash found in :count
             # this allows you to specify :select, :order, or anything else just for the count query
             count_options.update(options.delete(:count)) if options[:count]
+
+            count_options.except! :count, :order
+            
             # thanks to active record for making us duplicate this code
             count_options[:conditions] ||= wp_extract_finder_conditions(finder, args)
+            count_options.delete(:conditions) unless count_options[:conditions]
 
             count = count(count_options)
             count.respond_to?(:length) ? count.length : count
@@ -118,7 +123,7 @@ module WillPaginate
         end
       end
 
-      def wp_parse_options options
+      def wp_parse_options(options)
         raise ArgumentError, 'hash parameters expected' unless options.respond_to? :symbolize_keys!
         options.symbolize_keys!
         raise ArgumentError, ':page parameter required' unless options.key? :page

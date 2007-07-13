@@ -1,4 +1,6 @@
 require 'test/unit'
+require 'rubygems'
+
 # gem install redgreen for colored test output
 begin require 'redgreen'; rescue LoadError; end
 
@@ -31,23 +33,10 @@ class ActiveRecordTestCase < Test::Unit::TestCase
   end
 end
 
-unless Hash.instance_methods.include? 'slice'
-  Hash.class_eval do
-    # Returns a new hash with only the given keys.
-    def slice(*keys)
-      allowed = Set.new(respond_to?(:convert_key) ? keys.map { |key| convert_key(key) } : keys)
-      reject { |key,| !allowed.include?(key) }
-    end
-
-    # Replaces the hash with only the given keys.
-    def slice!(*keys)
-      replace(slice(*keys))
-    end
-  end
-end
-
 ActiveRecordTestConnector.setup
 ActionController::Routing::Routes.reload rescue nil
 ActionController::Routing::Routes.draw do |map|
   map.connect ':controller/:action/:id'
 end
+
+ActionController::Base.perform_caching = false

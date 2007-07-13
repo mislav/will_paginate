@@ -35,7 +35,7 @@ module WillPaginate
     # All extra options are passed to the generated container DIV, so eventually
     # they become its HTML attributes.
     #
-    def will_paginate entries = @entries, options = {}
+    def will_paginate(entries = @entries, options = {})
       total_pages = entries.page_count
 
       if total_pages > 1

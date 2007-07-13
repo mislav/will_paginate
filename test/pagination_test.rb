@@ -9,7 +9,7 @@ class PaginationTest < ActiveRecordTestCase
       @developers = Developer.paginate :page => params[:page], :per_page => (params[:per_page] || 4).to_i
 
       options = [:class, :prev_label, :next_label, :inner_window, :outer_window]
-      @options = params.slice(*options)
+      @options = params.except(:count, :order)
       options.each { |key| params.delete key }
 
       render :inline => '<%= will_paginate @developers, @options %>'

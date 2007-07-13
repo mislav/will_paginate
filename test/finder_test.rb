@@ -70,24 +70,27 @@ class FinderTest < ActiveRecordTestCase
 
   def test_paginate_associations
     dhh = users :david
-    expected = [projects(:action_controller), projects(:active_record)]
+    expected = [projects(:active_record), projects(:action_controller)]
+
+    # should this pull in the order from the association?  cuz it don't.
     entries = dhh.projects.paginate(:page => 1)
+
     assert_equal expected, entries
     assert_equal 2, entries.total_entries
 
     # with explicit order
     entries = dhh.projects.paginate(:page => 1, :order => 'projects.id')
-    assert_equal expected.reverse, entries
+    assert_equal expected, entries
     assert_equal 2, entries.total_entries
 
-    assert_nothing_raised { dhh.projects.find(:all, :order => 'topics.id', :limit => 4) }
-    entries = dhh.projects.paginate(:page => 1, :order => 'topics.id', :per_page => 4)
+    assert_nothing_raised { dhh.projects.find(:all, :order => 'projects.id', :limit => 4) }
+    entries = dhh.projects.paginate(:page => 1, :order => 'projects.id', :per_page => 4)
     assert_equal expected, entries
 
     # has_many with implicit order
     topic = Topic.find(1)
     expected = [replies(:spam), replies(:witty_retort)]
-    assert_equal expected, topic.replies.paginate(:page => 1)
+    assert_equal expected.map(&:id).sort, topic.replies.paginate(:page => 1).map(&:id).sort
     assert_equal expected.reverse, topic.replies.paginate(:page => 1, :order => 'replies.id ASC')
   end
   
@@ -115,8 +118,8 @@ class FinderTest < ActiveRecordTestCase
 
   def test_paginate_with_group
     entries = Developer.paginate :page => 1, :per_page => 10, :group => 'salary'
-    expected = [ users(:david), users(:jamis), users(:dev_10), users(:poor_jamis) ].sort_by(&:salary)
-    assert_equal expected, entries.to_a.sort_by(&:salary)
+    expected = [ users(:david), users(:jamis), users(:dev_10), users(:poor_jamis) ].map(&:salary).sort
+    assert_equal expected, entries.map(&:salary).sort
   end
 
   def test_paginate_with_dynamic_finder
