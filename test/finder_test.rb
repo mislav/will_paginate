@@ -111,8 +111,17 @@ class FinderTest < ActiveRecordTestCase
   end
   
   def test_paginate_with_include_and_order
-    entries = Topic.paginate :page => 1, :include => :replies,  :order => 'replies.created_at asc, topics.created_at asc', :per_page => 10
-    expected = Topic.find :all, :include => 'replies', :order => 'replies.created_at asc, topics.created_at asc', :limit => 10
+    entries = Topic.paginate \
+      :page     => 1, 
+      :include  => :replies,  
+      :order    => 'replies.created_at asc, topics.created_at asc', 
+      :per_page => 10
+
+    expected = Topic.find :all, 
+      :include => 'replies', 
+      :order   => 'replies.created_at asc, topics.created_at asc', 
+      :limit   => 10
+
     assert_equal expected, entries.to_a
   end
 
