@@ -55,12 +55,13 @@ module WillPaginate
       #                           :page => params[:page], :per_page => 3, :total_entries => 9
       # 
       def paginate_by_sql(sql, options)
-        options, page, per_page = wp_parse_options options
+        options, page, per_page = wp_parse_options!(options)
 
         returning WillPaginate::Collection.new(page, per_page, options[:total_entries]) do |pager|
-          options.update(:offset => pager.offset, :limit => pager.per_page)
-          add_limit! (sql.is_a?(Array) ? sql.first : sql), options
-          pager.replace find_by_sql(sql)
+          options.update :offset => pager.offset, :limit => pager.per_page
+          sanitized_query = sanitize_sql(sql)
+          add_limit! sanitized_query, options
+          pager.replace find_by_sql(sanitized_query)
         end
       end
 
@@ -81,7 +82,7 @@ module WillPaginate
           return method_missing_without_paginate(method, *args, &block) 
         end
 
-        options, page, per_page = wp_parse_options args.pop
+        options, page, per_page = wp_parse_options!(args.pop)
 
         finder = method.to_s.sub /^paginate/, 'find'
         # :all is implicit
@@ -123,7 +124,7 @@ module WillPaginate
         end
       end
 
-      def wp_parse_options(options)
+      def wp_parse_options!(options)
         raise ArgumentError, 'hash parameters expected' unless options.respond_to? :symbolize_keys!
         options.symbolize_keys!
         raise ArgumentError, ':page parameter required' unless options.key? :page
