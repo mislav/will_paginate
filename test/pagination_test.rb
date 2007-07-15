@@ -6,11 +6,11 @@ class PaginationTest < ActiveRecordTestCase
   
   class PaginationController < ActionController::Base
     def list_developers
-      @developers = Developer.paginate :page => params[:page], :per_page => (params[:per_page] || 4).to_i
+      @developers = Developer.paginate :page => params[params[:param_name] || :page],
+                                       :per_page => (params[:per_page] || 4).to_i
 
-      options = [:class, :prev_label, :next_label, :inner_window, :outer_window]
       @options = params.except(:count, :order)
-      options.each { |key| params.delete key }
+      WillPaginate::ViewHelpers.pagination_options.keys.each { |key| params.delete key }
 
       render :inline => '<%= will_paginate @developers, @options %>'
     end
@@ -67,6 +67,35 @@ class PaginationTest < ActiveRecordTestCase
       assert_select 'span.current', entries.current_page.to_s
     end
   end
+  
+  def test_will_paginate_preserves_parameters
+    get :list_developers, :foo => { :bar => 'baz' }
+    assert_response :success
+    
+    assert_select 'div.pagination', 1, 'no main DIV' do
+      assert_select 'a[href]', 3 do |elements|
+        elements.each do |el|
+          assert_match /foo%5Bbar%5D=baz/, el['href']
+        end
+      end
+    end
+  end
+  
+  def test_will_paginate_with_custom_page_param
+    get :list_developers, :developers_page => 2, :param_name => :developers_page
+    assert_response :success
+    
+    entries = assigns :developers
+    assert entries
+    assert_equal 4, entries.size
+
+    assert_select 'div.pagination', 1, 'no main DIV' do
+      assert_select 'a[href]', 4 do |elements|
+        validate_page_numbers [nil,nil,3,3], elements, :developers_page
+      end
+      assert_select 'span.current', entries.current_page.to_s
+    end    
+  end
 
   def test_will_paginate_windows
     get :list_developers, :page => 6, :per_page => 1, :inner_window => 2
@@ -95,12 +124,12 @@ class PaginationTest < ActiveRecordTestCase
     assert_select 'div', false
     assert_equal '', @response.body
   end
-
+  
 protected
 
-  def validate_page_numbers expected, links
+  def validate_page_numbers expected, links, param_name = :page
     assert_equal(expected, links.map { |e|
-      e['href'] =~ /\Wpage=([^&]*)/
+      e['href'] =~ /\W#{param_name}=([^&]*)/
       $1 ? $1.to_i : $1
     })
   end

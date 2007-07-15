@@ -16,7 +16,8 @@ module WillPaginate
           :next_label   => 'Next &raquo;',
           :inner_window => 4, # links around the current page
           :outer_window => 1, # links around beginning and end
-          :separator    => ' ' # single space is friendly to spiders and non-graphic browsers
+          :separator    => ' ', # single space is friendly to spiders and non-graphic browsers
+          :param_name   => :page
           }
     mattr_reader :pagination_options
 
@@ -31,6 +32,7 @@ module WillPaginate
     #   inner_window: how many links are shown around the current page, defaults to 4
     #   outer_window: how many links are around the first and the last page, defaults to 1
     #   separator:    string separator for page HTML elements, default " " (single space)
+    #   param_name:   parameter name for page number in URLs, defaults to "page"
     #
     # All extra options are passed to the generated container DIV, so eventually
     # they become its HTML attributes.
@@ -42,6 +44,7 @@ module WillPaginate
         page = entries.current_page
         options = options.symbolize_keys.reverse_merge(pagination_options)
         inner_window, outer_window = options.delete(:inner_window).to_i, options.delete(:outer_window).to_i
+        param = options.delete :param_name
         min = page - inner_window
         max = page + inner_window
         
@@ -59,7 +62,7 @@ module WillPaginate
         # build the list of the links
         links = (1..total_pages).inject([]) do |list, n|
           if visible.include? n
-            list << page_link_or_span((n != page ? n : nil), 'current', n)
+            list << page_link_or_span((n != page ? n : nil), 'current', n, param)
           elsif n == beginning.last + 1 || n == tail.first - 1
             # ellipsis represents the gap between windows
             list << '...'
@@ -68,8 +71,8 @@ module WillPaginate
         end
         
         # next and previous buttons
-        links.unshift page_link_or_span(entries.previous_page, 'disabled', options.delete(:prev_label))
-        links.push    page_link_or_span(entries.next_page,     'disabled', options.delete(:next_label))
+        links.unshift page_link_or_span(entries.previous_page, 'disabled', options.delete(:prev_label), param)
+        links.push    page_link_or_span(entries.next_page,     'disabled', options.delete(:next_label), param)
         
         content_tag :div, links.join(options.delete(:separator)), options
       end
@@ -77,12 +80,12 @@ module WillPaginate
     
   protected
 
-    def page_link_or_span(page, span_class = nil, text = page.to_s)
+    def page_link_or_span(page, span_class, text, param)
       unless page
         content_tag :span, text, :class => span_class
       else
         # page links should preserve GET parameters, so we merge params
-        link_to text, params.merge(:page => (page !=1 ? page : nil))
+        link_to text, params.merge(param.to_sym => (page !=1 ? page : nil))
       end
     end
   end
