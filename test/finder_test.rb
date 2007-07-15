@@ -70,22 +70,22 @@ class FinderTest < ActiveRecordTestCase
 
   def test_paginate_associations
     dhh = users :david
-    expected = [projects(:action_controller), projects(:active_record)]
+    expected_name_ordered = [projects(:action_controller), projects(:active_record)]
+    expected_id_ordered   = [projects(:active_record), projects(:action_controller)]
 
-    # should this pull in the order from the association?  cuz it don't.
+    # with association-specified order
     entries = dhh.projects.paginate(:page => 1)
-
-    assert_equal expected, entries
+    assert_equal expected_name_ordered, entries
     assert_equal 2, entries.total_entries
 
     # with explicit order
     entries = dhh.projects.paginate(:page => 1, :order => 'projects.id')
-    assert_equal expected, entries
+    assert_equal expected_id_ordered, entries
     assert_equal 2, entries.total_entries
 
     assert_nothing_raised { dhh.projects.find(:all, :order => 'projects.id', :limit => 4) }
     entries = dhh.projects.paginate(:page => 1, :order => 'projects.id', :per_page => 4)
-    assert_equal expected, entries
+    assert_equal expected_id_ordered, entries
 
     # has_many with implicit order
     topic = Topic.find(1)

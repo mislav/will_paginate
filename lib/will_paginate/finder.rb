@@ -101,7 +101,7 @@ module WillPaginate
             # this allows you to specify :select, :order, or anything else just for the count query
             count_options.update(options.delete(:count)) if options[:count]
 
-            count_options.except! :count, :order, :select, :include
+            count_options.except! :count, :order, :select
             
             # thanks to active record for making us duplicate this code
             count_options[:conditions] ||= wp_extract_finder_conditions(finder, args)
