@@ -140,7 +140,7 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 8, entries.total_entries
     assert_equal entries, Developer.paginate_by_salary(100000, :page => 1, :per_page => 5)
 
-    assert_raises StandardError do
+    assert_raises RuntimeError do
       Developer.paginate_by_inexistent_attribute 100000, :page => 1
     end
   end
@@ -152,6 +152,16 @@ class FinderTest < ActiveRecordTestCase
 
     assert_equal (5..7).to_a, entries.map(&:id)
     assert_equal 9, entries.total_entries
+  end
+
+  def test_scoped_paginate
+    entries =
+      Developer.with_poor_ones do
+        Developer.paginate :page => 1
+      end
+
+    assert_equal 2, entries.size
+    assert_equal 2, entries.total_entries
   end
 
   def test_edge_case_api_madness

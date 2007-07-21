@@ -83,30 +83,36 @@ module WillPaginate
         end
 
         options, page, per_page = wp_parse_options!(args.pop)
-
+        # paginate finders are really just find_* with limit and offset
         finder = method.to_s.sub /^paginate/, 'find'
+        # magic counting for user convenience
+        total_entries = wp_count!(options, args, finder)
+
         # :all is implicit
         if finder == 'find'
           args.unshift(:all) if args.empty?
-        elsif finder.index('find_all') != 0
+        elsif finder.index('find_by_') == 0
           finder.sub! /^find/, 'find_all'
         end
 
+        ::Object.returning WillPaginate::Collection.new(page, per_page, total_entries) do |pager|
+          args << options.update(:offset => pager.offset, :limit => pager.per_page)
+          pager.replace send(finder, *args)
+        end
+      end
+
+      def wp_count!(options, args, finder)
         # :total_entries and :count are mutually exclusive!
-        total_entries = unless options[:total_entries]
+        unless options[:total_entries]
           unless args.first.is_a? Array
             # count expects (almost) the same options as find
-            count_options = options.dup
+            count_options = options.except :count, :order, :select
 
             # merge the hash found in :count
             # this allows you to specify :select, :order, or anything else just for the count query
-            count_options.update(options.delete(:count)) if options[:count]
-
-            count_options.except! :count, :order, :select
-            
-            # thanks to active record for making us duplicate this code
-            count_options[:conditions] ||= wp_extract_finder_conditions(finder, args)
-            count_options.delete(:conditions) unless count_options[:conditions]
+            count_options.update(options.delete(:count)) if options.key? :count
+            # extract the conditions from calls like "paginate_by_foo_and_bar"
+            wp_extract_finder_conditions(finder, args, count_options) unless count_options[:conditions]
 
             count = count(count_options)
             count.respond_to?(:length) ? count.length : count
@@ -116,11 +122,6 @@ module WillPaginate
           end
         else
           options.delete(:total_entries)
-        end
-
-        ::Object.returning WillPaginate::Collection.new(page, per_page, total_entries) do |pager|
-          args << options.update(:offset => pager.offset, :limit => pager.per_page)
-          pager.replace send(finder, *args)
         end
       end
 
@@ -135,12 +136,13 @@ module WillPaginate
 
     private
 
-      def wp_extract_finder_conditions(finder, arguments)
+      # thanks to active record for making us duplicate this code
+      def wp_extract_finder_conditions(finder, arguments, count_options)
         return unless match = /^find_(all_by|by)_([_a-zA-Z]\w*)$/.match(finder.to_s)
 
         attribute_names = extract_attribute_names_from_match(match)
-        raise StandardError, "I can't make sense of #{finder}" unless all_attributes_exists?(attribute_names)
-        construct_attributes_from_arguments(attribute_names, arguments)
+        raise "I can't make sense of #{finder}" unless all_attributes_exists?(attribute_names)
+        count_options[:conditions] = construct_attributes_from_arguments(attribute_names, arguments)
       end
     end
   end
