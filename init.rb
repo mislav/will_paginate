@@ -1,4 +1,4 @@
-require 'core_ext/hash'
+require 'will_paginate/core_ext'
 require 'will_paginate/collection'
 require 'will_paginate/finder'
 require 'will_paginate/view_helpers'
