@@ -6,17 +6,17 @@ thirty_seven_signals:
 TextDrive:
   id: 2
   name: TextDrive
-  rating: 4
+  rating: 3
 
 PlanetArgon:
   id: 3
   name: Planet Argon
-  rating: 4
+  rating: 3
 
 Google:
   id: 4
   name: Google
-  rating: 4
+  rating: 5
   
 Ionist:
   id: 5

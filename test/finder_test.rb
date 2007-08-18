@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/helper'
 require File.dirname(__FILE__) + '/../init'
 
 class FinderTest < ActiveRecordTestCase
-  fixtures :topics, :replies, :users, :projects, :developers_projects
+  fixtures :topics, :replies, :users, :projects, :developers_projects, :companies
 
   def test_new_methods_presence
     assert_respond_to_all Topic, %w(per_page paginate paginate_by_sql)
@@ -189,6 +189,11 @@ class FinderTest < ActiveRecordTestCase
     assert_nothing_raised do
       Developer.paginate :select => 'users.*', :page => 1
     end
+  end
+
+  def test_should_use_scoped_finders_if_present
+    companies = Company.paginate_best :all, :page => 1
+    assert_equal 3, companies.total_entries
   end
 
 protected
