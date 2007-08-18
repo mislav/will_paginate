@@ -154,6 +154,13 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 9, entries.total_entries
   end
 
+  def test_count_by_sql
+    entries = Developer.paginate_by_sql ['select * from users where salary > ?', 60000],
+      :page => 2, :per_page => 3
+
+    assert_equal 12, entries.total_entries
+  end
+
   def test_scoped_paginate
     entries =
       Developer.with_poor_ones do

@@ -46,20 +46,20 @@ module WillPaginate
     # 
     module ClassMethods
       # This methods wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
-      # based on the params otherwise used by paginating finds: +page+, +per_page+ and +total_entries+.
-      # The last one is required because paginate_by_sql will not try to count by itself.
+      # based on the params otherwise used by paginating finds: +page+ and +per_page+.
       #
       # Example:
       # 
       #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
-      #                           :page => params[:page], :per_page => 3, :total_entries => 9
+      #                           :page => params[:page], :per_page => 3
       # 
       def paginate_by_sql(sql, options)
         options, page, per_page = wp_parse_options!(options)
+        sanitized_query = sanitize_sql(sql)
+        total_entries = options[:total_entries] || count_by_sql("SELECT COUNT(*) FROM (#{sanitized_query}) AS count_table")
 
-        returning WillPaginate::Collection.new(page, per_page, options[:total_entries]) do |pager|
+        returning WillPaginate::Collection.new(page, per_page, total_entries) do |pager|
           options.update :offset => pager.offset, :limit => pager.per_page
-          sanitized_query = sanitize_sql(sql)
           add_limit! sanitized_query, options
           pager.replace find_by_sql(sanitized_query)
         end
