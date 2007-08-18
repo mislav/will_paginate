@@ -140,6 +140,12 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 8, entries.total_entries
     assert_equal entries, Developer.paginate_by_salary(100000, :page => 1, :per_page => 5)
 
+    # dynamic finder + conditions
+    entries = Developer.paginate_by_salary(100000, :page => 1,
+                                           :conditions => ['id > ?', 6])
+    assert_equal 4, entries.total_entries
+    assert_equal (7..10).to_a, entries.map(&:id)
+
     assert_raises RuntimeError do
       Developer.paginate_by_inexistent_attribute 100000, :page => 1
     end
