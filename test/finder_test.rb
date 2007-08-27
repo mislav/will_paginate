@@ -68,6 +68,58 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 1, entries.page_count
   end
 
+  def test_paginate_with_include_and_conditions
+    entries = Topic.paginate \
+      :page     => 1, 
+      :include  => :replies,  
+      :conditions => "replies.content LIKE 'Bird%' ", 
+      :per_page => 10
+
+    expected = Topic.find :all, 
+      :include => 'replies', 
+      :conditions => "replies.content LIKE 'Bird%' ", 
+      :limit   => 10
+
+    assert_equal expected, entries.to_a
+    assert_equal 1, entries.total_entries
+  end
+  
+  def test_paginate_with_include_and_order
+    entries = Topic.paginate \
+      :page     => 1, 
+      :include  => :replies,  
+      :order    => 'replies.created_at asc, topics.created_at asc', 
+      :per_page => 10
+
+    expected = Topic.find :all, 
+      :include => 'replies', 
+      :order   => 'replies.created_at asc, topics.created_at asc', 
+      :limit   => 10
+
+    assert_equal expected, entries.to_a
+    assert_equal 4, entries.total_entries
+  end
+
+  def test_paginate_associations_with_include
+    entries, project = nil, projects(:active_record)
+
+    assert_nothing_raised "THIS IS A BUG in Rails 1.2.3 that was fixed in [7326]. " +
+        "Please upgrade to the 1-2-stable branch or edge Rails." do
+      entries = project.topics.paginate \
+        :page     => 1, 
+        :include  => :replies,  
+        :conditions => "replies.content LIKE 'Nice%' ", 
+        :per_page => 10
+    end
+
+    expected = Topic.find :all, 
+      :include => 'replies', 
+      :conditions => "project_id = #{project.id} AND replies.content LIKE 'Nice%' ", 
+      :limit   => 10
+
+    assert_equal expected, entries.to_a
+  end
+
   def test_paginate_associations
     dhh = users :david
     expected_name_ordered = [projects(:action_controller), projects(:active_record)]
@@ -107,21 +159,6 @@ class FinderTest < ActiveRecordTestCase
     entries = Developer.paginate :page => 1,
                         :joins => 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id',
                         :conditions => 'project_id = 1', :count => { :select => "users.id" }
-    assert_equal expected, entries.to_a
-  end
-  
-  def test_paginate_with_include_and_order
-    entries = Topic.paginate \
-      :page     => 1, 
-      :include  => :replies,  
-      :order    => 'replies.created_at asc, topics.created_at asc', 
-      :per_page => 10
-
-    expected = Topic.find :all, 
-      :include => 'replies', 
-      :order   => 'replies.created_at asc, topics.created_at asc', 
-      :limit   => 10
-
     assert_equal expected, entries.to_a
   end
 
