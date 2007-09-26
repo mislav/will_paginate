@@ -34,6 +34,7 @@ class ActiveRecordTestCase < Test::Unit::TestCase
 end
 
 ActiveRecordTestConnector.setup
+
 ActionController::Routing::Routes.reload rescue nil
 ActionController::Routing::Routes.draw do |map|
   map.connect ':controller/:action/:id'

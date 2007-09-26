@@ -4,8 +4,8 @@ unless ActiveRecord::Base.respond_to? :paginate
   require 'will_paginate/finder'
   require 'will_paginate/view_helpers'
 
-  ActionView::Base.send   :include, WillPaginate::ViewHelpers
-  ActiveRecord::Base.send :include, WillPaginate::Finder
+  ActionView::Base.class_eval   { include WillPaginate::ViewHelpers }
+  ActiveRecord::Base.class_eval { include WillPaginate::Finder }
 
   module ActiveRecord::Associations
     # to support paginating finders on associations, we have to mix in the

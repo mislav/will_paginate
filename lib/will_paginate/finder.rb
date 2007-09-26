@@ -114,11 +114,11 @@ module WillPaginate
             # extract the conditions from calls like "paginate_by_foo_and_bar"
             conditions = wp_extract_finder_conditions(finder, args, count_options)
 
-            # scope_out adds a 'with_finder' method which acts like with_scope, if it's present
-            # then execute the count with the scoping provided by the with_finder  
             count = nil
             counter = Proc.new { count = count(count_options) }
             
+            # scope_out adds a 'with_finder' method which acts like with_scope, if it's present
+            # then execute the count with the scoping provided by the with_finder  
             if respond_to?(scoper = finder.sub(/^find/, 'with'))
               send(scoper, &counter)
             else
