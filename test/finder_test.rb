@@ -233,6 +233,9 @@ class FinderTest < ActiveRecordTestCase
       assert_equal (4..6).to_a, entries.map(&:id)
       assert_equal 8, entries.total_entries
     end
+
+    # :count could be nil and we should still not cry
+    assert_nothing_raised { Topic.paginate :page => 1, :count => nil }
   end
 
   def test_count_doesnt_use_select_options

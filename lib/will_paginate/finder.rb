@@ -110,7 +110,7 @@ module WillPaginate
             
             # merge the hash found in :count
             # this allows you to specify :select, :order, or anything else just for the count query
-            count_options.update(options.delete(:count)) if options.key? :count
+            count_options.update(options.delete(:count) || {}) if options.key? :count
             # extract the conditions from calls like "paginate_by_foo_and_bar"
             conditions = wp_extract_finder_conditions(finder, args, count_options)
 
