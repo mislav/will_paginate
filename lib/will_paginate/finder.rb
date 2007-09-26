@@ -111,18 +111,22 @@ module WillPaginate
             # merge the hash found in :count
             # this allows you to specify :select, :order, or anything else just for the count query
             count_options.update(options.delete(:count) || {}) if options.key? :count
-            # extract the conditions from calls like "paginate_by_foo_and_bar"
-            conditions = wp_extract_finder_conditions(finder, args, count_options)
 
-            count = nil
-            counter = Proc.new { count = count(count_options) }
+            # we may have to scope ...
+            counter = Proc.new { count(count_options) }
+
+            # we may be in a model or an association proxy!
+            klass = (@owner and @reflection) ? @reflection.klass : self
             
-            # scope_out adds a 'with_finder' method which acts like with_scope, if it's present
-            # then execute the count with the scoping provided by the with_finder  
-            if respond_to?(scoper = finder.sub(/^find/, 'with'))
+            count = if klass.respond_to?(scoper = finder.sub(/^find/, 'with'))
+              # scope_out adds a 'with_finder' method which acts like with_scope, if it's present
+              # then execute the count with the scoping provided by the with_finder  
               send(scoper, &counter)
-            else
+            elsif conditions = wp_extract_finder_conditions(finder, args)
+              # extracted the conditions from calls like "paginate_by_foo_and_bar"
               with_scope(:find => { :conditions => conditions }, &counter)
+            else
+              counter.call
             end
 
             count.respond_to?(:length) ? count.length : count
@@ -147,7 +151,7 @@ module WillPaginate
     private
 
       # thanks to active record for making us duplicate this code
-      def wp_extract_finder_conditions(finder, arguments, count_options)
+      def wp_extract_finder_conditions(finder, arguments)
         return unless match = /^find_(all_by|by)_([_a-zA-Z]\w*)$/.match(finder.to_s)
 
         attribute_names = extract_attribute_names_from_match(match)
