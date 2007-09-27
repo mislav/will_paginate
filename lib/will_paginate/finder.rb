@@ -1,6 +1,6 @@
 module WillPaginate
-  # A mixin for ActiveRecord::Base. Provides `per_page` class method
-  # and makes `paginate` finders possible with some method_missing magic.
+  # A mixin for ActiveRecord::Base. Provides +per_page+ class method
+  # and makes +paginate+ finders possible with some method_missing magic.
   #
   # Find out more in WillPaginate::Finder::ClassMethods
   #
