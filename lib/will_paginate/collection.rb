@@ -5,17 +5,22 @@ module WillPaginate
   # correct page links.
   #
   class Collection < Array
-    attr_reader :current_page, :per_page
-    attr_accessor :total_entries
+    attr_reader :current_page, :per_page, :total_entries
 
     # These collection objects are instantiated by ActiveRecord paginating
     # finders; there is no need to do it manually.
     #
-    def initialize(page, per_page, total)
-      @current_page  = page.to_i
-      @per_page      = per_page.to_i
-      @total_entries = total.to_i
-      @total_pages   = (@total_entries / @per_page.to_f).ceil
+    def initialize(page, per_page, total = nil)
+      @current_page = page.to_i
+      @per_page     = per_page.to_i
+      
+      self.total_entries = total if total
+    end
+
+    def self.create(page, per_page, total = nil, &block)
+      pager = new(page, per_page, total)
+      yield pager
+      pager
     end
 
     # The total number of pages.
@@ -40,6 +45,20 @@ module WillPaginate
     # current_page + 1 or nil if there is no next page
     def next_page
       current_page < page_count ? (current_page + 1) : nil
+    end
+
+    def total_entries=(number)
+      @total_entries = number.to_i
+      @total_pages   = (@total_entries / per_page.to_f).ceil
+    end
+
+    def replace(array)
+      super
+      # The collection is shorter then page limit? Rejoice, because
+      # then we know that we are on the last page!
+      if total_entries.nil? and length < per_page
+        self.total_entries = offset + length
+      end
     end
   end
 end

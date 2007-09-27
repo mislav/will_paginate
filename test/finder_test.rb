@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/helper'
 require File.dirname(__FILE__) + '/../init'
 
 class FinderTest < ActiveRecordTestCase
-  fixtures :topics, :replies, :users, :projects, :developers_projects, :companies
+  fixtures :topics, :replies, :users, :projects, :developers_projects
 
   def test_new_methods_presence
     assert_respond_to_all Topic, %w(per_page paginate paginate_by_sql)
@@ -183,7 +183,7 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 4, entries.total_entries
     assert_equal (7..10).to_a, entries.map(&:id)
 
-    assert_raises RuntimeError do
+    assert_raises NoMethodError do
       Developer.paginate_by_inexistent_attribute 100000, :page => 1
     end
   end
@@ -218,13 +218,6 @@ class FinderTest < ActiveRecordTestCase
     # explicit :all should not break anything
     assert_equal Topic.paginate(:page => nil), Topic.paginate(:all, :page => 1)
 
-    # this is a little weird test for issue #37
-    # the Topic model find and count methods accept an extra option, :foo
-    # this checks if that extra option was intact by our paginating finder
-    entries = Topic.paginate(:foo => 'bar', :page => 1)
-    assert_equal 'bar', entries.first
-    assert_equal 100, entries.total_entries
-
     # Are we on edge? Find out by testing find_all which was removed in [6998]
     unless Developer.respond_to? :find_all
       # AR finders also accept arrays of IDs
@@ -238,15 +231,27 @@ class FinderTest < ActiveRecordTestCase
     assert_nothing_raised { Topic.paginate :page => 1, :count => nil }
   end
 
-  def test_count_doesnt_use_select_options
-    assert_nothing_raised do
-      Developer.paginate :select => 'users.*', :page => 1
-    end
-  end
+  uses_mocha 'parameter' do
+    def test_extra_parameters_stay_untouched
+      Topic.expects(:find).with() { |*args| args.last.key? :foo }.returns(Array.new(5))
+      Topic.expects(:count).with(){ |*args| args.last.key? :foo }.returns(1)
 
-  def test_should_use_scoped_finders_if_present
-    companies = Company.paginate_best :all, :page => 1
-    assert_equal 3, companies.total_entries
+      Topic.paginate :foo => 'bar', :page => 1, :per_page => 4
+    end
+
+    def test_count_doesnt_use_select_options
+      Developer.expects(:find).with() { |*args| args.last.key? :select }.returns(Array.new(5))
+      Developer.expects(:count).with(){ |*args| !args.last.key?(:select) }.returns(1)
+      
+      Developer.paginate :select => 'users.*', :page => 1, :per_page => 4
+    end
+
+    def test_should_use_scoped_finders_if_present
+      Topic.expects(:find_best).returns(Array.new(5))
+      Topic.expects(:with_best).returns(1)
+      
+      Topic.paginate_best :page => 1, :per_page => 4
+    end
   end
 
 protected
