@@ -28,6 +28,12 @@ module WillPaginate
       @total_pages
     end
 
+    # Helper method that is true when someone tries to fetch a page with a larger
+    # number than the last page or with a number smaller than 1
+    def out_of_bounds?
+      current_page > page_count or current_page < 1
+    end
+
     # Current offset of the paginated collection. If we're on the first page,
     # it is always 0. If we're on the 2nd page and there are 30 entries per page,
     # the offset is 30. This property is useful if you want to render ordinals
@@ -56,7 +62,7 @@ module WillPaginate
       super
       # The collection is shorter then page limit? Rejoice, because
       # then we know that we are on the last page!
-      if total_entries.nil? and length < per_page
+      if total_entries.nil? and length > 0 and length < per_page
         self.total_entries = offset + length
       end
     end

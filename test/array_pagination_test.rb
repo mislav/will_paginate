@@ -35,6 +35,18 @@ class ArrayPaginationTest < Test::Unit::TestCase
     assert_instance_of Array, collection.entries
     assert_equal 3, collection.offset
     assert_equal 4, collection.page_count
+    assert !collection.out_of_bounds?
+  end
+
+  def test_out_of_bounds
+    entries = create(2, 3, 2){}
+    assert entries.out_of_bounds?
+    
+    entries = create(0, 3, 2){}
+    assert entries.out_of_bounds?
+    
+    entries = create(1, 3, 2){}
+    assert !entries.out_of_bounds?
   end
 
   def test_guessing_total_count
