@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/helper'
-require File.dirname(__FILE__) + '/../init'
+require 'will_paginate/core_ext'
 
 class ArrayPaginationTest < Test::Unit::TestCase
   def test_simple

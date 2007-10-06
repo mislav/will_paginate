@@ -8,3 +8,6 @@ ActiveRecordTestConnector.setup
 # load all fixtures
 fixture_path = File.join(dirname, '..', 'fixtures')
 Fixtures.create_fixtures(fixture_path, ActiveRecord::Base.connection.tables)
+
+require 'will_paginate'
+WillPaginate.enable_activerecord

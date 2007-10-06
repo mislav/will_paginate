@@ -1,5 +1,17 @@
 require File.dirname(__FILE__) + '/helper'
-require File.dirname(__FILE__) + '/../init'
+require File.dirname(__FILE__) + '/lib/activerecord_test_case'
+require 'action_controller'
+require 'action_controller/test_process'
+
+require 'will_paginate'
+WillPaginate.enable
+
+ActionController::Routing::Routes.reload rescue nil
+ActionController::Routing::Routes.draw do |map|
+  map.connect ':controller/:action/:id'
+end
+
+ActionController::Base.perform_caching = false
 
 class PaginationTest < ActiveRecordTestCase
   fixtures :users

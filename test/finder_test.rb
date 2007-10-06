@@ -1,5 +1,8 @@
 require File.dirname(__FILE__) + '/helper'
-require File.dirname(__FILE__) + '/../init'
+require File.dirname(__FILE__) + '/lib/activerecord_test_case'
+
+require 'will_paginate'
+WillPaginate.enable_activerecord
 
 class FinderTest < ActiveRecordTestCase
   fixtures :topics, :replies, :users, :projects, :developers_projects

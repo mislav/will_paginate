@@ -1,3 +1,5 @@
+require 'will_paginate/collection'
+
 module WillPaginate
   # = Global options for pagination helpers
   #

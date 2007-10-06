@@ -30,6 +30,8 @@ unless Hash.instance_methods.include? 'slice'
   end
 end
 
+require 'will_paginate/collection'
+
 unless Array.instance_methods.include? 'paginate'
   # http://www.desimcadam.com/archives/8
   Array.class_eval do
