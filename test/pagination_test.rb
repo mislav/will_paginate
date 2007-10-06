@@ -1,10 +1,6 @@
 require File.dirname(__FILE__) + '/helper'
-require File.dirname(__FILE__) + '/lib/activerecord_test_case'
 require 'action_controller'
 require 'action_controller/test_process'
-
-require 'will_paginate'
-WillPaginate.enable
 
 ActionController::Routing::Routes.reload rescue nil
 ActionController::Routing::Routes.draw do |map|
@@ -13,28 +9,28 @@ end
 
 ActionController::Base.perform_caching = false
 
-class PaginationTest < ActiveRecordTestCase
-  fixtures :users
+require 'will_paginate'
+WillPaginate.enable_actionpack
+
+class PaginationTest < Test::Unit::TestCase
+  class Developer
+    # dummy
+  end
   
   class PaginationController < ActionController::Base
     def list_developers
-      @developers = Developer.paginate :page => params[params[:param_name] || :page],
-                                       :per_page => (params[:per_page] || 4).to_i
+      page = params[params[:param_name] || :page] || 1
+      @developers = (1..11).to_a.paginate page, params[:per_page] || 4
 
-      @options = params.except(:count, :order)
+      @options = params.dup
       WillPaginate::ViewHelpers.pagination_options.keys.each { |key| params.delete key }
 
       render :inline => '<%= will_paginate @developers, @options %>'
     end
 
-    def no_pagination
-      @developers = Developer.paginate :page => params[:page], :per_page => 15
-      render :inline => '<%= will_paginate @developers %>'
-    end
-
-  protected
-    def rescue_errors(e) raise e end
-    def rescue_action(e) raise e end
+    protected
+      def rescue_errors(e) raise e end
+      def rescue_action(e) raise e end
   end
   
   def setup
@@ -131,12 +127,11 @@ class PaginationTest < ActiveRecordTestCase
   end
 
   def test_no_pagination
-    get :no_pagination
+    get :list_developers, :per_page => 12
     entries = assigns :developers
     assert_equal 1, entries.page_count
-    assert_equal Developer.count, entries.size
+    assert_equal 11, entries.size
 
-    assert_select 'div', false
     assert_equal '', @response.body
   end
   

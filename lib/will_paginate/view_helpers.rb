@@ -1,4 +1,4 @@
-require 'will_paginate/collection'
+require 'will_paginate/core_ext'
 
 module WillPaginate
   # = Global options for pagination helpers
@@ -9,7 +9,7 @@ module WillPaginate
   #
   #   WillPaginate::ViewHelpers.pagination_options[:prev_label] = 'Previous page'
   #
-  # By putting this into your environment.rb you can easily localize link texts to previous
+  # By putting this into your environment.rb you can easily translate link texts to previous
   # and next pages, as well as override some other defaults to your liking.
   module ViewHelpers
     # default options that can be overriden on the global level
@@ -40,58 +40,95 @@ module WillPaginate
     # they become its HTML attributes.
     #
     def will_paginate(entries = @entries, options = {})
-      total_pages = entries.page_count
+      total_pages = 
 
-      if total_pages > 1
-        options = options.symbolize_keys.reverse_merge(pagination_options)
-        page, param = entries.current_page, options.delete(:param_name)
+      if entries.page_count > 1
+        renderer = WillPaginate::LinkRenderer.new entries, options, self
+        links = renderer.items
         
-        inner_window, outer_window = options.delete(:inner_window).to_i, options.delete(:outer_window).to_i
-        min = page - inner_window
-        max = page + inner_window
-        # adjust lower or upper limit if other is out of bounds
-        if max > total_pages then min -= max - total_pages
-        elsif min < 1  then max += 1 - min
-        end
-        
-        current   = min..max
-        beginning = 1..(1 + outer_window)
-        tail      = (total_pages - outer_window)..total_pages
-        visible   = [beginning, current, tail].map(&:to_a).flatten.sort.uniq
-        links, prev = [], 0
-
-        visible.each do |n|
-          next if n < 1
-          break if n > total_pages
-
-          unless n - prev > 1
-            prev = n
-            links << page_link_or_span((n != page ? n : nil), 'current', n, param)
-          else
-            # ellipsis represents the gap between windows
-            prev = n - 1
-            links << '...'
-            redo
-          end
-        end
-        
-        # next and previous buttons
-        links.unshift page_link_or_span(entries.previous_page, 'disabled', options.delete(:prev_label), param)
-        links.push    page_link_or_span(entries.next_page,     'disabled', options.delete(:next_label), param)
-        
-        content_tag :div, links.join(options.delete(:separator)), options
+        content_tag :div, links, renderer.html_options
       end
+    end
+  end
+
+  class LinkRenderer
+    # include ActionView::Helpers::TagHelper
+
+    def initialize(collection, options, template)
+      @collection = collection
+      @options = options.symbolize_keys.reverse_merge WillPaginate::ViewHelpers.pagination_options
+      @template = template
+    end
+
+    def items
+      returning windowed_paginator do |links|
+        # next and previous buttons
+        links.unshift page_link_or_span(@collection.previous_page, 'disabled', @options[:prev_label])
+        links.push    page_link_or_span(@collection.next_page,     'disabled', @options[:next_label])
+      end.join(@options[:separator])
+    end
+
+    def html_options
+      @options.except *(WillPaginate::ViewHelpers.pagination_options.keys - [:class])
     end
     
   protected
 
-    def page_link_or_span(page, span_class, text, param)
-      unless page
-        content_tag :span, text, :class => span_class
-      else
-        # page links should preserve GET parameters, so we merge params
-        link_to text, params.merge(param.to_sym => (page !=1 ? page : nil))
+    def windowed_paginator
+      inner_window, outer_window = @options[:inner_window].to_i, @options[:outer_window].to_i
+      min = page - inner_window
+      max = page + inner_window
+      # adjust lower or upper limit if other is out of bounds
+      if max > total_pages then min -= max - total_pages
+      elsif min < 1 then max += 1 - min
       end
+      
+      current   = min..max
+      beginning = 1..(1 + outer_window)
+      tail      = (total_pages - outer_window)..total_pages
+      visible   = [beginning, current, tail].map(&:to_a).flatten.sort.uniq
+      
+      links, prev = [], 0
+
+      visible.each do |n|
+        next  if n < 1
+        break if n > total_pages
+
+        unless n - prev > 1
+          prev = n
+          links << page_link_or_span((n != page ? n : nil), 'current', n)
+        else
+          # ellipsis represents the gap between windows
+          prev = n - 1
+          links << '...'
+          redo
+        end
+      end
+      
+      links
+    end
+
+    def page_link_or_span(page, span_class, text)
+      unless page
+        @template.content_tag :span, text, :class => span_class
+      else
+        # page links should preserve GET/POST parameters
+        @template.link_to text, @template.params.merge(param => page != 1 ? page : nil)
+      end
+    end
+
+  private
+
+    def page
+      @collection.current_page
+    end
+
+    def total_pages
+      @collection.page_count
+    end
+
+    def param
+      @options[:param_name].to_sym
     end
   end
 end
