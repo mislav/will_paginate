@@ -7,17 +7,6 @@ class FinderTest < ActiveRecordTestCase
   def test_new_methods_presence
     assert_respond_to_all Topic, %w(per_page paginate paginate_by_sql)
   end
-
-  def test_paginated_collection
-    entries = %w(a b c)
-    collection = WillPaginate::Collection.new 2, 3, 10
-    collection.replace entries
-
-    assert_equal entries, collection
-    assert_respond_to_all collection, %w(page_count each offset size current_page per_page total_entries)
-    assert_equal Array, collection.entries.class
-    assert_equal 3, collection.offset
-  end
   
   def test_simple_paginate
     entries = Topic.paginate :page => nil
@@ -32,10 +21,18 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 1, entries.previous_page
     assert_equal 1, entries.page_count
     assert entries.empty?
+  end
 
+  def test_parameter_api
     # :page parameter in options is required!
     assert_raise(ArgumentError){ Topic.paginate }
     assert_raise(ArgumentError){ Topic.paginate({}) }
+    
+    # explicit :all should not break anything
+    assert_equal Topic.paginate(:page => nil), Topic.paginate(:all, :page => 1)
+
+    # :count could be nil and we should still not cry
+    assert_nothing_raised { Topic.paginate :page => 1, :count => nil }
   end
   
   def test_paginate_with_per_page
@@ -214,24 +211,26 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 2, entries.total_entries
   end
 
-  def test_edge_case_api_madness
-    # explicit :all should not break anything
-    assert_equal Topic.paginate(:page => nil), Topic.paginate(:all, :page => 1)
-
-    # Are we on edge? Find out by testing find_all which was removed in [6998]
-    unless Developer.respond_to? :find_all
+  # Are we on edge? Find out by testing find_all which was removed in [6998]
+  unless Developer.respond_to? :find_all
+    def test_paginate_array_of_ids
       # AR finders also accept arrays of IDs
       # (this was broken in Rails before [6912])
       entries = Developer.paginate((1..8).to_a, :per_page => 3, :page => 2)
       assert_equal (4..6).to_a, entries.map(&:id)
       assert_equal 8, entries.total_entries
     end
-
-    # :count could be nil and we should still not cry
-    assert_nothing_raised { Topic.paginate :page => 1, :count => nil }
   end
 
   uses_mocha 'parameter' do
+    def test_guessing_the_total_count
+      Topic.expects(:find).returns(Array.new(2))
+      Topic.expects(:count).never
+      
+      entries = Topic.paginate :page => 2, :per_page => 4
+      assert_equal 6, entries.total_entries
+    end
+    
     def test_extra_parameters_stay_untouched
       Topic.expects(:find).with() { |*args| args.last.key? :foo }.returns(Array.new(5))
       Topic.expects(:count).with(){ |*args| args.last.key? :foo }.returns(1)
@@ -251,14 +250,6 @@ class FinderTest < ActiveRecordTestCase
       Topic.expects(:with_best).returns(1)
       
       Topic.paginate_best :page => 1, :per_page => 4
-    end
-  end
-
-protected
-
-  def assert_respond_to_all object, methods
-    methods.each do |method|
-      [method.to_s, method.to_sym].each {|m| assert_respond_to object, m }
     end
   end
 end
