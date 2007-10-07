@@ -170,7 +170,6 @@ class FinderTest < ActiveRecordTestCase
 
   def test_paginate_with_dynamic_finder
     expected = [replies(:witty_retort), replies(:spam)]
-    assert_equal expected, Reply.paginate_all_by_topic_id(1, :page => 1)
     assert_equal expected, Reply.paginate_by_topic_id(1, :page => 1)
 
     entries = Developer.paginate :conditions => { :salary => 100000 }, :page => 1, :per_page => 5
@@ -226,6 +225,13 @@ class FinderTest < ActiveRecordTestCase
   end
 
   uses_mocha 'parameter' do
+    def test_implicit_all_with_dynamic_finders
+      Topic.expects(:find_all_by_foo).returns([])
+      Topic.expects(:wp_extract_finder_conditions)
+      Topic.expects(:count)
+      Topic.paginate_by_foo :page => 1
+    end
+    
     def test_guessing_the_total_count
       Topic.expects(:find).returns(Array.new(2))
       Topic.expects(:count).never

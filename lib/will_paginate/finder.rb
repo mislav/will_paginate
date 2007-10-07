@@ -98,7 +98,7 @@ module WillPaginate
         if finder == 'find'
           args.unshift(:all) if args.empty?
         elsif finder.index('find_by_') == 0
-          finder.sub! /^find/, 'find_all'
+          finder.sub! 'find', 'find_all'
         end
 
         WillPaginate::Collection.create(page, per_page, total_entries) do |pager|
@@ -160,7 +160,9 @@ module WillPaginate
         return unless match = /^find_(all_by|by)_([_a-zA-Z]\w*)$/.match(finder.to_s)
 
         attribute_names = extract_attribute_names_from_match(match)
-        raise "I can't make sense of #{finder}" unless all_attributes_exists?(attribute_names)
+        unless all_attributes_exists?(attribute_names)
+          raise "I can't make sense of `#{finder}`. Try doing the count manually"
+        end
         construct_attributes_from_arguments(attribute_names, arguments)
       end
     end
