@@ -51,8 +51,10 @@ module WillPaginate
     end
   end
 
+  # This class does the heavy lifting of actually building the pagination
+  # links. It is used by +will_paginate+ helper internally, but avoid using it
+  # directly (for now) because its API is not set in stone yet.
   class LinkRenderer
-    # include ActionView::Helpers::TagHelper
 
     def initialize(collection, options, template)
       @collection = collection

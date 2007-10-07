@@ -11,6 +11,9 @@ now you can. Simply:
 
   script/plugin install svn://errtheblog.com/svn/plugins/will_paginate
 
+Ryan Bates made an awesome screencast[http://railscasts.com/episodes/51], check
+it out.
+
 
 == Example usage:
 
@@ -27,7 +30,8 @@ pagination, just stick this in:
 
     <%= will_paginate @posts %>
 
-You're done. (Copy and paste the example fancy CSS styles from the bottom.) You can find the option list at WillPaginate::ViewHelpers.
+You're done. (Copy and paste the example fancy CSS styles from the bottom.) You
+can find the option list at WillPaginate::ViewHelpers.
 
 How does it know how much items to fetch per page? It asks your model by calling
 +Post.per_page+. You can define it like this:

@@ -86,7 +86,7 @@ class PaginationTest < Test::Unit::TestCase
         elements.each do |el|
           assert_match /foo%5Bbar%5D=baz/, el['href'], "THIS IS A BUG in Rails 1.2 which " +
             "has been fixed in Rails 2.0."
-          # there is no need to worry *unless* you too are using hashes is parameters which
+          # there is no need to worry *unless* you too are using hashes in parameters which
           # need to be preserved over pages
         end
       end
