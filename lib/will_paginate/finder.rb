@@ -111,8 +111,12 @@ module WillPaginate
       end
 
       def wp_count!(options, args, finder)
+        excludees = [:count, :order, :limit, :offset]
+        unless options[:select] and options[:select] =~ /^\s*DISTINCT/i
+          excludees << :select # only exclude the select param if it doesn't begin with DISTINCT
+        end
         # count expects (almost) the same options as find
-        count_options = options.except :count, :order, :select, :limit, :offset
+        count_options = options.except *excludees
 
         # merge the hash found in :count
         # this allows you to specify :select, :order, or anything else just for the count query

@@ -209,6 +209,12 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 12, entries.total_entries
   end
 
+  def test_count_distinct
+    entries = Developer.paginate :select => 'DISTINCT salary', :page => 1, :per_page => 4
+    assert_equal 4, entries.size
+    assert_equal 4, entries.total_entries
+  end
+
   def test_scoped_paginate
     entries =
       Developer.with_poor_ones do
