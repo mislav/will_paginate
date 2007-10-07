@@ -51,18 +51,14 @@ class ActiveRecordTestConnector
     end
   end
 
-    # Load actionpack sqlite tables
   def self.load_schema
-    ActiveRecord::Base.silence do
-      File.read(File.dirname(__FILE__) + "/../fixtures/schema.sql").split(';').each do |sql|
-        ActiveRecord::Base.connection.execute(sql) unless sql.blank?
-      end
-    end
+    ActiveRecord::Migration.verbose = false
+    load File.dirname(__FILE__) + "/../fixtures/schema.rb"
   end
 
   def self.require_fixture_models
     models = Dir.glob(File.dirname(__FILE__) + "/../fixtures/*.rb")
     models = (models.grep(/user.rb/) + models).uniq
-    models.each {|f| require f}
+    models.each { |f| require f }
   end
 end
