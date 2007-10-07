@@ -14,7 +14,8 @@ class ActiveRecordTestConnector
     unless self.connected || !self.able_to_connect
       setup_connection
       load_schema
-      require_fixture_models
+      # require_fixture_models
+      Dependencies.load_paths.unshift(File.dirname(__FILE__) + "/../fixtures")
       self.connected = true
     end
   rescue Exception => e  # errors from ActiveRecord setup
@@ -52,8 +53,10 @@ class ActiveRecordTestConnector
   end
 
   def self.load_schema
-    ActiveRecord::Migration.verbose = false
-    load File.dirname(__FILE__) + "/../fixtures/schema.rb"
+    ActiveRecord::Base.silence do
+      ActiveRecord::Migration.verbose = false
+      load File.dirname(__FILE__) + "/../fixtures/schema.rb"
+    end
   end
 
   def self.require_fixture_models
