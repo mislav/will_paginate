@@ -254,5 +254,13 @@ class FinderTest < ActiveRecordTestCase
       
       Topic.paginate_best :page => 1, :per_page => 4
     end
+
+    def test_ability_to_use_with_custom_finders
+      # acts_as_taggable defines `find_tagged_with(tag, options)`
+      Topic.expects(:find_tagged_with).with('will_paginate', :offset => 0, :limit => 5).returns([])
+      Topic.expects(:count).with({}).returns(0)
+      
+      Topic.paginate_tagged_with 'will_paginate', :page => 1, :per_page => 5
+    end
   end
 end
