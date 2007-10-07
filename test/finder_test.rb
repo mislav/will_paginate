@@ -145,6 +145,12 @@ class FinderTest < ActiveRecordTestCase
     assert_equal expected.map(&:id).sort, topic.replies.paginate(:page => 1).map(&:id).sort
     assert_equal expected.reverse, topic.replies.paginate(:page => 1, :order => 'replies.id ASC')
   end
+
+  def test_paginate_association_extension
+    project = Project.find(:first)
+    entries = project.replies.paginate_recent :page => 1
+    assert_equal [replies(:brave)], entries
+  end
   
   def test_paginate_with_joins
     entries = Developer.paginate :page => 1,

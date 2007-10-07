@@ -18,3 +18,17 @@ spam:
   content: Nice site!
   created_at: <%= 1.hour.ago.to_s(:db) %>
   updated_at: nil
+
+decisive:
+  id: 4
+  topic_id: 4
+  content: "I'm getting to the bottom of this"
+  created_at: <%= 30.minutes.ago.to_s(:db) %>
+  updated_at: nil
+
+brave:
+  id: 5
+  topic_id: 4
+  content: "AR doesn't scare me a bit"
+  created_at: <%= 10.minutes.ago.to_s(:db) %>
+  updated_at: nil
