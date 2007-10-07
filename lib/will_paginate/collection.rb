@@ -1,10 +1,10 @@
 module WillPaginate
   # Arrays returned from paginating finds are, in fact, instances of this.
   # You may think of WillPaginate::Collection as an ordinary array with some
-  # extra properties. Those properites are used by view helpers to generate
+  # extra properties. Those properties are used by view helpers to generate
   # correct page links.
   #
-  # WillPaginate::Collection also asists in rolling out your own pagination
+  # WillPaginate::Collection also assists in rolling out your own pagination
   # solutions: see +create+.
   #
   class Collection < Array
@@ -91,10 +91,10 @@ module WillPaginate
     # This is a magic wrapper for the original Array#replace method. It serves
     # for populating the paginated collection after initialization.
     #
-    # Why magic? Because it tries to guess the total number of entries juding
+    # Why magic? Because it tries to guess the total number of entries judging
     # by the size of given array. If it is shorter than +per_page+ limit, then we
     # know we're on the last page. This trick is very useful for avoiding
-    # unneccessary hits to the database to do the counting after we fetched the
+    # unnecessary hits to the database to do the counting after we fetched the
     # data for the current page.
     #
     # However, after using +replace+ you should always test the value of

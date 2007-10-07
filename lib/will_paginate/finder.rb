@@ -42,7 +42,7 @@ module WillPaginate
     # Options for paginating finders are:
     # 
     #   page           REQUIRED, but defaults to 1 if false or nil
-    #   per_page       (default is read from the model, which is 30 if not overriden)
+    #   per_page       (default is read from the model, which is 30 if not overridden)
     #   total entries  not needed unless you want to count the records yourself somehow
     #   count          hash of options that are used only for the call to count
     # 

@@ -12,7 +12,7 @@ module WillPaginate
   # By putting this into your environment.rb you can easily translate link texts to previous
   # and next pages, as well as override some other defaults to your liking.
   module ViewHelpers
-    # default options that can be overriden on the global level
+    # default options that can be overridden on the global level
     @@pagination_options = { :class => 'pagination',
           :prev_label   => '&laquo; Previous',
           :next_label   => 'Next &raquo;',
