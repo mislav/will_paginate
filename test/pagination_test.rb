@@ -19,11 +19,10 @@ class PaginationTest < Test::Unit::TestCase
   
   class PaginationController < ActionController::Base
     def list_developers
-      page = params[params[:param_name] || :page] || 1
-      @developers = (1..11).to_a.paginate page, params[:per_page] || 4
-
-      @options = params.dup
-      WillPaginate::ViewHelpers.pagination_options.keys.each { |key| params.delete key }
+      @options = params.delete(:options) || {}
+      page = params[@options[:param_name] || :page] || 1
+      
+      @developers = (1..11).to_a.paginate(page, params[:per_page] || 4)
 
       render :inline => '<%= will_paginate @developers, @options %>'
     end
@@ -59,7 +58,9 @@ class PaginationTest < Test::Unit::TestCase
   end
 
   def test_will_paginate_with_options
-    get :list_developers, :page => 2, :class => 'will_paginate', :prev_label => 'Prev', :next_label => 'Next'
+    get :list_developers, :page => 2, :options => {
+      :class => 'will_paginate', :prev_label => 'Prev', :next_label => 'Next'
+    }
     assert_response :success
     
     entries = assigns :developers
@@ -93,7 +94,7 @@ class PaginationTest < Test::Unit::TestCase
   end
   
   def test_will_paginate_with_custom_page_param
-    get :list_developers, :developers_page => 2, :param_name => :developers_page
+    get :list_developers, :developers_page => 2, :options => { :param_name => :developers_page }
     assert_response :success
     
     entries = assigns :developers
@@ -109,7 +110,7 @@ class PaginationTest < Test::Unit::TestCase
   end
 
   def test_will_paginate_windows
-    get :list_developers, :page => 6, :per_page => 1, :inner_window => 2
+    get :list_developers, :page => 6, :per_page => 1, :options => { :inner_window => 2 }
     assert_response :success
     
     entries = assigns :developers
