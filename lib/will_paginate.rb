@@ -1,3 +1,5 @@
+require 'active_support'
+
 # = You *will* paginate!
 #
 # First read about WillPaginate::Finder::ClassMethods, then see
@@ -37,6 +39,19 @@ module WillPaginate
           alias_method_chain :method_missing, :paginate
         end
       end
+    end
+  end
+
+  module Deprecation
+    extend ActiveSupport::Deprecation
+
+    def self.warn(message, callstack = caller)
+      message = 'WillPaginate: ' + message.strip.gsub(/ {3,}/, ' ')
+      behavior.call(message, callstack) if behavior && !silenced?
+    end
+
+    def self.silenced?
+      ActiveSupport::Deprecation.silenced?
     end
   end
 end

@@ -13,16 +13,15 @@ require 'will_paginate'
 WillPaginate.enable_actionpack
 
 class PaginationTest < Test::Unit::TestCase
-  class Developer
-    # dummy
-  end
   
   class PaginationController < ActionController::Base
     def list_developers
       @options = params.delete(:options) || {}
-      page = params[@options[:param_name] || :page] || 1
       
-      @developers = (1..11).to_a.paginate(page, params[:per_page] || 4)
+      @developers = (1..11).to_a.paginate(
+        :page => params[@options[:param_name] || :page] || 1,
+        :per_page => params[:per_page] || 4
+      )
 
       render :inline => '<%= will_paginate @developers, @options %>'
     end

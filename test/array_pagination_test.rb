@@ -1,26 +1,49 @@
 require File.dirname(__FILE__) + '/helper'
+require 'will_paginate'
 require 'will_paginate/core_ext'
 
 class ArrayPaginationTest < Test::Unit::TestCase
   def test_simple
     collection = ('a'..'e').to_a
     
-    [{ :current => 1,  :per_page => 3,  :expected => %w( a b c ) },
-     { :current => 2,  :per_page => 3,  :expected => %w( d e ) },
-     { :current => 1,  :per_page => 5,  :expected => %w( a b c d e ) },
-     { :current => 3,  :per_page => 5,  :expected => [] },
-     { :current => -1, :per_page => 5,  :expected => [] },
-     { :current => 1,  :per_page => -5, :expected => [] },
+    [{ :page => 1,  :per_page => 3,  :expected => %w( a b c ) },
+     { :page => 2,  :per_page => 3,  :expected => %w( d e ) },
+     { :page => 1,  :per_page => 5,  :expected => %w( a b c d e ) },
+     { :page => 3,  :per_page => 5,  :expected => [] },
+     { :page => -1, :per_page => 5,  :expected => [] },
+     { :page => 1,  :per_page => -5, :expected => [] },
     ].
     each do |conditions|
-      assert_equal conditions[:expected], collection.paginate(conditions[:current], conditions[:per_page])
+      assert_equal conditions[:expected], collection.paginate(conditions.slice(:page, :per_page))
     end
   end
 
   def test_defaults
-    result = ('a'..'z').to_a.paginate
+    result = (1..50).to_a.paginate
     assert_equal 1, result.current_page
-    assert_equal 15, result.size
+    assert_equal 30, result.size
+  end
+
+  def test_deprecated_api
+    assert_deprecated 'paginate API' do
+      result = (1..50).to_a.paginate(2, 10)
+      assert_equal 2, result.current_page
+      assert_equal (11..20).to_a, result
+      assert_equal 50, result.total_entries
+    end
+    
+    assert_deprecated { [].paginate nil }
+  end
+
+  def test_total_entries_has_precedence
+    result = %w(a b c).paginate :total_entries => 5
+    assert_equal 5, result.total_entries
+  end
+
+  def test_argument_error_with_params_and_another_argument
+    assert_raise ArgumentError do
+      [].paginate({}, 5)
+    end
   end
 
   def test_paginated_collection
@@ -76,12 +99,23 @@ class ArrayPaginationTest < Test::Unit::TestCase
   end
 
   private
-
     def create(page = 2, limit = 5, total = nil, &block)
       WillPaginate::Collection.create(page, limit, total, &block)
     end
 
     def array(size = 3)
       Array.new(size)
+    end
+    
+    def collect_deprecations
+      old_behavior = WillPaginate::Deprecation.behavior
+      deprecations = []
+      WillPaginate::Deprecation.behavior = Proc.new do |message, callstack|
+        deprecations << message
+      end
+      result = yield
+      [result, deprecations]
+    ensure
+      WillPaginate::Deprecation.behavior = old_behavior
     end
 end
