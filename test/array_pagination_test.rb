@@ -49,7 +49,7 @@ class ArrayPaginationTest < Test::Unit::TestCase
   def test_paginated_collection
     entries = %w(a b c)
     collection = create(2, 3, 10) do |pager|
-      pager.replace entries
+      assert_equal entries, pager.replace(entries)
     end
 
     assert_equal entries, collection
