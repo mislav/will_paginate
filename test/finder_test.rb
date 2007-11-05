@@ -267,6 +267,7 @@ class FinderTest < ActiveRecordTestCase
     end
 
     def test_should_use_scoped_finders_if_present
+      # scope-out compatibility
       Topic.expects(:find_best).returns(Array.new(5))
       Topic.expects(:with_best).returns(1)
       

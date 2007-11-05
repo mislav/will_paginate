@@ -94,11 +94,11 @@ module WillPaginate
         # paginate finders are really just find_* with limit and offset
         finder = method.to_s.sub /^paginate/, 'find'
 
-        # :all is implicit, naturally
+        # :all is implicit
         if finder == 'find'
           args.unshift(:all) if args.empty?
         elsif finder.index('find_by_') == 0
-          finder.sub! 'find', 'find_all'
+          finder.sub! /^find/, 'find_all'
         end
 
         WillPaginate::Collection.create(page, per_page, total_entries) do |pager|
@@ -128,7 +128,7 @@ module WillPaginate
         # we may be in a model or an association proxy!
         klass = (@owner and @reflection) ? @reflection.klass : self
 
-        count = if klass.respond_to?(scoper = finder.sub(/^find/, 'with'))
+        count = if finder =~ /^find_/ and klass.respond_to?(scoper = finder.sub(/^find_/, 'with_'))
                   # scope_out adds a 'with_finder' method which acts like with_scope, if it's present
                   # then execute the count with the scoping provided by the with_finder  
                   send(scoper, &counter)
