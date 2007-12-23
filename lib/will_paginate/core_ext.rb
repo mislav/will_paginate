@@ -1,3 +1,4 @@
+require 'will_paginate'
 require 'set'
 
 unless Hash.instance_methods.include? 'except'
@@ -48,7 +49,7 @@ unless Array.instance_methods.include? 'paginate'
         options = {}
       else
         options = options_or_page
-        page = options[:page] || 1
+        page = options[:page]
         raise ArgumentError, "wrong number of arguments (1 hash or 2 Fixnums expected)" if per_page
         per_page = options[:per_page]
       end

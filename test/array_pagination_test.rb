@@ -1,5 +1,4 @@
 require File.dirname(__FILE__) + '/helper'
-require 'will_paginate'
 require 'will_paginate/core_ext'
 
 class ArrayPaginationTest < Test::Unit::TestCase
@@ -10,8 +9,6 @@ class ArrayPaginationTest < Test::Unit::TestCase
      { :page => 2,  :per_page => 3,  :expected => %w( d e ) },
      { :page => 1,  :per_page => 5,  :expected => %w( a b c d e ) },
      { :page => 3,  :per_page => 5,  :expected => [] },
-     { :page => -1, :per_page => 5,  :expected => [] },
-     { :page => 1,  :per_page => -5, :expected => [] },
     ].
     each do |conditions|
       assert_equal conditions[:expected], collection.paginate(conditions.slice(:page, :per_page))
@@ -65,9 +62,6 @@ class ArrayPaginationTest < Test::Unit::TestCase
     entries = create(2, 3, 2){}
     assert entries.out_of_bounds?
     
-    entries = create(0, 3, 2){}
-    assert entries.out_of_bounds?
-    
     entries = create(1, 3, 2){}
     assert !entries.out_of_bounds?
   end
@@ -98,9 +92,25 @@ class ArrayPaginationTest < Test::Unit::TestCase
     assert_equal nil, entries.total_entries
   end
 
+  def test_invalid_page
+    bad_input = [0, -1, nil, '', 'Schnitzel']
+
+    bad_input.each do |bad|
+      assert_raise(WillPaginate::InvalidPage) { create(bad) }
+    end
+  end
+
+  def test_invalid_per_page_setting
+    assert_raise(ArgumentError) { create(1, -1) }
+  end
+
   private
     def create(page = 2, limit = 5, total = nil, &block)
-      WillPaginate::Collection.create(page, limit, total, &block)
+      if block_given?
+        WillPaginate::Collection.create(page, limit, total, &block)
+      else
+        WillPaginate::Collection.new(page, limit, total)
+      end
     end
 
     def array(size = 3)

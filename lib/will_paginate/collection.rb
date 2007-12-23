@@ -1,4 +1,12 @@
+require 'will_paginate'
+
 module WillPaginate
+  class InvalidPage < ArgumentError
+    def initialize(page, page_num)
+      super "#{page.inspect} given as value, which translates to '#{page_num}' as page number"
+    end
+  end
+  
   # Arrays returned from paginating finds are, in fact, instances of this.
   # You may think of WillPaginate::Collection as an ordinary array with some
   # extra properties. Those properties are used by view helpers to generate
@@ -17,7 +25,9 @@ module WillPaginate
     #
     def initialize(page, per_page, total = nil)
       @current_page = page.to_i
+      raise InvalidPage.new(page, @current_page) if @current_page < 1
       @per_page     = per_page.to_i
+      raise ArgumentError, "`per_page` setting cannot be less than 1 (#{@per_page} given)" if @per_page < 1
       
       self.total_entries = total if total
     end
@@ -58,10 +68,11 @@ module WillPaginate
       @total_pages
     end
 
-    # Helper method that is true when someone tries to fetch a page with a larger
-    # number than the last page or with a number smaller than 1
+    # Helper method that is true when someone tries to fetch a page with a
+    # larger number than the last page. Can be used in combination with flashes
+    # and redirecting.
     def out_of_bounds?
-      current_page > page_count or current_page < 1
+      current_page > page_count
     end
 
     # Current offset of the paginated collection. If we're on the first page,

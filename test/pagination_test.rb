@@ -135,11 +135,19 @@ class PaginationTest < Test::Unit::TestCase
     assert_equal '', @response.body
   end
   
+  def test_faulty_input
+    assert_raise WillPaginate::InvalidPage do
+      get :list_developers, :page => 'foo'
+    end
+  end
+  
 protected
 
   def validate_page_numbers expected, links, param_name = :page
+    param_pattern = /\W#{param_name}=([^&]*)/
+    
     assert_equal(expected, links.map { |e|
-      e['href'] =~ /\W#{param_name}=([^&]*)/
+      e['href'] =~ param_pattern
       $1 ? $1.to_i : $1
     })
   end
