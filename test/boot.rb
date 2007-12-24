@@ -10,14 +10,23 @@ else
   app_root = plugin_root + '/../../..'
 
   if File.directory? app_root + '/config'
-    puts 'using config/boot.rb'
+    puts "using application's config/boot.rb"
     ENV['RAILS_ENV'] = 'test'
     require File.expand_path(app_root + '/config/boot')
   else
     # simply use installed gems if available
-    puts 'using rubygems'
+    version = ENV['RAILS_VERSION']
+    version = nil if version and version == ""
+    
+    puts "using Rails#{version ? ' ' + version : nil} gems"
     require 'rubygems'
-    gem 'actionpack'; gem 'activerecord'
+    
+    if version
+      gem 'rails', version
+    else
+      gem 'actionpack'
+      gem 'activerecord'
+    end
   end
 end
 

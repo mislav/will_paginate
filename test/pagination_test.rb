@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/helper'
 require 'action_controller'
 require 'action_controller/test_process'
 
-ActionController::Routing::Routes.reload rescue nil
+# ActionController::Routing::Routes.reload rescue nil
 ActionController::Routing::Routes.draw do |map|
   map.connect ':controller/:action/:id'
 end
@@ -16,7 +16,7 @@ class PaginationTest < Test::Unit::TestCase
   
   class PaginationController < ActionController::Base
     def list_developers
-      @options = params.delete(:options) || {}
+      @options = session[:wp] || {}
       
       @developers = (1..11).to_a.paginate(
         :page => params[@options[:param_name] || :page] || 1,
@@ -57,7 +57,7 @@ class PaginationTest < Test::Unit::TestCase
   end
 
   def test_will_paginate_with_options
-    get :list_developers, :page => 2, :options => {
+    get :list_developers, { :page => 2 }, :wp => {
       :class => 'will_paginate', :prev_label => 'Prev', :next_label => 'Next'
     }
     assert_response :success
@@ -76,24 +76,33 @@ class PaginationTest < Test::Unit::TestCase
     end
   end
   
-  def test_will_paginate_preserves_parameters
+  def test_will_paginate_preserves_parameters_on_get
     get :list_developers, :foo => { :bar => 'baz' }
-    assert_response :success
+    assert_links_match /foo%5Bbar%5D=baz/
+  end
+  
+  def test_will_paginate_doesnt_preserve_parameters_on_post
+    post :list_developers, :foo => 'bar'
+    assert_no_links_match /foo=bar/
+  end
+  
+  def test_adding_additional_parameters
+    get :list_developers, {}, :wp => { :params => { :foo => 'bar' } }
+    assert_links_match /foo=bar/
+  end
+  
+  def test_removing_arbitrary_parameters
+    get :list_developers, { :foo => 'bar' }, :wp => { :params => { :foo => nil } }
+    assert_no_links_match /foo=bar/
+  end
     
-    assert_select 'div.pagination', 1, 'no main DIV' do
-      assert_select 'a[href]', 3 do |elements|
-        elements.each do |el|
-          assert_match /foo%5Bbar%5D=baz/, el['href'], "THIS IS A BUG in Rails 1.2 which " +
-            "has been fixed in Rails 2.0."
-          # there is no need to worry *unless* you too are using hashes in parameters which
-          # need to be preserved over pages
-        end
-      end
-    end
+  def test_adding_additional_route_parameters
+    get :list_developers, {}, :wp => { :params => { :controller => 'baz' } }
+    assert_links_match %r{\Wbaz/list_developers\W}
   end
   
   def test_will_paginate_with_custom_page_param
-    get :list_developers, :developers_page => 2, :options => { :param_name => :developers_page }
+    get :list_developers, { :developers_page => 2 }, :wp => { :param_name => :developers_page }
     assert_response :success
     
     entries = assigns :developers
@@ -109,7 +118,7 @@ class PaginationTest < Test::Unit::TestCase
   end
 
   def test_will_paginate_windows
-    get :list_developers, :page => 6, :per_page => 1, :options => { :inner_window => 2 }
+    get :list_developers, { :page => 6, :per_page => 1 }, :wp => { :inner_window => 2 }
     assert_response :success
     
     entries = assigns :developers
@@ -150,5 +159,21 @@ protected
       e['href'] =~ param_pattern
       $1 ? $1.to_i : $1
     })
+  end
+
+  def assert_links_match pattern
+    assert_select 'div.pagination a[href]' do |elements|
+      elements.each do |el|
+        assert_match pattern, el['href']
+      end
+    end
+  end
+
+  def assert_no_links_match pattern
+    assert_select 'div.pagination a[href]' do |elements|
+      elements.each do |el|
+        assert_no_match pattern, el['href']
+      end
+    end
   end
 end

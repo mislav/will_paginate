@@ -19,7 +19,8 @@ module WillPaginate
           :inner_window => 4, # links around the current page
           :outer_window => 1, # links around beginning and end
           :separator    => ' ', # single space is friendly to spiders and non-graphic browsers
-          :param_name   => :page
+          :param_name   => :page,
+          :params       => nil
           }
     mattr_reader :pagination_options
 
@@ -29,19 +30,25 @@ module WillPaginate
     # Options for will_paginate view helper:
     # 
     #   class:        CSS class name for the generated DIV (default "pagination")
-    #   prev_label:   default '&laquo; Previous',
-    #   next_label:   default 'Next &raquo;',
+    #   prev_label:   default '&laquo; Previous'
+    #   next_label:   default 'Next &raquo;'
     #   inner_window: how many links are shown around the current page, defaults to 4
     #   outer_window: how many links are around the first and the last page, defaults to 1
     #   separator:    string separator for page HTML elements, default " " (single space)
     #   param_name:   parameter name for page number in URLs, defaults to "page"
+    #   params:       additional parameters when generating pagination links
+    #                 (eg. :controller => 'foo', :action => nil)
     #
-    # All extra options are passed to the generated container DIV, so eventually
-    # they become its HTML attributes.
+    # All options beside listed ones are passed as HTML attributes to the container
+    # element for pagination links (the DIV). For example:
+    # 
+    #   <%= will_paginate @posts, :id => 'wp_posts' %>
+    #
+    # ... will result in:
+    #
+    #   <div class="pagination" id="wp_posts"> ... </div>
     #
     def will_paginate(entries = @entries, options = {})
-      total_pages = 
-
       if entries.page_count > 1
         renderer = WillPaginate::LinkRenderer.new entries, options, self
         links = renderer.items
@@ -78,8 +85,8 @@ module WillPaginate
 
     def windowed_paginator
       inner_window, outer_window = @options[:inner_window].to_i, @options[:outer_window].to_i
-      min = page - inner_window
-      max = page + inner_window
+      min = current_page - inner_window
+      max = current_page + inner_window
       # adjust lower or upper limit if other is out of bounds
       if max > total_pages then min -= max - total_pages
       elsif min < 1 then max += 1 - min
@@ -98,7 +105,7 @@ module WillPaginate
 
         unless n - prev > 1
           prev = n
-          links << page_link_or_span((n != page ? n : nil), 'current', n)
+          links << page_link_or_span((n != current_page ? n : nil), 'current', n)
         else
           # ellipsis represents the gap between windows
           prev = n - 1
@@ -111,17 +118,24 @@ module WillPaginate
     end
 
     def page_link_or_span(page, span_class, text)
-      unless page
-        @template.content_tag :span, text, :class => span_class
+      if page
+        @template.link_to text, url_options(page)
       else
-        # page links should preserve GET/POST parameters
-        @template.link_to text, @template.params.merge(param => page != 1 ? page : nil)
+        @template.content_tag :span, text, :class => span_class
       end
+    end
+
+    def url_options(page)
+      options = { param_name => page != 1 ? page : nil }
+      # page links should preserve GET parameters
+      options = params.merge(options) if @template.request.get?
+      options.rec_merge!(@options[:params]) if @options[:params]
+      return options
     end
 
   private
 
-    def page
+    def current_page
       @collection.current_page
     end
 
@@ -129,8 +143,12 @@ module WillPaginate
       @collection.page_count
     end
 
-    def param
-      @options[:param_name].to_sym
+    def param_name
+      @param_name ||= @options[:param_name].to_sym
+    end
+
+    def params
+      @params ||= @template.params.to_hash.symbolize_keys
     end
   end
 end
