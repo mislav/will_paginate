@@ -2,7 +2,6 @@ require File.dirname(__FILE__) + '/helper'
 require 'action_controller'
 require 'action_controller/test_process'
 
-# ActionController::Routing::Routes.reload rescue nil
 ActionController::Routing::Routes.draw do |map|
   map.connect ':controller/:action/:id'
 end

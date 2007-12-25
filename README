@@ -19,6 +19,8 @@ Simply do:
 
   script/plugin install svn://errtheblog.com/svn/plugins/will_paginate
 
+The plugin officially supports Rails versions 1.2.6 and 2.0.2.
+
 == Example usage
 
 Use a paginate finder in the controller:
