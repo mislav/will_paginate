@@ -94,9 +94,9 @@ Chris Wanstrath, Dr. Nic Williams, K. Adam Christensen, Mike Garey, Bence
 Golda, Matt Aimonetti, Charles Brian Quinn, Desi McAdam, James Coglan, Matijs
 van Zuijlen, Hongli Lai.
 
-== Want Digg style?
+== Usable pagination in the UI
 
-Copy the following css into your stylesheet for a good start:
+Copy the following CSS into your stylesheet for a good start:
 
   .pagination {
     padding: 3px;
@@ -127,3 +127,12 @@ Copy the following css into your stylesheet for a good start:
     border: 1px solid #eee;
     color: #ddd;
   }
+
+More reading about pagination as design pattern:
+
+* Pagination 101:
+  http://kurafire.net/log/archive/2007/06/22/pagination-101
+* Pagination gallery:
+  http://www.smashingmagazine.com/2007/11/16/pagination-gallery-examples-and-good-practices/
+* Pagination on Yahoo Design Pattern Library:
+  http://developer.yahoo.com/ypatterns/parent.php?pattern=pagination
