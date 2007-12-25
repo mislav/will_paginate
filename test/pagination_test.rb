@@ -79,6 +79,19 @@ class PaginationTest < Test::Unit::TestCase
       assert_select 'span.current', entries.current_page.to_s
     end
   end
+
+  def test_will_paginate_without_container
+    get :list_developers, {}, :wp => { :container => false }
+    assert_select 'div.pagination', 0, 'no main DIV'
+    assert_select 'a[href]', 3
+  end
+
+  def test_will_paginate_without_page_links
+    get :list_developers, { :page => 2 }, :wp => { :page_links => false }
+    assert_select 'a[href]', 2 do |elements|
+      validate_page_numbers [1,3], elements
+    end
+  end
   
   def test_will_paginate_preserves_parameters_on_get
     get :list_developers, :foo => { :bar => 'baz' }

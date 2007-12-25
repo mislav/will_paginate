@@ -7,8 +7,8 @@ module WillPaginate
   # the controller.
   #
   # This error is *not* raised when a page further than the last page is
-  # requested. Use <tt>WillPaginate::Collection#out_of_bounds?</tt> method to check for those
-  # cases and manually deal with them as you see fit.
+  # requested. Use <tt>WillPaginate::Collection#out_of_bounds?</tt> method to
+  # check for those cases and manually deal with them as you see fit.
   class InvalidPage < ArgumentError
     def initialize(page, page_num)
       super "#{page.inspect} given as value, which translates to '#{page_num}' as page number"
@@ -55,7 +55,7 @@ module WillPaginate
     #   end
     #
     # The possibilities with this are endless. For another example, here is how
-    # WillPaginate defines pagination on Array instances:
+    # WillPaginate used to define pagination for Array instances:
     #
     #   Array.class_eval do
     #     def paginate(page = 1, per_page = 15)

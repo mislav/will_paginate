@@ -29,7 +29,9 @@ module WillPaginate
       :separator    => ' ', # single space is friendly to spiders and non-graphic browsers
       :param_name   => :page,
       :params       => nil,
-      :renderer     => 'WillPaginate::LinkRenderer'
+      :renderer     => 'WillPaginate::LinkRenderer',
+      :page_links   => true,
+      :container    => true
     }
     mattr_reader :pagination_options
 
@@ -48,6 +50,9 @@ module WillPaginate
     # * <tt>:params</tt> -- additional parameters when generating pagination links
     #   (eg. <tt>:controller => "foo", :action => nil</tt>)
     # * <tt>:renderer</tt> -- class name of the link renderer (default: WillPaginate::LinkRenderer)
+    # * <tt>:page_links</tt> -- when false, only previous/next links are rendered (default: true)
+    # * <tt>:container</tt> -- toggles rendering of the DIV container for pagination links, set to
+    #   false only when you are rendering your own pagination markup (default: true)
     #
     # All options beside listed ones are passed as HTML attributes to the container
     # element for pagination links (the DIV). For example:
@@ -79,7 +84,7 @@ module WillPaginate
       renderer_class = options[:renderer].to_s.constantize
       renderer = renderer_class.new collection, options, self
       # render HTML for pagination
-      content_tag :div, renderer.to_html, renderer.html_attributes
+      renderer.to_html
     end
   end
 
@@ -95,15 +100,24 @@ module WillPaginate
     end
 
     def to_html
-      returning windowed_paginator do |links|
-        # next and previous buttons
-        links.unshift page_link_or_span(@collection.previous_page, 'disabled', @options[:prev_label])
-        links.push    page_link_or_span(@collection.next_page,     'disabled', @options[:next_label])
-      end.join(@options[:separator])
+      links = @options[:page_links] ? windowed_paginator : []
+      # previous/next buttons
+      links.unshift page_link_or_span(@collection.previous_page, 'disabled', @options[:prev_label])
+      links.push    page_link_or_span(@collection.next_page,     'disabled', @options[:next_label])
+      
+      html = links.join(@options[:separator])
+      @options[:container] ? @template.content_tag(:div, html, html_attributes) : html
     end
 
     def html_attributes
-      @html_attributes ||= @options.except *(WillPaginate::ViewHelpers.pagination_options.keys - [:class])
+      return @html_attributes if @html_attributes
+      @html_attributes = @options.except *(WillPaginate::ViewHelpers.pagination_options.keys - [:class])
+      # pagination of Post models will automatically have the ID "posts_pagination"
+      # FIXME: this has negative implications
+      #if @options[:container] and defined?(ActiveRecord) and @collection.first.is_a?(ActiveRecord::Base)
+      #  @html_attributes[:id] = @collection.first.class.name.underscore.pluralize + '_pagination'
+      #end
+      @html_attributes
     end
     
   protected
