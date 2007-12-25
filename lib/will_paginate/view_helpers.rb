@@ -53,6 +53,9 @@ module WillPaginate
     # * <tt>:page_links</tt> -- when false, only previous/next links are rendered (default: true)
     # * <tt>:container</tt> -- toggles rendering of the DIV container for pagination links, set to
     #   false only when you are rendering your own pagination markup (default: true)
+    # * <tt>:id</tt> -- HTML ID for the container (default: nil). Pass +true+ to have the ID automatically
+    #   generated from the class name of objects in collection: for example, paginating
+    #   ArticleComment models would yield an ID of "article_comments_pagination".
     #
     # All options beside listed ones are passed as HTML attributes to the container
     # element for pagination links (the DIV). For example:
@@ -112,11 +115,10 @@ module WillPaginate
     def html_attributes
       return @html_attributes if @html_attributes
       @html_attributes = @options.except *(WillPaginate::ViewHelpers.pagination_options.keys - [:class])
-      # pagination of Post models will automatically have the ID "posts_pagination"
-      # FIXME: this has negative implications
-      #if @options[:container] and defined?(ActiveRecord) and @collection.first.is_a?(ActiveRecord::Base)
-      #  @html_attributes[:id] = @collection.first.class.name.underscore.pluralize + '_pagination'
-      #end
+      # pagination of Post models will have the ID of "posts_pagination"
+      if @options[:container] and @options[:id] === true
+        @html_attributes[:id] = @collection.first.class.name.underscore.pluralize + '_pagination'
+      end
       @html_attributes
     end
     

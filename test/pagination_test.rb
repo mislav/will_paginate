@@ -181,6 +181,23 @@ class PaginationTest < Test::Unit::TestCase
     end
     assert ex.message.include?('@developers')
   end
+
+  def test_setting_id_for_container
+    get :list_developers
+    assert_select 'div.pagination', 1 do |div|
+      assert_nil div.first['id']
+    end
+    # magic ID
+    get :list_developers, {}, :wp => { :id => true }
+    assert_select 'div.pagination', 1 do |div|
+      assert_equal 'fixnums_pagination', div.first['id']
+    end
+    # explicit ID
+    get :list_developers, {}, :wp => { :id => 'custom_id' }
+    assert_select 'div.pagination', 1 do |div|
+      assert_equal 'custom_id', div.first['id']
+    end
+  end
   
 protected
 
