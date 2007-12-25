@@ -1,21 +1,25 @@
 = WillPaginate
 
 Pagination is just limiting the number of records displayed. Why should you let
-it get in your way while doing more important tasks on your project? This
-plugin makes magic happen. Ever wanted to be able to do just this:
+it get in your way while developing, then? This plugin makes magic happen. Did
+you ever want to be able to do just this on a model:
 
   Post.paginate :page => 1
 
-... and then render the page links with a single call to a view helper? Well,
-now you can. Simply:
+... and then render the page links with a single view helper? Well, now you
+can. Ryan Bates made an awesome screencast[http://railscasts.com/episodes/51],
+check it out.
+
+Need to ask questions? Join our Google
+group[http://groups.google.com/group/will_paginate].
+
+== Install the plugin
+
+Simply do:
 
   script/plugin install svn://errtheblog.com/svn/plugins/will_paginate
 
-Ryan Bates made an awesome screencast[http://railscasts.com/episodes/51], check
-it out.
-
-
-== Example usage:
+== Example usage
 
 Use a paginate finder in the controller:
 
@@ -77,7 +81,7 @@ BROWSE SOURCE on Warehouse: http://plugins.require.errtheblog.com/browser/will_p
 Want to discuss, request features, ask questions? Join the Google group:
 http://groups.google.com/group/will_paginate
 
-  Ruby port by:           PJ Hyett, Mislav Marohnić (Sulien)
+  Authors:                Mislav Marohnić, PJ Hyett
   Original announcement:  http://errtheblog.com/post/929 
   Original PHP source:    http://www.strangerstudios.com/sandbox/pagination/diggstyle.php
   Contributors:           Chris Wanstrath, Dr. Nic Williams, K. Adam Christensen, 

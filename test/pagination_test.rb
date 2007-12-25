@@ -14,7 +14,7 @@ WillPaginate.enable_actionpack
 
 class PaginationTest < Test::Unit::TestCase
   
-  class PaginationController < ActionController::Base
+  class DevelopersController < ActionController::Base
     def list_developers
       @options = session[:wp] || {}
       
@@ -26,13 +26,18 @@ class PaginationTest < Test::Unit::TestCase
       render :inline => '<%= will_paginate @developers, @options %>'
     end
 
+    def guess_collection_name
+      @developers = session[:wp]
+      render :inline => '<%= will_paginate %>'
+    end
+
     protected
       def rescue_errors(e) raise e end
       def rescue_action(e) raise e end
   end
   
   def setup
-    @controller = PaginationController.new
+    @controller = DevelopersController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
     super
@@ -68,7 +73,7 @@ class PaginationTest < Test::Unit::TestCase
 
     assert_select 'div.will_paginate', 1, 'no main DIV' do
       assert_select 'a[href]', 4 do |elements|
-        validate_page_numbers [nil,nil,3,3], elements
+        validate_page_numbers [1,1,3,3], elements
         assert_select elements.first, 'a', "Prev"
         assert_select elements.last, 'a', "Next"
       end
@@ -111,7 +116,7 @@ class PaginationTest < Test::Unit::TestCase
 
     assert_select 'div.pagination', 1, 'no main DIV' do
       assert_select 'a[href]', 4 do |elements|
-        validate_page_numbers [nil,nil,3,3], elements, :developers_page
+        validate_page_numbers [1,1,3,3], elements, :developers_page
       end
       assert_select 'span.current', entries.current_page.to_s
     end    
@@ -127,7 +132,7 @@ class PaginationTest < Test::Unit::TestCase
 
     assert_select 'div.pagination', 1, 'no main DIV' do
       assert_select 'a[href]', 10 do |elements|
-        validate_page_numbers [5,nil,2,4,5,7,8,10,11,7], elements
+        validate_page_numbers [5,1,2,4,5,7,8,10,11,7], elements
         assert_select elements.first, 'a', "&laquo; Previous"
         assert_select elements.last, 'a', "Next &raquo;"
       end
@@ -144,9 +149,17 @@ class PaginationTest < Test::Unit::TestCase
     assert_equal '', @response.body
   end
   
-  def test_faulty_input
+  def test_faulty_input_raises_error
     assert_raise WillPaginate::InvalidPage do
       get :list_developers, :page => 'foo'
+    end
+  end
+
+  uses_mocha 'helper internals' do
+    def test_collection_name_can_be_guessed
+      collection = mock
+      collection.expects(:page_count).returns(1)
+      get :guess_collection_name, {}, :wp => collection
     end
   end
   

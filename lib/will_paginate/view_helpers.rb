@@ -20,7 +20,8 @@ module WillPaginate
           :outer_window => 1, # links around beginning and end
           :separator    => ' ', # single space is friendly to spiders and non-graphic browsers
           :param_name   => :page,
-          :params       => nil
+          :params       => nil,
+          :renderer     => 'WillPaginate::LinkRenderer'
           }
     mattr_reader :pagination_options
 
@@ -38,6 +39,7 @@ module WillPaginate
     #   param_name:   parameter name for page number in URLs, defaults to "page"
     #   params:       additional parameters when generating pagination links
     #                 (eg. :controller => 'foo', :action => nil)
+    #   renderer:     class name of the link renderer, defaults to WillPaginate::LinkRenderer
     #
     # All options beside listed ones are passed as HTML attributes to the container
     # element for pagination links (the DIV). For example:
@@ -48,13 +50,16 @@ module WillPaginate
     #
     #   <div class="pagination" id="wp_posts"> ... </div>
     #
-    def will_paginate(entries = @entries, options = {})
-      if entries.page_count > 1
-        renderer = WillPaginate::LinkRenderer.new entries, options, self
-        links = renderer.items
-        
-        content_tag :div, links, renderer.html_options
-      end
+    def will_paginate(collection = nil, options = {})
+      collection = instance_variable_get("@#{controller.controller_name}") unless collection
+      # early exit if there is nothing to render
+      return nil unless collection.page_count > 1
+      options = options.symbolize_keys.reverse_merge WillPaginate::ViewHelpers.pagination_options
+      # create the renderer instance
+      renderer_class = options[:renderer].to_s.constantize
+      renderer = renderer_class.new collection, options, self
+      # render HTML for pagination
+      content_tag :div, renderer.to_html, renderer.html_attributes
     end
   end
 
@@ -65,11 +70,11 @@ module WillPaginate
 
     def initialize(collection, options, template)
       @collection = collection
-      @options = options.symbolize_keys.reverse_merge WillPaginate::ViewHelpers.pagination_options
-      @template = template
+      @options    = options
+      @template   = template
     end
 
-    def items
+    def to_html
       returning windowed_paginator do |links|
         # next and previous buttons
         links.unshift page_link_or_span(@collection.previous_page, 'disabled', @options[:prev_label])
@@ -77,8 +82,8 @@ module WillPaginate
       end.join(@options[:separator])
     end
 
-    def html_options
-      @options.except *(WillPaginate::ViewHelpers.pagination_options.keys - [:class])
+    def html_attributes
+      @html_attributes ||= @options.except *(WillPaginate::ViewHelpers.pagination_options.keys - [:class])
     end
     
   protected
@@ -126,7 +131,7 @@ module WillPaginate
     end
 
     def url_options(page)
-      options = { param_name => page != 1 ? page : nil }
+      options = { param_name => page }
       # page links should preserve GET parameters
       options = params.merge(options) if @template.request.get?
       options.rec_merge!(@options[:params]) if @options[:params]
