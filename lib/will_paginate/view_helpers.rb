@@ -1,7 +1,14 @@
 require 'will_paginate/core_ext'
 
 module WillPaginate
-  # = Global options for pagination helpers
+  # = Will Paginate view helpers
+  #
+  # Currently there is only one view helper: +will_paginate+. It renders the
+  # pagination links for the given collection. The helper itself is lightweight
+  # and serves only as a wrapper around link renderer instantiation; the
+  # renderer then does all the hard work of generating the HTML.
+  # 
+  # == Global options for helpers
   #
   # Options for pagination helpers are optional and get their default values from the
   # WillPaginate::ViewHelpers.pagination_options hash. You can write to this hash to
@@ -13,33 +20,34 @@ module WillPaginate
   # and next pages, as well as override some other defaults to your liking.
   module ViewHelpers
     # default options that can be overridden on the global level
-    @@pagination_options = { :class => 'pagination',
-          :prev_label   => '&laquo; Previous',
-          :next_label   => 'Next &raquo;',
-          :inner_window => 4, # links around the current page
-          :outer_window => 1, # links around beginning and end
-          :separator    => ' ', # single space is friendly to spiders and non-graphic browsers
-          :param_name   => :page,
-          :params       => nil,
-          :renderer     => 'WillPaginate::LinkRenderer'
-          }
+    @@pagination_options = {
+      :class        => 'pagination',
+      :prev_label   => '&laquo; Previous',
+      :next_label   => 'Next &raquo;',
+      :inner_window => 4, # links around the current page
+      :outer_window => 1, # links around beginning and end
+      :separator    => ' ', # single space is friendly to spiders and non-graphic browsers
+      :param_name   => :page,
+      :params       => nil,
+      :renderer     => 'WillPaginate::LinkRenderer'
+    }
     mattr_reader :pagination_options
 
-    # Renders Digg-style pagination. (We know you wanna!)
-    # Returns nil if there is only one page in total (can't paginate that).
+    # Renders Digg/Flickr-style pagination for a WillPaginate::Collection
+    # object. Nil is returned if there is only one page in total; no point in
+    # rendering the pagination in that case...
     # 
-    # Options for will_paginate view helper:
-    # 
-    #   class:        CSS class name for the generated DIV (default "pagination")
-    #   prev_label:   default '&laquo; Previous'
-    #   next_label:   default 'Next &raquo;'
-    #   inner_window: how many links are shown around the current page, defaults to 4
-    #   outer_window: how many links are around the first and the last page, defaults to 1
-    #   separator:    string separator for page HTML elements, default " " (single space)
-    #   param_name:   parameter name for page number in URLs, defaults to "page"
-    #   params:       additional parameters when generating pagination links
-    #                 (eg. :controller => 'foo', :action => nil)
-    #   renderer:     class name of the link renderer, defaults to WillPaginate::LinkRenderer
+    # ==== Options
+    # * <tt>:class</tt> -- CSS class name for the generated DIV (default: "pagination")
+    # * <tt>:prev_label</tt> -- default: "« Previous"
+    # * <tt>:next_label</tt> -- default: "Next »"
+    # * <tt>:inner_window</tt> -- how many links are shown around the current page (default: 4)
+    # * <tt>:outer_window</tt> -- how many links are around the first and the last page (default: 1)
+    # * <tt>:separator</tt> -- string separator for page HTML elements (default: single space)
+    # * <tt>:param_name</tt> -- parameter name for page number in URLs (default: <tt>:page</tt>)
+    # * <tt>:params</tt> -- additional parameters when generating pagination links
+    #   (eg. <tt>:controller => "foo", :action => nil</tt>)
+    # * <tt>:renderer</tt> -- class name of the link renderer (default: WillPaginate::LinkRenderer)
     #
     # All options beside listed ones are passed as HTML attributes to the container
     # element for pagination links (the DIV). For example:
@@ -50,8 +58,20 @@ module WillPaginate
     #
     #   <div class="pagination" id="wp_posts"> ... </div>
     #
+    # ==== Using the helper without arguments
+    # If the helper is called without passing in the collection object, it will
+    # try to read from the instance variable inferred by the controller name.
+    # For example, calling +will_paginate+ while the current controller is
+    # PostsController will result in trying to read from the <tt>@posts</tt>
+    # variable.
+    #
     def will_paginate(collection = nil, options = {})
-      collection = instance_variable_get("@#{controller.controller_name}") unless collection
+      unless collection or !controller
+        collection_name = "@#{controller.controller_name}"
+        collection = instance_variable_get(collection_name)
+        raise ArgumentError, "The #{collection_name} variable appears to be empty. Did you " +
+          "forget to specify the collection object for will_paginate?" unless collection
+      end
       # early exit if there is nothing to render
       return nil unless collection.page_count > 1
       options = options.symbolize_keys.reverse_merge WillPaginate::ViewHelpers.pagination_options

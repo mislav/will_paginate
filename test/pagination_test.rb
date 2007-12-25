@@ -162,6 +162,13 @@ class PaginationTest < Test::Unit::TestCase
     end
   end
   
+  def test_inferred_collection_name_raises_error_when_nil
+    ex = assert_raise ArgumentError do
+      get :guess_collection_name, {}, :wp => nil
+    end
+    assert ex.message.include?('@developers')
+  end
+  
 protected
 
   def validate_page_numbers expected, links, param_name = :page

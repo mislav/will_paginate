@@ -17,34 +17,31 @@ module WillPaginate
 
     # = Paginating finders for ActiveRecord models
     # 
-    # WillPaginate doesn't really add extra methods to your ActiveRecord models (except +per_page+
-    # unless it's already available). It simply intercepts
-    # the calls to paginating finders such as +paginate+, +paginate_by_user_id+ (and so on) and
-    # translates them to ordinary finders: +find+, +find_by_user_id+, etc. It does so with some
-    # method_missing magic, but you don't need to care for that. You simply use paginating finders
-    # same way you used ordinary ones. You only need to tell them what page you want in options.
+    # WillPaginate doesn't really add extra methods to your ActiveRecord models
+    # (except +per_page+ unless it's already available). It simply intercepts
+    # the calls to paginating finders such as +paginate+, +paginate_by_user_id+
+    # (and so on) and translates them to ordinary finders: +find+,
+    # +find_by_user_id+, etc. It does so with some +method_missing+ magic, but
+    # you don't need to care for that. You simply use paginating finders same
+    # way you used ordinary ones. You only need to specify what page do you want:
     #
-    #   @topics = Topic.paginate :all, :page => params[:page]
+    #   @posts = Post.paginate :page => params[:page]
     # 
-    # In paginating finders, "all" is implicit. No sense in paginating a single record, right? So:
+    # In paginating finders, "all" is implicit. No sense in paginating a single
+    # record, right? So:
     # 
     #   Post.paginate                  => Post.find :all
     #   Post.paginate_all_by_something => Post.find_all_by_something
     #   Post.paginate_by_something     => Post.find_all_by_something
     #
-    # Knowing that, the above example can be written simply as:
+    # Don't forget to pass the +page+ parameter! Without it, paginating finders
+    # will raise an error.
     #
-    #   @topics = Topic.paginate :page => params[:page]
-    #
-    # Don't forget to pass the +page+ parameter! Without it, paginating finders will raise an error.
-    #
-    # == Options
-    # Options for paginating finders are:
-    # 
-    #   page           REQUIRED, but defaults to 1 if false or nil
-    #   per_page       (default is read from the model, which is 30 if not overridden)
-    #   total entries  not needed unless you want to count the records yourself somehow
-    #   count          hash of options that are used only for the call to count
+    # == Options for paginating finders
+    # * <tt>:page</tt> -- REQUIRED, but defaults to 1 if false or nil
+    # * <tt>:per_page</tt> -- defaults to <tt>CurrentModel.per_page</tt> (which is 30 if not overridden)
+    # * <tt>:total entries</tt> -- use only if you manually count total entries
+    # * <tt>:count</tt> -- additional options that are passed on to +count+
     # 
     module ClassMethods
       # This methods wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string

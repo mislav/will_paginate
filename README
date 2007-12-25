@@ -86,9 +86,13 @@ http://groups.google.com/group/will_paginate
   Authors:                Mislav Marohnić, PJ Hyett
   Original announcement:  http://errtheblog.com/post/929 
   Original PHP source:    http://www.strangerstudios.com/sandbox/pagination/diggstyle.php
-  Contributors:           Chris Wanstrath, Dr. Nic Williams, K. Adam Christensen, 
-                          Mike Garey, Bence Golda, Matt Aimonetti, Charles Brian Quinn,
-                          Desi McAdam, James Coglan, Matijs van Zuijlen
+
+All these people helped making will_paginate what it is now with their code
+contributions or simply awesome ideas:
+
+Chris Wanstrath, Dr. Nic Williams, K. Adam Christensen, Mike Garey, Bence
+Golda, Matt Aimonetti, Charles Brian Quinn, Desi McAdam, James Coglan, Matijs
+van Zuijlen, Hongli Lai.
 
 == Want Digg style?
 
