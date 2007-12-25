@@ -27,7 +27,8 @@ class PaginationTest < Test::Unit::TestCase
 
     def guess_collection_name
       @developers = session[:wp]
-      render :inline => '<%= will_paginate %>'
+      @options    = session[:wp_options]
+      render :inline => '<%= will_paginate @options %>'
     end
 
     protected

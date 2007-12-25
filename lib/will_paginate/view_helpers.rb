@@ -71,9 +71,16 @@ module WillPaginate
     # try to read from the instance variable inferred by the controller name.
     # For example, calling +will_paginate+ while the current controller is
     # PostsController will result in trying to read from the <tt>@posts</tt>
-    # variable.
+    # variable. Example:
+    #
+    #   <%= will_paginate :id => true %>
+    #
+    # ... will result in <tt>@post</tt> collection getting paginated:
+    #
+    #   <div class="pagination" id="posts_pagination"> ... </div>
     #
     def will_paginate(collection = nil, options = {})
+      options, collection = collection, nil if collection.is_a? Hash
       unless collection or !controller
         collection_name = "@#{controller.controller_name}"
         collection = instance_variable_get(collection_name)
