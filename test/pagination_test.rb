@@ -136,7 +136,7 @@ class PaginationTest < Test::Unit::TestCase
   end
 
   def test_will_paginate_windows
-    get :list_developers, { :page => 6, :per_page => 1 }, :wp => { :inner_window => 2 }
+    get :list_developers, { :page => 6, :per_page => 1 }, :wp => { :inner_window => 1 }
     assert_response :success
     
     entries = assigns :developers
@@ -144,12 +144,23 @@ class PaginationTest < Test::Unit::TestCase
     assert_equal 1, entries.size
 
     assert_select 'div.pagination', 1, 'no main DIV' do
-      assert_select 'a[href]', 10 do |elements|
-        validate_page_numbers [5,1,2,4,5,7,8,10,11,7], elements
+      assert_select 'a[href]', 8 do |elements|
+        validate_page_numbers [5,1,2,5,7,10,11,7], elements
         assert_select elements.first, 'a', "&laquo; Previous"
         assert_select elements.last, 'a', "Next &raquo;"
       end
       assert_select 'span.current', entries.current_page.to_s
+    end
+  end
+
+  def test_will_paginate_eliminates_small_gaps
+    get :list_developers, { :page => 6, :per_page => 1 }, :wp => { :inner_window => 2 }
+    assert_response :success
+    
+    assert_select 'div.pagination', 1, 'no main DIV' do
+      assert_select 'a[href]', 12 do |elements|
+        validate_page_numbers [5,1,2,3,4,5,7,8,9,10,11,7], elements
+      end
     end
   end
 

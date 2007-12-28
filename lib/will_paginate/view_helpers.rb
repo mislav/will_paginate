@@ -133,27 +133,30 @@ module WillPaginate
 
     def windowed_paginator
       inner_window, outer_window = @options[:inner_window].to_i, @options[:outer_window].to_i
-      min = current_page - inner_window
-      max = current_page + inner_window
+      window_from = current_page - inner_window
+      window_to = current_page + inner_window
+      
       # adjust lower or upper limit if other is out of bounds
-      if max > total_pages then min -= max - total_pages
-      elsif min < 1 then max += 1 - min
+      if window_to > total_pages
+        window_from -= window_to - total_pages
+        window_to = total_pages
+      elsif window_from < 1
+        window_to += 1 - window_from
+        window_from = 1
       end
       
-      current   = min..max
-      beginning = 1..(1 + outer_window)
-      tail      = (total_pages - outer_window)..total_pages
-      visible   = [beginning, current, tail].map(&:to_a).flatten.sort.uniq
+      visible   = (1..total_pages).to_a
+      left_gap  = (2 + outer_window)...window_from
+      right_gap = (window_to + 1)...(total_pages - outer_window)
+      visible  -= left_gap.to_a  if left_gap.last - left_gap.first > 1
+      visible  -= right_gap.to_a if right_gap.last - right_gap.first > 1
       
       links, prev = [], 0
 
       visible.each do |n|
-        next  if n < 1
-        break if n > total_pages
-
         unless n - prev > 1
           prev = n
-          links << page_link_or_span((n != current_page ? n : nil), 'current', n)
+          links << page_link_or_span(n)
         else
           # ellipsis represents the gap between windows
           prev = n - 1
@@ -165,8 +168,9 @@ module WillPaginate
       links
     end
 
-    def page_link_or_span(page, span_class, text)
-      if page
+    def page_link_or_span(page, span_class = 'current', text = nil)
+      text ||= page.to_s
+      if page and page != current_page
         @template.link_to text, url_options(page)
       else
         @template.content_tag :span, text, :class => span_class
