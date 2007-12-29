@@ -193,30 +193,6 @@ class FinderTest < ActiveRecordTestCase
     end
   end
 
-  def test_paginate_by_sql
-    assert_respond_to Developer, :paginate_by_sql
-    entries = Developer.paginate_by_sql ['select * from users where salary > ?', 80000],
-      :page => 2, :per_page => 3
-
-    assert_equal (5..7).to_a, entries.map(&:id)
-    # omitting :total_entries in options performs a count
-    assert_equal 9, entries.total_entries
-
-    # the :total_entries value should be respected
-    entries = Developer.paginate_by_sql ['select * from users where salary > ?', 80000],
-      :page => 2, :per_page => 3, :total_entries => 999
-    
-    assert_equal (5..7).to_a, entries.map(&:id)
-    assert_equal 999, entries.total_entries
-  end
-
-  def test_count_by_sql
-    entries = Developer.paginate_by_sql ['select * from users where salary > ?', 60000],
-      :page => 2, :per_page => 3
-
-    assert_equal 12, entries.total_entries
-  end
-
   def test_count_distinct
     entries = Developer.paginate :select => 'DISTINCT salary', :page => 1, :per_page => 4
     assert_equal 4, entries.size
@@ -224,10 +200,7 @@ class FinderTest < ActiveRecordTestCase
   end
 
   def test_scoped_paginate
-    entries =
-      Developer.with_poor_ones do
-        Developer.paginate :page => 1
-      end
+    entries = Developer.with_poor_ones { Developer.paginate :page => 1 }
 
     assert_equal 2, entries.size
     assert_equal 2, entries.total_entries
@@ -244,7 +217,7 @@ class FinderTest < ActiveRecordTestCase
     end
   end
 
-  uses_mocha 'parameter' do
+  uses_mocha 'internals' do
     def test_implicit_all_with_dynamic_finders
       Topic.expects(:find_all_by_foo).returns([])
       Topic.expects(:wp_extract_finder_conditions)
@@ -269,7 +242,7 @@ class FinderTest < ActiveRecordTestCase
 
     def test_count_doesnt_use_select_options
       Developer.expects(:find).with() { |*args| args.last.key? :select }.returns(Array.new(5))
-      Developer.expects(:count).with(){ |*args| !args.last.key?(:select) }.returns(1)
+      Developer.expects(:count).with(){ |*args| !args.last.key? :select }.returns(1)
       
       Developer.paginate :select => 'users.*', :page => 1, :per_page => 4
     end
@@ -288,6 +261,30 @@ class FinderTest < ActiveRecordTestCase
       Topic.expects(:count).with({}).returns(0)
       
       Topic.paginate_tagged_with 'will_paginate', :page => 1, :per_page => 5
+    end
+
+    def test_paginate_by_sql
+      assert_respond_to Developer, :paginate_by_sql
+      Developer.expects(:find_by_sql).with('sql LIMIT 3 OFFSET 3').returns([])
+      Developer.expects(:count_by_sql).with('SELECT COUNT(*) FROM (sql) AS count_table').returns(0)
+      
+      entries = Developer.paginate_by_sql 'sql', :page => 2, :per_page => 3
+      assert_equal 0, entries.total_entries
+    end
+
+    def test_paginate_by_sql_respects_total_entries_setting
+      Developer.expects(:find_by_sql).returns([])
+      Developer.expects(:count_by_sql).never
+      
+      entries = Developer.paginate_by_sql 'sql', :page => 1, :total_entries => 999
+      assert_equal 999, entries.total_entries
+    end
+
+    def test_paginate_by_sql_strips_order_by_when_counting
+      Developer.expects(:find_by_sql).returns([])
+      Developer.expects(:count_by_sql).with("SELECT COUNT(*) FROM (sql\n ) AS count_table").returns(0)
+      
+      entries = Developer.paginate_by_sql "sql\n ORDER\nby foo, bar, `baz` ASC", :page => 1
     end
   end
 end

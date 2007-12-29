@@ -40,7 +40,7 @@ module WillPaginate
     # == Options for paginating finders
     # * <tt>:page</tt> -- REQUIRED, but defaults to 1 if false or nil
     # * <tt>:per_page</tt> -- defaults to <tt>CurrentModel.per_page</tt> (which is 30 if not overridden)
-    # * <tt>:total entries</tt> -- use only if you manually count total entries
+    # * <tt>:total_entries</tt> -- use only if you manually count total entries
     # * <tt>:count</tt> -- additional options that are passed on to +count+
     # 
     module ClassMethods
@@ -51,17 +51,28 @@ module WillPaginate
       # 
       #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
       #                           :page => params[:page], :per_page => 3
+      #
+      # A query for counting rows will automatically be generated if you don't
+      # supply <tt>:total_entries</tt>. If you experience problems with this
+      # generated SQL, you might want to perform the count manually in your
+      # application.
       # 
       def paginate_by_sql(sql, options)
         WillPaginate::Collection.create(*wp_parse_options!(options)) do |pager|
           query = sanitize_sql(sql)
-          count_query = "SELECT COUNT(*) FROM (#{query}) AS count_table" unless pager.total_entries
           options.update :offset => pager.offset, :limit => pager.per_page
           
+          original_query = query.dup
           add_limit! query, options
+          # perfom the find
           pager.replace find_by_sql(query)
           
-          pager.total_entries = count_by_sql(count_query) unless pager.total_entries
+          unless pager.total_entries
+            count_query = original_query.sub /\bORDER\s+BY\s+[\w`,\s]+$/mi, ''
+            count_query = "SELECT COUNT(*) FROM (#{count_query}) AS count_table"
+            # perform the count query
+            pager.total_entries = count_by_sql(count_query)
+          end
         end
       end
 
