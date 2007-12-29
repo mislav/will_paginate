@@ -53,17 +53,15 @@ module WillPaginate
       #                           :page => params[:page], :per_page => 3
       # 
       def paginate_by_sql(sql, options)
-        options, page, per_page = wp_parse_options!(options)
-
-        WillPaginate::Collection.create(page, per_page) do |pager|
+        WillPaginate::Collection.create(*wp_parse_options!(options)) do |pager|
           query = sanitize_sql(sql)
-          count_query = "SELECT COUNT(*) FROM (#{query}) AS count_table" unless options[:total_entries]
+          count_query = "SELECT COUNT(*) FROM (#{query}) AS count_table" unless pager.total_entries
           options.update :offset => pager.offset, :limit => pager.per_page
           
           add_limit! query, options
           pager.replace find_by_sql(query)
           
-          pager.total_entries = options[:total_entries] || count_by_sql(count_query) unless pager.total_entries
+          pager.total_entries = count_by_sql(count_query) unless pager.total_entries
         end
       end
 
@@ -84,7 +82,8 @@ module WillPaginate
           return method_missing_without_paginate(method, *args, &block) 
         end
 
-        options, page, per_page, total_entries = wp_parse_options!(args.pop)
+        options = args.pop
+        page, per_page, total_entries = wp_parse_options!(options)
         # an array of IDs may have been given:
         total_entries ||= (Array === args.first and args.first.size)
         
@@ -151,7 +150,7 @@ module WillPaginate
         page     = options.delete(:page) || 1
         per_page = options.delete(:per_page) || self.per_page
         total    = options.delete(:total_entries)
-        [options, page, per_page, total]
+        [page, per_page, total]
       end
 
     private

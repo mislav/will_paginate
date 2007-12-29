@@ -196,10 +196,18 @@ class FinderTest < ActiveRecordTestCase
   def test_paginate_by_sql
     assert_respond_to Developer, :paginate_by_sql
     entries = Developer.paginate_by_sql ['select * from users where salary > ?', 80000],
-      :page => 2, :per_page => 3, :total_entries => 9
+      :page => 2, :per_page => 3
 
     assert_equal (5..7).to_a, entries.map(&:id)
+    # omitting :total_entries in options performs a count
     assert_equal 9, entries.total_entries
+
+    # the :total_entries value should be respected
+    entries = Developer.paginate_by_sql ['select * from users where salary > ?', 80000],
+      :page => 2, :per_page => 3, :total_entries => 999
+    
+    assert_equal (5..7).to_a, entries.map(&:id)
+    assert_equal 999, entries.total_entries
   end
 
   def test_count_by_sql
