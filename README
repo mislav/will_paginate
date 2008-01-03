@@ -7,10 +7,12 @@ you ever want to be able to do just this on a model:
   Post.paginate :page => 1
 
 ... and then render the page links with a single view helper? Well, now you
-can. Ryan Bates made an awesome screencast[http://railscasts.com/episodes/51],
+can.
+
+Ryan Bates made an awesome screencast[http://railscasts.com/episodes/51],
 check it out.
 
-Need to ask questions? Join our Google
+Your mind reels with questions? Join our Google
 group[http://groups.google.com/group/will_paginate].
 
 == Install the plugin
@@ -19,7 +21,8 @@ Simply do:
 
   script/plugin install svn://errtheblog.com/svn/plugins/will_paginate
 
-The plugin officially supports Rails versions 1.2.6 and 2.0.2.
+The plugin officially supports Rails versions 1.2.6 and 2.0.2. You can browse
+its source on Warehouse: http://plugins.require.errtheblog.com/browser/will_paginate
 
 == Example usage
 
@@ -40,7 +43,7 @@ You're done. (Copy and paste the example fancy CSS styles from the bottom.) You
 can find the option list at WillPaginate::ViewHelpers.
 
 How does it know how much items to fetch per page? It asks your model by calling
-+Post.per_page+. You can define it like this:
+its <tt>per_page</tt> class method. You can define it like this:
 
     class Post < ActiveRecord::Base
       cattr_reader :per_page
@@ -55,14 +58,14 @@ How does it know how much items to fetch per page? It asks your model by calling
       end
     end
 
-... or don't worry about it at all. (WillPaginate defines it to be 30 if missing.)
-You can also specify the count explicitly when calling +paginate+:
+... or don't worry about it at all. WillPaginate defines it to be <b>30</b> by default.
+But you can always specify the count explicitly when calling +paginate+:
 
     @posts = Post.paginate :page => params[:page], :per_page => 50
 
 The +paginate+ finder wraps the original finder and returns your resultset that now has
 some new properties. You can use the collection as you would with any ActiveRecord
-resultset, but WillPaginate view helpers also need that object to be able to render pagination:
+resultset. WillPaginate view helpers also need that object to be able to render pagination:
 
     <ol>
       <% for post in @posts -%>
@@ -73,19 +76,37 @@ resultset, but WillPaginate view helpers also need that object to be able to ren
     <p>Now let's render us some pagination!</p>
     <%= will_paginate @posts %>
 
+More detailed documentation:
 
-== Authors, credits, contact!
+* WillPaginate::Finder::ClassMethods for pagination on your models;
+* WillPaginate::ViewHelpers for your views.
 
-REPORT BUGS on Lighthouse:  http://err.lighthouseapp.com/projects/466-plugins/overview
+== Oh noes, a bug!
 
-BROWSE SOURCE on Warehouse: http://plugins.require.errtheblog.com/browser/will_paginate
+Tell us what happened so we can fix it, quick! Issues are filed on the Lighthouse project:
+http://err.lighthouseapp.com/projects/466-plugins/tickets?q=tagged:will_paginate
+
+Steps to make an awesome bug report:
+
+1. Run <tt>rake test</tt> in the <i>will_paginate</i> directory. (You will need SQLite3.)
+   Copy the output if there are failing tests.
+2. Register on Lighthouse to create a new ticket.
+3. Write a descriptive, short title. Provide as much info as you can in the body.
+   Assign the ticket to Mislav and tag it with meaningful tags, <tt>"will_paginate"</tt>
+   being among them.
+4. Yay! You will be notified on updates automatically.
+
+Here is an example of a great bug report and patch:
+http://err.lighthouseapp.com/projects/466/tickets/172-total_entries-ignored-in-paginate_by_sql
+
+== Authors, credits, contact
 
 Want to discuss, request features, ask questions? Join the Google group:
 http://groups.google.com/group/will_paginate
 
-  Authors:                Mislav Marohnić, PJ Hyett
-  Original announcement:  http://errtheblog.com/post/929 
-  Original PHP source:    http://www.strangerstudios.com/sandbox/pagination/diggstyle.php
+Authors::                Mislav Marohnić, PJ Hyett
+Original announcement::  http://errtheblog.com/post/929 
+Original PHP source::    http://www.strangerstudios.com/sandbox/pagination/diggstyle.php
 
 All these people helped making will_paginate what it is now with their code
 contributions or simply awesome ideas:
