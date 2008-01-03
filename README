@@ -21,8 +21,20 @@ Simply do:
 
   script/plugin install svn://errtheblog.com/svn/plugins/will_paginate
 
+Alternatively, you can add the whole Err repository to plugin sources:
+
+  script/plugin source svn://errtheblog.com/svn/plugins
+
+You only have to do this once, then you can install will_paginate to each of your applications simply like this:
+
+  script/plugin install will_paginate
+
+To see what other plugins are now available to you, list the newly added plugin source:
+
+  script/plugin list --source=svn://errtheblog.com/svn/plugins
+
 The plugin officially supports Rails versions 1.2.6 and 2.0.2. You can browse
-its source on Warehouse: http://plugins.require.errtheblog.com/browser/will_paginate
+its source code on Warehouse: http://plugins.require.errtheblog.com/browser/will_paginate
 
 == Example usage
 
