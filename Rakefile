@@ -1,6 +1,8 @@
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
+require 'config/requirements'
+require 'config/hoe' # setup Hoe + all gem configuration
 
 desc 'Default: run unit tests.'
 task :default => :test
