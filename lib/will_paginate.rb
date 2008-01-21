@@ -59,3 +59,5 @@ module WillPaginate
     end
   end
 end
+
+WillPaginate.enable
