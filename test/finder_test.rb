@@ -193,17 +193,15 @@ class FinderTest < ActiveRecordTestCase
     end
   end
 
-  def test_count_distinct
-    entries = Developer.paginate :select => 'DISTINCT salary', :page => 1, :per_page => 4
-    assert_equal 4, entries.size
-    assert_equal 4, entries.total_entries
-  end
-
   def test_scoped_paginate
     entries = Developer.with_poor_ones { Developer.paginate :page => 1 }
 
     assert_equal 2, entries.size
     assert_equal 2, entries.total_entries
+  end
+
+  def test_readonly
+    assert_nothing_raised { Developer.paginate :readonly => true, :page => 1 }
   end
 
   # Are we on edge? Find out by testing find_all which was removed in [6998]
@@ -285,6 +283,18 @@ class FinderTest < ActiveRecordTestCase
       Developer.expects(:count_by_sql).with("SELECT COUNT(*) FROM (sql\n ) AS count_table").returns(0)
       
       entries = Developer.paginate_by_sql "sql\n ORDER\nby foo, bar, `baz` ASC", :page => 1
+    end
+
+    def test_count_skips_select
+      Developer.stubs(:find).returns([])
+      Developer.expects(:count).with({}).returns(0)
+      Developer.paginate :select => 'salary', :page => 1
+    end
+
+    def test_count_select_when_distinct
+      Developer.stubs(:find).returns([])
+      Developer.expects(:count).with(:select => 'DISTINCT salary').returns(0)
+      Developer.paginate :select => 'DISTINCT salary', :page => 1
     end
   end
 end
