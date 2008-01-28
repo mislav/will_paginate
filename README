@@ -4,7 +4,7 @@ Pagination is just limiting the number of records displayed. Why should you let
 it get in your way while developing, then? This plugin makes magic happen. Did
 you ever want to be able to do just this on a model:
 
-  Post.paginate :page => 1
+  Post.paginate :page => 1, :order => 'created_at DESC'
 
 ... and then render the page links with a single view helper? Well, now you
 can.
@@ -40,7 +40,7 @@ its source code on Warehouse: http://plugins.require.errtheblog.com/browser/will
 
 Use a paginate finder in the controller:
 
-    @posts = Post.paginate_by_board_id @board.id, :page => params[:page]
+    @posts = Post.paginate_by_board_id @board.id, :page => params[:page], :order => 'updated_at DESC'
 
 Yeah, +paginate+ works just like +find+ -- it just doesn't fetch all the
 records.  Don't forget to tell it which page you want, or it will complain!

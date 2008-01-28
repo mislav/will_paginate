@@ -25,7 +25,7 @@ module WillPaginate
     # you don't need to care for that. You simply use paginating finders same
     # way you used ordinary ones. You only need to specify what page do you want:
     #
-    #   @posts = Post.paginate :page => params[:page]
+    #   @posts = Post.paginate :page => params[:page], :order => 'created_at DESC'
     # 
     # In paginating finders, "all" is implicit. No sense in paginating a single
     # record, right? So:
@@ -42,6 +42,14 @@ module WillPaginate
     # * <tt>:per_page</tt> -- defaults to <tt>CurrentModel.per_page</tt> (which is 30 if not overridden)
     # * <tt>:total_entries</tt> -- use only if you manually count total entries
     # * <tt>:count</tt> -- additional options that are passed on to +count+
+    #
+    # == The importance of the <tt>:order</tt> parameter
+    #
+    # In ActiveRecord finders, <tt>:order</tt> parameter specifies columns for the
+    # <tt>ORDER BY</tt> clause in SQL. It is important to have it, since pagination only makes
+    # sense with ordered sets. Without the <tt>ORDER BY</tt> clause, databases aren't required
+    # to do consistent ordering when performing <tt>SELECT</tt> queries; this is especially true
+    # for PostgreSQL.
     # 
     module ClassMethods
       # This methods wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
@@ -50,7 +58,7 @@ module WillPaginate
       # Example:
       # 
       #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
-      #                           :page => params[:page], :per_page => 3
+      #                          :page => params[:page], :per_page => 3
       #
       # A query for counting rows will automatically be generated if you don't
       # supply <tt>:total_entries</tt>. If you experience problems with this
