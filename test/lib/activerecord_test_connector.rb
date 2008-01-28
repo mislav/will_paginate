@@ -27,28 +27,26 @@ class ActiveRecordTestConnector
   private
 
   def self.setup_connection
-    if Object.const_defined?(:ActiveRecord)
-      defaults = { :database => ':memory:' }
-      ActiveRecord::Base.logger = Logger.new STDOUT if $0 == 'irb'
-      
-      begin
-        options = defaults.merge :adapter => 'sqlite3', :timeout => 500
-        ActiveRecord::Base.establish_connection(options)
-        ActiveRecord::Base.configurations = { 'sqlite3_ar_integration' => options }
-        ActiveRecord::Base.connection
-      rescue Exception  # errors from establishing a connection
-        $stderr.puts 'SQLite 3 unavailable; trying SQLite 2.'
-        options = defaults.merge :adapter => 'sqlite'
-        ActiveRecord::Base.establish_connection(options)
-        ActiveRecord::Base.configurations = { 'sqlite2_ar_integration' => options }
-        ActiveRecord::Base.connection
-      end
-
-      unless Object.const_defined?(:QUOTED_TYPE)
-        Object.send :const_set, :QUOTED_TYPE, ActiveRecord::Base.connection.quote_column_name('type')
-      end
+    arg = ARGV.last
+    if arg.index('-') == 0
+      db = arg.sub('-', '').downcase
     else
-      raise "Can't setup connection since ActiveRecord isn't loaded."
+      db, arg = 'sqlite3', nil
+    end
+    
+    configurations = YAML.load_file(File.join(File.dirname(__FILE__), '..', 'database.yml'))
+    raise "no configuration for '#{db}'" unless configurations.key? db
+    configuration = configurations[db]
+    
+    ActiveRecord::Base.logger = Logger.new(STDOUT) if $0 == 'irb'
+    puts "using #{configuration['adapter']} adapter" if arg
+    
+    ActiveRecord::Base.establish_connection(configuration)
+    ActiveRecord::Base.configurations = { db => configuration }
+    ActiveRecord::Base.connection
+
+    unless Object.const_defined?(:QUOTED_TYPE)
+      Object.send :const_set, :QUOTED_TYPE, ActiveRecord::Base.connection.quote_column_name('type')
     end
   end
 

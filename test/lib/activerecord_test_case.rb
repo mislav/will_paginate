@@ -4,7 +4,7 @@ class ActiveRecordTestCase < Test::Unit::TestCase
   # Set our fixture path
   if ActiveRecordTestConnector.able_to_connect
     self.fixture_path = File.join(File.dirname(__FILE__), '..', 'fixtures')
-    self.use_transactional_fixtures = false
+    self.use_transactional_fixtures = true
   end
 
   def self.fixtures(*args)
