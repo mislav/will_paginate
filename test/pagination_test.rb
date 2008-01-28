@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/helper'
 require 'action_controller'
-require 'action_controller/test_process'
+require File.dirname(__FILE__) + '/lib/html_inner_text'
 
 ActionController::Routing::Routes.draw do |map|
   map.connect ':controller/:action/:id'
@@ -50,7 +50,7 @@ class PaginationTest < Test::Unit::TestCase
     assert entries
     assert_equal 4, entries.size
 
-    assert_select 'div.pagination', 1, 'no main DIV' do |el|
+    assert_select 'div.pagination', 1, 'no main DIV' do |pagination|
       assert_select 'a[href]', 3 do |elements|
         validate_page_numbers [2,3,2], elements
         assert_select elements.last, ':last-child', "Next &raquo;"
@@ -58,6 +58,7 @@ class PaginationTest < Test::Unit::TestCase
       assert_select 'span', 2
       assert_select 'span.disabled:first-child', "&laquo; Previous"
       assert_select 'span.current', entries.current_page.to_s
+      assert_equal '&laquo; Previous 1 2 3 Next &raquo;', pagination.first.inner_text
     end
   end
 
@@ -143,13 +144,14 @@ class PaginationTest < Test::Unit::TestCase
     assert entries
     assert_equal 1, entries.size
 
-    assert_select 'div.pagination', 1, 'no main DIV' do
+    assert_select 'div.pagination', 1, 'no main DIV' do |pagination|
       assert_select 'a[href]', 8 do |elements|
         validate_page_numbers [5,1,2,5,7,10,11,7], elements
         assert_select elements.first, 'a', "&laquo; Previous"
         assert_select elements.last, 'a', "Next &raquo;"
       end
       assert_select 'span.current', entries.current_page.to_s
+      assert_equal '&laquo; Previous 1 2 ... 5 6 7 ... 10 11 Next &raquo;', pagination.first.inner_text
     end
   end
 

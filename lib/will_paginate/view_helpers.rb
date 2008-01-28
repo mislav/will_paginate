@@ -131,6 +131,8 @@ module WillPaginate
     
   protected
 
+    def gap_marker; '...'; end
+    
     def windowed_paginator
       inner_window, outer_window = @options[:inner_window].to_i, @options[:outer_window].to_i
       window_from = current_page - inner_window
@@ -151,18 +153,13 @@ module WillPaginate
       visible  -= left_gap.to_a  if left_gap.last - left_gap.first > 1
       visible  -= right_gap.to_a if right_gap.last - right_gap.first > 1
       
-      links, prev = [], 0
+      links, prev = [], nil
 
       visible.each do |n|
-        unless n - prev > 1
-          prev = n
-          links << page_link_or_span(n)
-        else
-          # ellipsis represents the gap between windows
-          prev = n - 1
-          links << '...'
-          redo
-        end
+        # detect gaps:
+        links << gap_marker if prev and n > prev + 1
+        links << page_link_or_span(n)
+        prev = n
       end
       
       links
