@@ -27,19 +27,14 @@ class ActiveRecordTestConnector
   private
 
   def self.setup_connection
-    arg = ARGV.last
-    if arg.index('-') == 0
-      db = arg.sub('-', '').downcase
-    else
-      db, arg = 'sqlite3', nil
-    end
+    db = ENV['DB'].blank?? 'sqlite3' : ENV['DB']
     
     configurations = YAML.load_file(File.join(File.dirname(__FILE__), '..', 'database.yml'))
     raise "no configuration for '#{db}'" unless configurations.key? db
     configuration = configurations[db]
     
     ActiveRecord::Base.logger = Logger.new(STDOUT) if $0 == 'irb'
-    puts "using #{configuration['adapter']} adapter" if arg
+    puts "using #{configuration['adapter']} adapter" unless ENV['DB'].blank?
     
     ActiveRecord::Base.establish_connection(configuration)
     ActiveRecord::Base.configurations = { db => configuration }
