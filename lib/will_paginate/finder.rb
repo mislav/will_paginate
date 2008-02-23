@@ -55,9 +55,8 @@ module WillPaginate
     module ClassMethods
       def paginate(*args, &block)
         options = args.pop
-        options = options.dup unless !options or options.key? :finder
-        page, per_page, total_entries = wp_parse_options!(options)
-        finder = options.delete(:finder) || 'find'
+        page, per_page, total_entries = wp_parse_options(options)
+        finder = (options[:finder] || 'find').to_s
 
         if finder == 'find'
           # an array of IDs may have been given:
@@ -67,13 +66,15 @@ module WillPaginate
         end
 
         WillPaginate::Collection.create(page, per_page, total_entries) do |pager|
-          args << options.except(:count).merge(:offset => pager.offset, :limit => pager.per_page)
+          count_options = options.except :page, :per_page, :total_entries, :finder
+          find_options = count_options.except(:count).update(:offset => pager.offset, :limit => pager.per_page) 
           
-          @options_from_last_find = nil
+          args << find_options
+          # @options_from_last_find = nil
           pager.replace send(finder, *args, &block)
           
           # magic counting for user convenience:
-          pager.total_entries = wp_count!(options, args, finder) unless pager.total_entries
+          pager.total_entries = wp_count(count_options, args, finder) unless pager.total_entries
         end
       end
       
@@ -91,12 +92,11 @@ module WillPaginate
       # application.
       # 
       def paginate_by_sql(sql, options)
-        WillPaginate::Collection.create(*wp_parse_options!(options)) do |pager|
+        WillPaginate::Collection.create(*wp_parse_options(options)) do |pager|
           query = sanitize_sql(sql)
-          options.update :offset => pager.offset, :limit => pager.per_page
-          
           original_query = query.dup
-          add_limit! query, options
+          # add limit, offset
+          add_limit! query, :offset => pager.offset, :limit => pager.per_page
           # perfom the find
           pager.replace find_by_sql(query)
           
@@ -131,7 +131,7 @@ module WillPaginate
         finder.sub!('find', 'find_all') if finder.index('find_by_') == 0
         
         options = args.pop
-        raise ArgumentError, 'hash parameters expected' unless options.respond_to? :symbolize_keys!
+        raise ArgumentError, 'parameter hash expected' unless options.respond_to? :symbolize_keys
         options = options.dup
         options[:finder] = finder
         args << options
@@ -139,7 +139,7 @@ module WillPaginate
         paginate(*args, &block)
       end
 
-      def wp_count!(options, args, finder)
+      def wp_count(options, args, finder)
         excludees = [:count, :order, :limit, :offset, :readonly]
         unless options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
           excludees << :select # only exclude the select param if it doesn't begin with DISTINCT
@@ -149,7 +149,7 @@ module WillPaginate
 
         # merge the hash found in :count
         # this allows you to specify :select, :order, or anything else just for the count query
-        count_options.update(options.delete(:count) || {}) if options.key? :count
+        count_options.update options[:count] if options[:count]
 
         # we may have to scope ...
         counter = Proc.new { count(count_options) }
@@ -173,18 +173,18 @@ module WillPaginate
         count.respond_to?(:length) ? count.length : count
       end
 
-      def wp_parse_options!(options)
-        raise ArgumentError, 'hash parameters expected' unless options.respond_to? :symbolize_keys!
-        options.symbolize_keys!
+      def wp_parse_options(options)
+        raise ArgumentError, 'parameter hash expected' unless options.respond_to? :symbolize_keys
+        options = options.symbolize_keys
         raise ArgumentError, ':page parameter required' unless options.key? :page
         
         if options[:count] and options[:total_entries]
-          raise ArgumentError, ':count and :total_entries are mutually exclusive parameters'
+          raise ArgumentError, ':count and :total_entries are mutually exclusive'
         end
 
-        page     = options.delete(:page) || 1
-        per_page = options.delete(:per_page) || self.per_page
-        total    = options.delete(:total_entries)
+        page     = options[:page] || 1
+        per_page = options[:per_page] || self.per_page
+        total    = options[:total_entries]
         [page, per_page, total]
       end
 

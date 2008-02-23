@@ -307,5 +307,16 @@ class FinderTest < ActiveRecordTestCase
       
       Developer.paginate_by_id(ids, :per_page => 3, :page => 2, :order => 'id')
     end
+
+    def test_paginating_finder_doesnt_mangle_options
+      Developer.expects(:find).returns([])
+      Developer.expects(:count).returns(0)
+      options = { :page => 1 }
+      options.expects(:delete).never
+      options_before = options.dup
+      
+      Developer.paginate(options)
+      assert_equal options, options_before
+    end
   end
 end
