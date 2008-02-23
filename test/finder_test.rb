@@ -205,7 +205,8 @@ class FinderTest < ActiveRecordTestCase
     assert_nothing_raised { Developer.paginate :readonly => true, :page => 1 }
   end
 
-  def test_pagination_defines_method
+  # this functionality is temporarily removed
+  def xtest_pagination_defines_method
     pager = "paginate_by_created_at"
     assert !User.methods.include?(pager), "User methods should not include `#{pager}` method"
     # paginate!
@@ -297,6 +298,14 @@ class FinderTest < ActiveRecordTestCase
       Topic.expects(:count).with({}).returns(0)
       
       Topic.paginate_tagged_with 'will_paginate', :page => 1, :per_page => 5
+    end
+    
+    def test_array_argument_doesnt_eliminate_count
+      ids = (1..8).to_a
+      Developer.expects(:find_all_by_id).returns([])
+      Developer.expects(:count).returns(0)
+      
+      Developer.paginate_by_id(ids, :per_page => 3, :page => 2, :order => 'id')
     end
   end
 end

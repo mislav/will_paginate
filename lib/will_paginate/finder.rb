@@ -11,7 +11,7 @@ module WillPaginate
       base.extend ClassMethods
       class << base
         alias_method_chain :method_missing, :paginate
-        alias_method_chain :find_every,     :paginate
+        # alias_method_chain :find_every,     :paginate
         define_method(:per_page) { 30 } unless respond_to?(:per_page)
       end
     end
@@ -53,6 +53,30 @@ module WillPaginate
     # for PostgreSQL.
     # 
     module ClassMethods
+      def paginate(*args, &block)
+        options = args.pop
+        options = options.dup unless !options or options.key? :finder
+        page, per_page, total_entries = wp_parse_options!(options)
+        finder = options.delete(:finder) || 'find'
+
+        if finder == 'find'
+          # an array of IDs may have been given:
+          total_entries ||= (Array === args.first and args.first.size)
+          # :all is implicit
+          args.unshift(:all) if args.empty?
+        end
+
+        WillPaginate::Collection.create(page, per_page, total_entries) do |pager|
+          args << options.except(:count).merge(:offset => pager.offset, :limit => pager.per_page)
+          
+          @options_from_last_find = nil
+          pager.replace send(finder, *args, &block)
+          
+          # magic counting for user convenience:
+          pager.total_entries = wp_count!(options, args, finder) unless pager.total_entries
+        end
+      end
+      
       # This methods wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
       # based on the params otherwise used by paginating finds: +page+ and +per_page+.
       #
@@ -106,38 +130,13 @@ module WillPaginate
         finder = method.to_s.sub('paginate', 'find')
         finder.sub!('find', 'find_all') if finder.index('find_by_') == 0
         
-        if @owner and @reflection
-           unless @wp_extension_module
-             @wp_extension_module = Module.new
-             self.proxy_extend @wp_extension_module
-           end
-           eval_mode = 'module_eval'
-           @wp_extension_module
-        else
-          eval_mode = 'instance_eval'
-          self
-        end.send eval_mode, %{
-          def #{method}(*args, &block)
-            options = args.pop
-            page, per_page, total_entries = wp_parse_options!(options)
-            # an array of IDs may have been given:
-            total_entries ||= (Array === args.first and args.first.size)
-            # :all is implicit
-            #{finder == 'find' ? 'args.unshift(:all) if args.empty?' : ''}
-
-            WillPaginate::Collection.create(page, per_page, total_entries) do |pager|
-              args << options.except(:count).merge(:offset => pager.offset, :limit => pager.per_page)
-              
-              @options_from_last_find = nil
-              pager.replace #{finder}(*args, &block)
-              
-              # magic counting for user convenience:
-              pager.total_entries = wp_count!(options, args, '#{finder}') unless pager.total_entries
-            end
-          end
-        }, __FILE__, __LINE__
-        # paginating finder is now defined
-        __send__(method, *args, &block)
+        options = args.pop
+        raise ArgumentError, 'hash parameters expected' unless options.respond_to? :symbolize_keys!
+        options = options.dup
+        options[:finder] = finder
+        args << options
+        
+        paginate(*args, &block)
       end
 
       def wp_count!(options, args, finder)
@@ -191,10 +190,10 @@ module WillPaginate
 
     private
 
-      def find_every_with_paginate(options)
-        @options_from_last_find = options
-        find_every_without_paginate(options)
-      end
+      # def find_every_with_paginate(options)
+      #   @options_from_last_find = options
+      #   find_every_without_paginate(options)
+      # end
     end
   end
 end
