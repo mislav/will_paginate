@@ -11,6 +11,7 @@ module WillPaginate
       base.extend ClassMethods
       class << base
         alias_method_chain :method_missing, :paginate
+        alias_method_chain :find_every,     :paginate
         define_method(:per_page) { 30 } unless respond_to?(:per_page)
       end
     end
@@ -100,29 +101,43 @@ module WillPaginate
         unless method.to_s.index('paginate') == 0
           return method_missing_without_paginate(method, *args, &block) 
         end
-
-        options = args.pop
-        page, per_page, total_entries = wp_parse_options!(options)
-        # an array of IDs may have been given:
-        total_entries ||= (Array === args.first and args.first.size)
         
         # paginate finders are really just find_* with limit and offset
-        finder = method.to_s.sub /^paginate/, 'find'
+        finder = method.to_s.sub('paginate', 'find')
+        finder.sub!('find', 'find_all') if finder.index('find_by_') == 0
+        
+        if @owner and @reflection
+           unless @wp_extension_module
+             @wp_extension_module = Module.new
+             self.proxy_extend @wp_extension_module
+           end
+           eval_mode = 'module_eval'
+           @wp_extension_module
+        else
+          eval_mode = 'instance_eval'
+          self
+        end.send eval_mode, %{
+          def #{method}(*args, &block)
+            options = args.pop
+            page, per_page, total_entries = wp_parse_options!(options)
+            # an array of IDs may have been given:
+            total_entries ||= (Array === args.first and args.first.size)
+            # :all is implicit
+            #{finder == 'find' ? 'args.unshift(:all) if args.empty?' : ''}
 
-        # :all is implicit
-        if finder == 'find'
-          args.unshift(:all) if args.empty?
-        elsif finder.index('find_by_') == 0
-          finder.sub! /^find/, 'find_all'
-        end
-
-        WillPaginate::Collection.create(page, per_page, total_entries) do |pager|
-          args << options.except(:count).merge(:offset => pager.offset, :limit => pager.per_page)
-          pager.replace send(finder, *args)
-          
-          # magic counting for user convenience:
-          pager.total_entries = wp_count!(options, args, finder) unless pager.total_entries
-        end
+            WillPaginate::Collection.create(page, per_page, total_entries) do |pager|
+              args << options.except(:count).merge(:offset => pager.offset, :limit => pager.per_page)
+              
+              @options_from_last_find = nil
+              pager.replace #{finder}(*args, &block)
+              
+              # magic counting for user convenience:
+              pager.total_entries = wp_count!(options, args, '#{finder}') unless pager.total_entries
+            end
+          end
+        }, __FILE__, __LINE__
+        # paginating finder is now defined
+        __send__(method, *args, &block)
       end
 
       def wp_count!(options, args, finder)
@@ -143,12 +158,14 @@ module WillPaginate
         # we may be in a model or an association proxy!
         klass = (@owner and @reflection) ? @reflection.klass : self
 
-        count = if finder =~ /^find_/ and klass.respond_to?(scoper = finder.sub(/^find_/, 'with_'))
+        count = if finder.index('find_') == 0 and klass.respond_to?(scoper = finder.sub('find', 'with'))
                   # scope_out adds a 'with_finder' method which acts like with_scope, if it's present
-                  # then execute the count with the scoping provided by the with_finder  
+                  # then execute the count with the scoping provided by the with_finder
                   send(scoper, &counter)
-                elsif conditions = wp_extract_finder_conditions(finder, args)
-                  # extracted the conditions from calls like "paginate_by_foo_and_bar"
+                elsif match = /^find_(all_by|by)_([_a-zA-Z]\w*)$/.match(finder)
+                  # extract conditions from calls like "paginate_by_foo_and_bar"
+                  attribute_names = extract_attribute_names_from_match(match)
+                  conditions = construct_attributes_from_arguments(attribute_names, args)
                   with_scope(:find => { :conditions => conditions }, &counter)
                 else
                   counter.call
@@ -174,15 +191,9 @@ module WillPaginate
 
     private
 
-      # thanks to active record for making us duplicate this code
-      def wp_extract_finder_conditions(finder, arguments)
-        return unless match = /^find_(all_by|by)_([_a-zA-Z]\w*)$/.match(finder.to_s)
-
-        attribute_names = extract_attribute_names_from_match(match)
-        unless all_attributes_exists?(attribute_names)
-          raise "I can't make sense of `#{finder}`. Try doing the count manually"
-        end
-        construct_attributes_from_arguments(attribute_names, arguments)
+      def find_every_with_paginate(options)
+        @options_from_last_find = options
+        find_every_without_paginate(options)
       end
     end
   end
