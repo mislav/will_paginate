@@ -18,31 +18,24 @@ module WillPaginate
 
     # = Paginating finders for ActiveRecord models
     # 
-    # WillPaginate doesn't really add extra methods to your ActiveRecord models
-    # (except +per_page+ unless it's already available). It simply intercepts
-    # the calls to paginating finders such as +paginate+, +paginate_by_user_id+
-    # (and so on) and translates them to ordinary finders: +find+,
-    # +find_by_user_id+, etc. It does so with some +method_missing+ magic, but
-    # you don't need to care for that. You simply use paginating finders same
-    # way you used ordinary ones. You only need to specify what page do you want:
-    #
-    #   @posts = Post.paginate :page => params[:page], :order => 'created_at DESC'
+    # WillPaginate adds +paginate+ and +per_page+ methods to ActiveRecord::Base
+    # class methods and associations. It also hooks into +method_missing+ to
+    # intercept pagination calls to dynamic finders such as
+    # +paginate_by_user_id+ and translate them to ordinary finders
+    # (+find_all_by_user_id+ in this case).
     # 
-    # In paginating finders, "all" is implicit. No sense in paginating a single
-    # record, right? So:
+    # In short, paginating finders are equivalent to ActiveRecord finders; the
+    # only difference is that we start with "paginate" instead of "find" and
+    # that <tt>:page</tt> is required parameter:
+    #
+    #   @posts = Post.paginate :all, :page => params[:page], :order => 'created_at DESC'
     # 
-    #   Post.paginate                  => Post.find :all
-    #   Post.paginate_all_by_something => Post.find_all_by_something
-    #   Post.paginate_by_something     => Post.find_all_by_something
-    #
-    # Don't forget to pass the +page+ parameter! Without it, paginating finders
-    # will raise an error.
-    #
-    # == Options for paginating finders
-    # * <tt>:page</tt> -- REQUIRED, but defaults to 1 if false or nil
-    # * <tt>:per_page</tt> -- defaults to <tt>CurrentModel.per_page</tt> (which is 30 if not overridden)
-    # * <tt>:total_entries</tt> -- use only if you manually count total entries
-    # * <tt>:count</tt> -- additional options that are passed on to +count+
+    # In paginating finders, "all" is implicit. There is no sense in paginating
+    # a single record, right? So, you can drop the <tt>:all</tt> argument:
+    # 
+    #   Post.paginate(...)              =>  Post.find :all
+    #   Post.paginate_all_by_something  =>  Post.find_all_by_something
+    #   Post.paginate_by_something      =>  Post.find_all_by_something
     #
     # == The importance of the <tt>:order</tt> parameter
     #
@@ -53,6 +46,17 @@ module WillPaginate
     # for PostgreSQL.
     # 
     module ClassMethods
+      # This is the main paginating finder.
+      #
+      # == Special parameters for paginating finders
+      # * <tt>:page</tt> -- REQUIRED, but defaults to 1 if false or nil
+      # * <tt>:per_page</tt> -- defaults to <tt>CurrentModel.per_page</tt> (which is 30 if not overridden)
+      # * <tt>:total_entries</tt> -- use only if you manually count total entries
+      # * <tt>:count</tt> -- additional options that are passed on to +count+
+      # * <tt>:finder</tt> -- name of the ActiveRecord finder used (default: "find")
+      #
+      # All other options (+conditions+, +order+, ...) are forwarded to +find+
+      # and +count+ calls.
       def paginate(*args, &block)
         options = args.pop
         page, per_page, total_entries = wp_parse_options(options)
@@ -78,8 +82,9 @@ module WillPaginate
         end
       end
       
-      # This methods wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
-      # based on the params otherwise used by paginating finds: +page+ and +per_page+.
+      # Wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
+      # based on the params otherwise used by paginating finds: +page+ and
+      # +per_page+.
       #
       # Example:
       # 
@@ -109,7 +114,7 @@ module WillPaginate
         end
       end
 
-      def respond_to?(method, include_priv = false)
+      def respond_to?(method, include_priv = false) #:nodoc:
         case method.to_sym
         when :paginate, :paginate_by_sql
           true
@@ -120,7 +125,7 @@ module WillPaginate
 
     protected
       
-      def method_missing_with_paginate(method, *args, &block)
+      def method_missing_with_paginate(method, *args, &block) #:nodoc:
         # did somebody tried to paginate? if not, let them be
         unless method.to_s.index('paginate') == 0
           return method_missing_without_paginate(method, *args, &block) 
@@ -139,6 +144,8 @@ module WillPaginate
         paginate(*args, &block)
       end
 
+      # Does the not-so-trivial job of finding out the total number of entries
+      # in the database. It relies on the ActiveRecord +count+ method.
       def wp_count(options, args, finder)
         excludees = [:count, :order, :limit, :offset, :readonly]
         unless options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
@@ -173,7 +180,7 @@ module WillPaginate
         count.respond_to?(:length) ? count.length : count
       end
 
-      def wp_parse_options(options)
+      def wp_parse_options(options) #:nodoc:
         raise ArgumentError, 'parameter hash expected' unless options.respond_to? :symbolize_keys
         options = options.symbolize_keys
         raise ArgumentError, ':page parameter required' unless options.key? :page
