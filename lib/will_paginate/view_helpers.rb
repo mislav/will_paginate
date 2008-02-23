@@ -110,7 +110,7 @@ module WillPaginate
     end
 
     def to_html
-      links = @options[:page_links] ? windowed_paginator : []
+      links = @options[:page_links] ? windowed_links : []
       # previous/next buttons
       links.unshift page_link_or_span(@collection.previous_page, 'disabled', @options[:prev_label])
       links.push    page_link_or_span(@collection.next_page,     'disabled', @options[:next_label])
@@ -133,7 +133,19 @@ module WillPaginate
 
     def gap_marker; '...'; end
     
-    def windowed_paginator
+    def windowed_links
+      prev = nil
+
+      visible_page_numbers.inject [] do |links, n|
+        # detect gaps:
+        links << gap_marker if prev and n > prev + 1
+        links << page_link_or_span(n)
+        prev = n
+        links
+      end
+    end
+
+    def visible_page_numbers
       inner_window, outer_window = @options[:inner_window].to_i, @options[:outer_window].to_i
       window_from = current_page - inner_window
       window_to = current_page + inner_window
@@ -152,19 +164,10 @@ module WillPaginate
       right_gap = (window_to + 1)...(total_pages - outer_window)
       visible  -= left_gap.to_a  if left_gap.last - left_gap.first > 1
       visible  -= right_gap.to_a if right_gap.last - right_gap.first > 1
-      
-      links, prev = [], nil
 
-      visible.each do |n|
-        # detect gaps:
-        links << gap_marker if prev and n > prev + 1
-        links << page_link_or_span(n)
-        prev = n
-      end
-      
-      links
+      visible
     end
-
+    
     def page_link_or_span(page, span_class = 'current', text = nil)
       text ||= page.to_s
       if page and page != current_page
