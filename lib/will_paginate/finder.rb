@@ -39,12 +39,16 @@ module WillPaginate
     #
     # == The importance of the <tt>:order</tt> parameter
     #
-    # In ActiveRecord finders, <tt>:order</tt> parameter specifies columns for the
-    # <tt>ORDER BY</tt> clause in SQL. It is important to have it, since pagination only makes
-    # sense with ordered sets. Without the <tt>ORDER BY</tt> clause, databases aren't required
-    # to do consistent ordering when performing <tt>SELECT</tt> queries; this is especially true
-    # for PostgreSQL.
-    # 
+    # In ActiveRecord finders, <tt>:order</tt> parameter specifies columns for
+    # the <tt>ORDER BY</tt> clause in SQL. It is important to have it, since
+    # pagination only makes sense with ordered sets. Without the <tt>ORDER
+    # BY</tt> clause, databases aren't required to do consistent ordering when
+    # performing <tt>SELECT</tt> queries; this is especially true for
+    # PostgreSQL.
+    #
+    # Therefore, make sure you are doing ordering on a column that makes the
+    # most sense in the current context. Make that obvious to the user, also.
+    # For perfomance reasons you will also want to add an index to that column.
     module ClassMethods
       # This is the main paginating finder.
       #
