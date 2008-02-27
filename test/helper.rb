@@ -18,8 +18,8 @@ end
 # Wrap tests that use Mocha and skip if unavailable.
 def uses_mocha(test_name)
   require 'mocha' unless Object.const_defined?(:Mocha)
-  yield
 rescue LoadError => load_error
-  raise unless load_error.message =~ /mocha/i
   $stderr.puts "Skipping #{test_name} tests. `gem install mocha` and try again."
+else
+  yield
 end
