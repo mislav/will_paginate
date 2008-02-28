@@ -96,11 +96,23 @@ module WillPaginate
       # render HTML for pagination
       renderer.to_html
     end
+
+    # Renders a helpful message with numbers of displayed vs. total entries.
+    # You can use this as a blueprint for your own, similar helpers.
+    #
+    #   <%= page_entries_info @posts %>
+    #   #-> Displaying entries 6 - 10 of 26 in total
+    def page_entries_info(collection)
+      %{Displaying entries <b>%d&nbsp;-&nbsp;%d</b> of <b>%d</b> in total} % [
+        collection.offset + 1,
+        collection.offset + collection.length,
+        collection.total_entries
+      ]
+    end
   end
 
   # This class does the heavy lifting of actually building the pagination
-  # links. It is used by +will_paginate+ helper internally, but avoid using it
-  # directly (for now) because its API is not set in stone yet.
+  # links. It is used by +will_paginate+ helper internally.
   class LinkRenderer
 
     def initialize(collection, options, template)
