@@ -240,3 +240,18 @@ protected
     end
   end
 end
+
+class ViewHelpersTest < Test::Unit::TestCase
+  include WillPaginate::ViewHelpers
+
+  def test_page_entries_info
+    arr = ('a'..'z').to_a
+    collection = arr.paginate :page => 2, :per_page => 5
+    assert_equal %{Displaying entries <b>6&nbsp;-&nbsp;10</b> of <b>26</b> in total},
+      page_entries_info(collection)
+    
+    collection = arr.paginate :page => 7, :per_page => 4
+    assert_equal %{Displaying entries <b>25&nbsp;-&nbsp;26</b> of <b>26</b> in total},
+      page_entries_info(collection)
+  end
+end
