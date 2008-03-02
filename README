@@ -15,26 +15,27 @@ check it out.
 Your mind reels with questions? Join our Google
 group[http://groups.google.com/group/will_paginate].
 
-== Install the plugin
+== Installation
 
-Simply do:
+Will Paginate officially supports Rails versions 1.2.6 and 2.0.x.
 
-  script/plugin install svn://errtheblog.com/svn/plugins/will_paginate
+Previously, the plugin was available on the following SVN location:
 
-Alternatively, you can add the whole Err repository to plugin sources:
+  svn://errtheblog.com/svn/plugins/will_paginate
 
-  script/plugin source svn://errtheblog.com/svn/plugins
+In February 2008, it moved to GitHub[http://github.com/mislav/will_paginate/tree]
+to be tracked with git. The SVN repo continued to have updates, but not
+forever. Therefore you should switch to using the gem:
 
-You only have to do this once, then you can install will_paginate to each of your applications simply like this:
+  gem install will_paginate --no-ri
 
-  script/plugin install will_paginate
+After that, you can remove the plugin from your applications and add
+a simple require to the end of config/environment.rb:
 
-To see what other plugins are now available to you, list the newly added plugin source:
+  require 'will_paginate'
 
-  script/plugin list --source=svn://errtheblog.com/svn/plugins
-
-The plugin officially supports Rails versions 1.2.6 and 2.0.2. You can browse
-its source code on Warehouse: http://plugins.require.errtheblog.com/browser/will_paginate
+That's it, just remember to install the gem on all machines that
+you are running applications on.
 
 == Example usage
 
