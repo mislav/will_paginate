@@ -59,7 +59,7 @@ task :release => [:clean, :package] do |t|
 
   puts "Releasing #{NAME} v. #{version}"
   p files
-  rf.add_release RUBYFORGE_NAME, NAME, version, *files
+  rf.add_release RUBYFORGE_NAME, RUBYFORGE_NAME, version, *files
 end
 
 task :clean => [ :clobber_rdoc, :clobber_package ] do
