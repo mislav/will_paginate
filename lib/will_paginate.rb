@@ -59,3 +59,5 @@ module WillPaginate
     end
   end
 end
+
+WillPaginate.enable if defined? ActiveRecord and defined? ActionView
