@@ -212,6 +212,13 @@ class PaginationTest < Test::Unit::TestCase
       assert_equal 'custom_id', div.first['id']
     end
   end
+
+  if ActionController::Base.respond_to? :rescue_responses
+    def test_rescue_response_hook_presence
+      assert_equal :not_found,
+        DevelopersController.rescue_responses['WillPaginate::InvalidPage']
+    end
+  end
   
 protected
 

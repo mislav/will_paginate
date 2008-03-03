@@ -20,6 +20,10 @@ module WillPaginate
       return if ActionView::Base.instance_methods.include? 'will_paginate'
       require 'will_paginate/view_helpers'
       ActionView::Base.class_eval { include ViewHelpers }
+
+      if ActionController::Base.respond_to? :rescue_responses
+        ActionController::Base.rescue_responses['WillPaginate::InvalidPage'] = :not_found
+      end
     end
     
     # mixes in WillPaginate::Finder in ActiveRecord::Base and classes that deal
