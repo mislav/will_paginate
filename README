@@ -35,7 +35,15 @@ a simple require to the end of config/environment.rb:
   require 'will_paginate'
 
 That's it, just remember to install the gem on all machines that
-you are running applications on.
+you are deploying to.
+
+The second option is to download and extract the tarball from GitHub. Here is the
+link for downloading the current state of the master branch:
+http://github.com/mislav/will_paginate/tarball/master
+
+Extract it to <tt>vendor/plugins</tt>. The directory will have a default name
+like "mislav-will_paginate-master"; you can rename it to "will_paginate" for
+simplicity.
 
 == Example usage
 
