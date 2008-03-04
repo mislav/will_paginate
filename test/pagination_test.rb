@@ -75,8 +75,16 @@ class PaginationTest < Test::Unit::TestCase
     assert_select 'div.will_paginate', 1, 'no main DIV' do
       assert_select 'a[href]', 4 do |elements|
         validate_page_numbers [1,1,3,3], elements
-        assert_select elements.first, 'a', "Prev"
-        assert_select elements.last, 'a', "Next"
+        # test rel attribute values:
+        assert_select elements[1], 'a', '1' do |link|
+          assert_equal 'prev start', link.first['rel']
+        end
+        assert_select elements.first, 'a', "Prev" do |link|
+          assert_equal 'prev start', link.first['rel']
+        end
+        assert_select elements.last, 'a', "Next" do |link|
+          assert_equal 'next', link.first['rel']
+        end
       end
       assert_select 'span.current', entries.current_page.to_s
     end

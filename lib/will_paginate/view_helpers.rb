@@ -183,7 +183,7 @@ module WillPaginate
     def page_link_or_span(page, span_class = 'current', text = nil)
       text ||= page.to_s
       if page and page != current_page
-        @template.link_to text, url_options(page)
+        @template.link_to text, url_options(page), :rel => rel_value(page)
       else
         @template.content_tag :span, text, :class => span_class
       end
@@ -198,6 +198,14 @@ module WillPaginate
     end
 
   private
+
+    def rel_value(page)
+      case page
+      when @collection.previous_page; 'prev' + (page == 1 ? ' start' : '')
+      when @collection.next_page; 'next'
+      when 1; 'start'
+      end
+    end
 
     def current_page
       @collection.current_page
