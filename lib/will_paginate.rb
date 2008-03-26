@@ -41,6 +41,14 @@ module WillPaginate
           alias_method_chain :method_missing, :paginate
         end
       end
+
+      unless defined? ActiveRecord::NamedScope
+        require 'will_paginate/named_scope'
+
+        ActiveRecord::Base.class_eval do
+          include WillPaginate::NamedScope
+        end
+      end
     end
   end
 

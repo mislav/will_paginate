@@ -219,6 +219,13 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 2, entries.size
     assert_equal 2, entries.total_entries
   end
+  
+  def test_paginate_in_named_scope
+    entries = Developer.poor.paginate :page => 1, :per_page => 1
+
+    assert_equal 1, entries.size
+    assert_equal 2, entries.total_entries
+  end
 
   def test_readonly
     assert_nothing_raised { Developer.paginate :readonly => true, :page => 1 }
