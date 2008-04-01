@@ -1,5 +1,3 @@
-require 'will_paginate'
-
 module WillPaginate
   # = OMG, invalid page number!
   # This is an ArgumentError raised in case a page was requested that is either
@@ -34,7 +32,7 @@ module WillPaginate
     def initialize(page, per_page, total = nil)
       @current_page = page.to_i
       raise InvalidPage.new(page, @current_page) if @current_page < 1
-      @per_page     = per_page.to_i
+      @per_page = per_page.to_i
       raise ArgumentError, "`per_page` setting cannot be less than 1 (#{@per_page} given)" if @per_page < 1
       
       self.total_entries = total if total
