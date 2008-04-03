@@ -28,7 +28,19 @@ class PaginationTest < Test::Unit::TestCase
     def guess_collection_name
       @developers = session[:wp]
       @options    = session[:wp_options]
+      
       render :inline => '<%= will_paginate @options %>'
+    end
+
+    def paginated_section
+      @developers = session[:wp]
+      @options    = session[:wp_options]
+      
+      render :inline => <<-ERB
+        <% paginated_section @options do %>
+          <%= content_tag :div, '', :id => "developers" %>
+        <% end %>
+      ERB
     end
 
     protected
@@ -226,6 +238,13 @@ class PaginationTest < Test::Unit::TestCase
       assert_equal :not_found,
         DevelopersController.rescue_responses['WillPaginate::InvalidPage']
     end
+  end
+
+  def test_paginated_section
+    collection = WillPaginate::Collection.new 1, 1, 2
+    get :paginated_section, {}, :wp => collection, :wp_options => { :class => 'will_paginate' }
+    assert_select 'div.will_paginate', 2
+    assert_select 'div.will_paginate + div#developers', 1
   end
   
 protected

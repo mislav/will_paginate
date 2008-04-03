@@ -97,15 +97,25 @@ module WillPaginate
       renderer.to_html
     end
     
-    # Wrapper for rendering pagination link at the top and bottom of paginated content.
-    # <% with_pagination( @posts, :id => 'wp_posts' ) do %>
-    #   <%= render_collection @posts, 'shared/post', 'shared/no_posts' %>
-    # <% end %>
-    #   
-    def with_pagination( collection = nil, options = {}, &block )
-      pagination = ( will_paginate( collection, options ) || '' )
-      concat( ( pagination + capture( &block ) + pagination ), block.binding )
-    end    
+    # Wrapper for rendering pagination links at both top and bottom of a block
+    # of content.
+    # 
+    #   <% paginated_section @posts do %>
+    #     <ol>
+    #       <% for post in @posts %>
+    #         <li> ... </li>
+    #       <% end %>
+    #     </ol>
+    #   <% end %>
+    #
+    # Arguments are passed to a <tt>will_paginate</tt> call, so the same options
+    # apply. Don't use the <tt>:id</tt> option; otherwise you'll finish with two
+    # blocks of pagination links sharing the same ID (which is invalid HTML).
+    def paginated_section(*args, &block)
+      pagination = will_paginate(*args) || ''
+      content = pagination + capture(&block) + pagination
+      concat content, block.binding
+    end
 
     # Renders a helpful message with numbers of displayed vs. total entries.
     # You can use this as a blueprint for your own, similar helpers.
