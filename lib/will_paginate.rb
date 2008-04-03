@@ -33,15 +33,16 @@ module WillPaginate
       require 'will_paginate/finder'
       ActiveRecord::Base.class_eval { include Finder }
 
+      # support paginating finders on associations
       associations = ActiveRecord::Associations
       collection = associations::AssociationCollection
+      classes = [collection]
+      # before [9200], HMT wasn't a subclass of AssociationCollection
+      unless associations::HasManyThroughAssociation.superclass == collection
+        classes << associations::HasManyThroughAssociation
+      end
       
-      # to support paginating finders on associations, we have to mix in the
-      # method_missing magic from WillPaginate::Finder::ClassMethods to AssociationProxy
-      # subclasses, but in a different way for Rails 1.2.x and 2.0
-      (collection.instance_methods.include?(:create!) ?
-        collection : collection.subclasses.map(&:constantize)
-      ).push(associations::HasManyThroughAssociation).each do |klass|
+      classes.each do |klass|
         klass.class_eval do
           include Finder::ClassMethods
           alias_method_chain :method_missing, :paginate
