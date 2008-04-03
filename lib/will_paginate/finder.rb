@@ -85,6 +85,28 @@ module WillPaginate
           pager.total_entries = wp_count(count_options, args, finder) unless pager.total_entries
         end
       end
+
+      # Iterates through all records by loading one page at a time. This is useful
+      # for migrations or any other use case where you don't want to load all the
+      # records in memory at once.
+      #
+      # It uses +paginate+ internally; therefore it accepts all of its options.
+      # You can specify a starting page with <tt>:page</tt> (default is 1). Default
+      # <tt>:order</tt> is <tt>"id"</tt>, override if necessary.
+      def paginated_each(options = {}, &block)
+        options = { :order => 'id', :page => 1 }.merge options
+        options[:page] = options[:page].to_i
+        options[:total_entries] = 0 # skip the individual count queries
+        total = 0
+        
+        begin 
+          collection = paginate(options)
+          total += collection.each(&block).size
+          options[:page] += 1
+        end until collection.size < collection.per_page
+        
+        total
+      end
       
       # Wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
       # based on the params otherwise used by paginating finds: +page+ and

@@ -230,7 +230,7 @@ class FinderTest < ActiveRecordTestCase
     def test_implicit_all_with_dynamic_finders
       Topic.expects(:find_all_by_foo).returns([])
       Topic.expects(:count).returns(0)
-      Topic.paginate_by_foo :page => 1
+      Topic.paginate_by_foo :page => 2
     end
     
     def test_guessing_the_total_count
@@ -239,6 +239,14 @@ class FinderTest < ActiveRecordTestCase
       
       entries = Topic.paginate :page => 2, :per_page => 4
       assert_equal 6, entries.total_entries
+    end
+    
+    def test_guessing_that_there_are_no_records
+      Topic.expects(:find).returns([])
+      Topic.expects(:count).never
+      
+      entries = Topic.paginate :page => 1, :per_page => 4
+      assert_equal 0, entries.total_entries
     end
     
     def test_extra_parameters_stay_untouched
@@ -251,13 +259,13 @@ class FinderTest < ActiveRecordTestCase
     def test_count_skips_select
       Developer.stubs(:find).returns([])
       Developer.expects(:count).with({}).returns(0)
-      Developer.paginate :select => 'salary', :page => 1
+      Developer.paginate :select => 'salary', :page => 2
     end
 
     def test_count_select_when_distinct
       Developer.stubs(:find).returns([])
       Developer.expects(:count).with(:select => 'DISTINCT salary').returns(0)
-      Developer.paginate :select => 'DISTINCT salary', :page => 1
+      Developer.paginate :select => 'DISTINCT salary', :page => 2
     end
 
     def test_should_use_scoped_finders_if_present
@@ -288,16 +296,16 @@ class FinderTest < ActiveRecordTestCase
       Developer.expects(:find_by_sql).returns([])
       Developer.expects(:count_by_sql).with("SELECT COUNT(*) FROM (sql\n ) AS count_table").returns(0)
       
-      entries = Developer.paginate_by_sql "sql\n ORDER\nby foo, bar, `baz` ASC", :page => 1
+      Developer.paginate_by_sql "sql\n ORDER\nby foo, bar, `baz` ASC", :page => 2
     end
 
     # TODO: counts are still wrong
     def test_ability_to_use_with_custom_finders
       # acts_as_taggable defines find_tagged_with(tag, options)
-      Topic.expects(:find_tagged_with).with('will_paginate', :offset => 0, :limit => 5).returns([])
+      Topic.expects(:find_tagged_with).with('will_paginate', :offset => 5, :limit => 5).returns([])
       Topic.expects(:count).with({}).returns(0)
       
-      Topic.paginate_tagged_with 'will_paginate', :page => 1, :per_page => 5
+      Topic.paginate_tagged_with 'will_paginate', :page => 2, :per_page => 5
     end
     
     def test_array_argument_doesnt_eliminate_count
@@ -310,13 +318,27 @@ class FinderTest < ActiveRecordTestCase
 
     def test_paginating_finder_doesnt_mangle_options
       Developer.expects(:find).returns([])
-      Developer.expects(:count).returns(0)
       options = { :page => 1 }
       options.expects(:delete).never
       options_before = options.dup
       
       Developer.paginate(options)
       assert_equal options, options_before
+    end
+
+    def test_paginated_each
+      collection = stub('collection', :size => 5, :empty? => false, :per_page => 5)
+      collection.expects(:each).times(2).returns(collection)
+      last_collection = stub('collection', :size => 4, :empty? => false, :per_page => 5)
+      last_collection.expects(:each).returns(last_collection)
+      
+      params = { :order => 'id', :total_entries => 0 }
+      
+      Developer.expects(:paginate).with(params.merge(:page => 2)).returns(collection)
+      Developer.expects(:paginate).with(params.merge(:page => 3)).returns(collection)
+      Developer.expects(:paginate).with(params.merge(:page => 4)).returns(last_collection)
+      
+      assert_equal 14, Developer.paginated_each(:page => '2') { }
     end
   end
 end

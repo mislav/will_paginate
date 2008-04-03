@@ -122,7 +122,7 @@ module WillPaginate
       
       # The collection is shorter then page limit? Rejoice, because
       # then we know that we are on the last page!
-      if total_entries.nil? and length > 0 and length < per_page
+      if total_entries.nil? and length < per_page and (current_page == 1 or length > 0)
         self.total_entries = offset + length
       end
 
