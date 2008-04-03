@@ -97,7 +97,11 @@ module WillPaginate
       renderer.to_html
     end
     
-    # 
+    # Wrapper for rendering pagination link at the top and bottom of paginated content.
+    # <% with_pagination( @posts, :id => 'wp_posts' ) do %>
+    #   <%= render_collection @posts, 'shared/post', 'shared/no_posts' %>
+    # <% end %>
+    #   
     def with_pagination( collection = nil, options = {}, &block )
       pagination = ( will_paginate( collection, options ) || '' )
       concat( ( pagination + capture( &block ) + pagination ), block.binding )
