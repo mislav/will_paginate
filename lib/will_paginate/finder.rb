@@ -93,6 +93,9 @@ module WillPaginate
       # It uses +paginate+ internally; therefore it accepts all of its options.
       # You can specify a starting page with <tt>:page</tt> (default is 1). Default
       # <tt>:order</tt> is <tt>"id"</tt>, override if necessary.
+      #
+      # See http://weblog.jamisbuck.org/2007/4/6/faking-cursors-in-activerecord where
+      # Jamis Buck describes this and also uses a more efficient way for MySQL.
       def paginated_each(options = {}, &block)
         options = { :order => 'id', :page => 1 }.merge options
         options[:page] = options[:page].to_i
