@@ -96,6 +96,12 @@ module WillPaginate
       # render HTML for pagination
       renderer.to_html
     end
+    
+    # 
+    def with_pagination( collection = nil, options = {}, &block )
+      pagination = ( will_paginate( collection, options ) || '' )
+      concat( ( pagination + capture( &block ) + pagination ), block.binding )
+    end    
 
     # Renders a helpful message with numbers of displayed vs. total entries.
     # You can use this as a blueprint for your own, similar helpers.
