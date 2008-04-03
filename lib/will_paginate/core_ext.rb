@@ -31,8 +31,21 @@ unless Hash.instance_methods.include? 'slice'
   end
 end
 
-unless Hash.instance_methods.include? 'rec_merge!'
+unless Hash.instance_methods.include? 'rec_merge'
   Hash.class_eval do
+    def rec_merge(other)
+      res = self.clone
+      other.each do |key, other_value|
+        value = res[key]
+        if value.is_a?(Hash) and other_value.is_a?(Hash)
+          res[key] = value.rec_merge other_value
+        else
+          res[key] = other_value
+        end
+      end
+      res
+    end 
+    
     # Same as Hash#merge!, but recursively merges sub-hashes
     # (stolen from Haml)
     def rec_merge!(other)
