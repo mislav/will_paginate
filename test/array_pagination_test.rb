@@ -22,14 +22,8 @@ class ArrayPaginationTest < Test::Unit::TestCase
   end
 
   def test_deprecated_api
-    assert_deprecated 'paginate API' do
-      result = (1..50).to_a.paginate(2, 10)
-      assert_equal 2, result.current_page
-      assert_equal (11..20).to_a, result
-      assert_equal 50, result.total_entries
-    end
-    
-    assert_deprecated { [].paginate nil }
+    assert_raise(ArgumentError) { [].paginate(2) }
+    assert_raise(ArgumentError) { [].paginate(2, 10) }
   end
 
   def test_total_entries_has_precedence
@@ -90,6 +84,13 @@ class ArrayPaginationTest < Test::Unit::TestCase
       pager.replace array(0)
     end
     assert_equal nil, entries.total_entries
+    
+    entries = create(1) do |pager|
+      # collection is empty and we're on page 1,
+      # so the whole thing must be empty, too
+      pager.replace array(0)
+    end
+    assert_equal 0, entries.total_entries
   end
 
   def test_invalid_page
