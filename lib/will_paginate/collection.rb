@@ -22,7 +22,7 @@ module WillPaginate
   # solutions: see +create+.
   #
   class Collection < Array
-    attr_reader :current_page, :per_page, :total_entries
+    attr_reader :current_page, :per_page, :total_entries, :total_pages
 
     # Arguments to this constructor are the current page number, per-page limit
     # and the total number of entries. The last argument is optional because it
@@ -69,23 +69,17 @@ module WillPaginate
       pager
     end
 
-    # The total number of pages.
-    def page_count
-      @total_pages
-    end
-
     # Helper method that is true when someone tries to fetch a page with a
     # larger number than the last page. Can be used in combination with flashes
     # and redirecting.
     def out_of_bounds?
-      current_page > page_count
+      current_page > total_pages
     end
 
     # Current offset of the paginated collection. If we're on the first page,
     # it is always 0. If we're on the 2nd page and there are 30 entries per page,
     # the offset is 30. This property is useful if you want to render ordinals
     # besides your records: simply start with offset + 1.
-    #
     def offset
       (current_page - 1) * per_page
     end
@@ -97,7 +91,7 @@ module WillPaginate
 
     # current_page + 1 or nil if there is no next page
     def next_page
-      current_page < page_count ? (current_page + 1) : nil
+      current_page < total_pages ? (current_page + 1) : nil
     end
 
     def total_entries=(number)

@@ -16,13 +16,13 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 1, entries.current_page
     assert_nil entries.previous_page
     assert_nil entries.next_page
-    assert_equal 1, entries.page_count
+    assert_equal 1, entries.total_pages
     assert_equal 4, entries.size
     
     entries = Topic.paginate :page => 2
     assert_equal 2, entries.current_page
     assert_equal 1, entries.previous_page
-    assert_equal 1, entries.page_count
+    assert_equal 1, entries.total_pages
     assert entries.empty?
   end
 
@@ -41,31 +41,31 @@ class FinderTest < ActiveRecordTestCase
   def test_paginate_with_per_page
     entries = Topic.paginate :page => 1, :per_page => 1
     assert_equal 1, entries.size
-    assert_equal 4, entries.page_count
+    assert_equal 4, entries.total_pages
 
     # Developer class has explicit per_page at 10
     entries = Developer.paginate :page => 1
     assert_equal 10, entries.size
-    assert_equal 2, entries.page_count
+    assert_equal 2, entries.total_pages
 
     entries = Developer.paginate :page => 1, :per_page => 5
     assert_equal 11, entries.total_entries
     assert_equal 5, entries.size
-    assert_equal 3, entries.page_count
+    assert_equal 3, entries.total_pages
   end
   
   def test_paginate_with_order
     entries = Topic.paginate :page => 1, :order => 'created_at desc'
     expected = [topics(:futurama), topics(:harvey_birdman), topics(:rails), topics(:ar)].reverse
     assert_equal expected, entries.to_a
-    assert_equal 1, entries.page_count
+    assert_equal 1, entries.total_pages
   end
   
   def test_paginate_with_conditions
     entries = Topic.paginate :page => 1, :conditions => ["created_at > ?", 30.minutes.ago]
     expected = [topics(:rails), topics(:ar)]
     assert_equal expected, entries.to_a
-    assert_equal 1, entries.page_count
+    assert_equal 1, entries.total_pages
   end
 
   def test_paginate_with_include_and_conditions

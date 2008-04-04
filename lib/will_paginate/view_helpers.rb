@@ -88,7 +88,7 @@ module WillPaginate
           "forget to specify the collection object for will_paginate?" unless collection
       end
       # early exit if there is nothing to render
-      return nil unless collection.page_count > 1
+      return nil unless collection.total_pages > 1
       options = options.symbolize_keys.reverse_merge WillPaginate::ViewHelpers.pagination_options
       # create the renderer instance
       renderer_class = options[:renderer].to_s.constantize
@@ -234,7 +234,7 @@ module WillPaginate
     end
 
     def total_pages
-      @collection.page_count
+      @collection.total_pages
     end
 
     def param_name

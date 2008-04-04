@@ -189,7 +189,7 @@ class PaginationTest < Test::Unit::TestCase
   def test_no_pagination
     get :list_developers, :per_page => 12
     entries = assigns :developers
-    assert_equal 1, entries.page_count
+    assert_equal 1, entries.total_pages
     assert_equal 11, entries.size
 
     assert_equal '', @response.body
@@ -204,7 +204,7 @@ class PaginationTest < Test::Unit::TestCase
   uses_mocha 'helper internals' do
     def test_collection_name_can_be_guessed
       collection = mock
-      collection.expects(:page_count).returns(1)
+      collection.expects(:total_pages).returns(1)
       get :guess_collection_name, {}, :wp => collection
     end
   end

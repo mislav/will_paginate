@@ -50,11 +50,11 @@ class ArrayPaginationTest < Test::Unit::TestCase
     end
 
     assert_equal entries, collection
-    assert_respond_to_all collection, %w(page_count each offset size current_page per_page total_entries)
+    assert_respond_to_all collection, %w(total_pages each offset size current_page per_page total_entries)
     assert_kind_of Array, collection
     assert_instance_of Array, collection.entries
     assert_equal 3, collection.offset
-    assert_equal 4, collection.page_count
+    assert_equal 4, collection.total_pages
     assert !collection.out_of_bounds?
   end
 
@@ -96,12 +96,17 @@ class ArrayPaginationTest < Test::Unit::TestCase
     bad_input = [0, -1, nil, '', 'Schnitzel']
 
     bad_input.each do |bad|
-      assert_raise(WillPaginate::InvalidPage) { create(bad) }
+      assert_raise(WillPaginate::InvalidPage) { create bad }
     end
   end
 
   def test_invalid_per_page_setting
     assert_raise(ArgumentError) { create(1, -1) }
+  end
+
+  def test_page_count_was_removed
+    assert_raise(NoMethodError) { create.page_count }
+    # It's `total_pages` now.
   end
 
   private
