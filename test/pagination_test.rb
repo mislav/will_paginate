@@ -201,11 +201,24 @@ class PaginationTest < Test::Unit::TestCase
     end
   end
 
+  class LegacyCollection < WillPaginate::Collection
+    alias :page_count :total_pages
+    undef :total_pages
+  end
+  
   uses_mocha 'helper internals' do
     def test_collection_name_can_be_guessed
       collection = mock
       collection.expects(:total_pages).returns(1)
       get :guess_collection_name, {}, :wp => collection
+    end
+
+    def test_deprecation_notices_with_page_count
+      collection = LegacyCollection.new 1, 1, 2
+
+      assert_deprecated collection.class.name do
+        get :guess_collection_name, {}, :wp => collection
+      end
     end
   end
   
@@ -272,6 +285,18 @@ protected
         assert_no_match pattern, el['href']
       end
     end
+  end
+  
+  def collect_deprecations
+    old_behavior = WillPaginate::Deprecation.behavior
+    deprecations = []
+    WillPaginate::Deprecation.behavior = Proc.new do |message, callstack|
+      deprecations << message
+    end
+    result = yield
+    [result, deprecations]
+  ensure
+    WillPaginate::Deprecation.behavior = old_behavior
   end
 end
 

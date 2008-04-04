@@ -123,16 +123,4 @@ class ArrayPaginationTest < Test::Unit::TestCase
     def array(size = 3)
       Array.new(size)
     end
-    
-    def collect_deprecations
-      old_behavior = WillPaginate::Deprecation.behavior
-      deprecations = []
-      WillPaginate::Deprecation.behavior = Proc.new do |message, callstack|
-        deprecations << message
-      end
-      result = yield
-      [result, deprecations]
-    ensure
-      WillPaginate::Deprecation.behavior = old_behavior
-    end
 end

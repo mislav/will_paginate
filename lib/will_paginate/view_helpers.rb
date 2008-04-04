@@ -88,7 +88,8 @@ module WillPaginate
           "forget to specify the collection object for will_paginate?" unless collection
       end
       # early exit if there is nothing to render
-      return nil unless collection.total_pages > 1
+      return nil unless WillPaginate::ViewHelpers.total_pages_for_collection(collection) > 1
+      
       options = options.symbolize_keys.reverse_merge WillPaginate::ViewHelpers.pagination_options
       # create the renderer instance
       renderer_class = options[:renderer].to_s.constantize
@@ -112,7 +113,7 @@ module WillPaginate
     # apply. Don't use the <tt>:id</tt> option; otherwise you'll finish with two
     # blocks of pagination links sharing the same ID (which is invalid HTML).
     def paginated_section(*args, &block)
-      pagination = will_paginate(*args) || ''
+      pagination = will_paginate(*args).to_s
       content = pagination + capture(&block) + pagination
       concat content, block.binding
     end
@@ -128,6 +129,21 @@ module WillPaginate
         collection.offset + collection.length,
         collection.total_entries
       ]
+    end
+
+    def self.total_pages_for_collection(collection) #:nodoc:
+      if collection.respond_to? :page_count and !collection.respond_to? :total_pages
+        WillPaginate::Deprecation.warn <<-MSG
+          You are using a paginated collection of class #{collection.class.name}
+          which conforms to the old API of WillPaginate::Collection by using
+          `page_count`, while the current method name is `total_pages`. Please
+          upgrade your or 3rd-party code that provides the paginated collection.
+        MSG
+        class << collection
+          def total_pages; page_count; end
+        end
+      end
+      collection.total_pages
     end
   end
 
@@ -234,7 +250,7 @@ module WillPaginate
     end
 
     def total_pages
-      @collection.total_pages
+      @total_pages ||= WillPaginate::ViewHelpers.total_pages_for_collection(@collection)
     end
 
     def param_name
