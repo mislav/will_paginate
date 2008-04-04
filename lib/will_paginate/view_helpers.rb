@@ -85,7 +85,7 @@ module WillPaginate
         collection_name = "@#{controller.controller_name}"
         collection = instance_variable_get(collection_name)
         raise ArgumentError, "The #{collection_name} variable appears to be empty. Did you " +
-          "forget to specify the collection object for will_paginate?" unless collection
+          "forget to pass the collection object for will_paginate?" unless collection
       end
       # early exit if there is nothing to render
       return nil unless WillPaginate::ViewHelpers.total_pages_for_collection(collection) > 1
@@ -102,12 +102,20 @@ module WillPaginate
     # of content.
     # 
     #   <% paginated_section @posts do %>
-    #     <ol>
+    #     <ol id="posts">
     #       <% for post in @posts %>
     #         <li> ... </li>
     #       <% end %>
     #     </ol>
     #   <% end %>
+    #
+    # will result in:
+    #
+    #   <div class="pagination"> ... </div>
+    #   <ol id="posts">
+    #     ...
+    #   </ol>
+    #   <div class="pagination"> ... </div>
     #
     # Arguments are passed to a <tt>will_paginate</tt> call, so the same options
     # apply. Don't use the <tt>:id</tt> option; otherwise you'll finish with two
@@ -137,7 +145,7 @@ module WillPaginate
           You are using a paginated collection of class #{collection.class.name}
           which conforms to the old API of WillPaginate::Collection by using
           `page_count`, while the current method name is `total_pages`. Please
-          upgrade your or 3rd-party code that provides the paginated collection.
+          upgrade yours or 3rd-party code that provides the paginated collection.
         MSG
         class << collection
           def total_pages; page_count; end
@@ -150,13 +158,19 @@ module WillPaginate
   # This class does the heavy lifting of actually building the pagination
   # links. It is used by +will_paginate+ helper internally.
   class LinkRenderer
-
+    # * +collection+ is a WillPaginate::Collection instance or any other object
+    #   that conforms to that API
+    # * +options+ are forwarded from +will_paginate+ view helper
+    # * +template+ is the reference to the template being rendered
     def initialize(collection, options, template)
       @collection = collection
       @options    = options
       @template   = template
     end
 
+    # Process it! This method returns the complete HTML string which contains
+    # pagination links. Feel free to subclass LinkRenderer and change this
+    # method as you see fit.
     def to_html
       links = @options[:page_links] ? windowed_links : []
       # previous/next buttons
@@ -167,6 +181,8 @@ module WillPaginate
       @options[:container] ? @template.content_tag(:div, html, html_attributes) : html
     end
 
+    # Returns the subset of +options+ this instance was initialized with that
+    # represent HTML attributes for the container element of pagination links.
     def html_attributes
       return @html_attributes if @html_attributes
       @html_attributes = @options.except *(WillPaginate::ViewHelpers.pagination_options.keys - [:class])
@@ -179,10 +195,14 @@ module WillPaginate
     
   protected
 
+    # The gap in page links is represented by:
+    #
+    #   <span class="gap">&hellip;</span>
     def gap_marker
       '<span class="gap">&hellip;</span>'
     end
     
+    # Collects link items for visible page numbers.
     def windowed_links
       prev = nil
 
@@ -195,6 +215,8 @@ module WillPaginate
       end
     end
 
+    # Calculates visible page numbers using the <tt>:inner_window</tt> and
+    # <tt>:outer_window</tt> options.
     def visible_page_numbers
       inner_window, outer_window = @options[:inner_window].to_i, @options[:outer_window].to_i
       window_from = current_page - inner_window
@@ -227,6 +249,8 @@ module WillPaginate
       end
     end
 
+    # Returns URL params for +page_link_or_span+, taking the current GET params
+    # and <tt>:params</tt> option into account.
     def url_options(page)
       options = { param_name => page }
       # page links should preserve GET parameters

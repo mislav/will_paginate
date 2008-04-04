@@ -2,7 +2,7 @@ require 'will_paginate/core_ext'
 
 module WillPaginate
   # A mixin for ActiveRecord::Base. Provides +per_page+ class method
-  # and makes +paginate+ finders possible with some method_missing magic.
+  # and hooks things up to provide paginating finders.
   #
   # Find out more in WillPaginate::Finder::ClassMethods
   #
@@ -18,9 +18,9 @@ module WillPaginate
 
     # = Paginating finders for ActiveRecord models
     # 
-    # WillPaginate adds +paginate+ and +per_page+ methods to ActiveRecord::Base
-    # class methods and associations. It also hooks into +method_missing+ to
-    # intercept pagination calls to dynamic finders such as
+    # WillPaginate adds +paginate+, +per_page+ and other methods to
+    # ActiveRecord::Base class methods and associations. It also hooks into
+    # +method_missing+ to intercept pagination calls to dynamic finders such as
     # +paginate_by_user_id+ and translate them to ordinary finders
     # (+find_all_by_user_id+ in this case).
     # 
