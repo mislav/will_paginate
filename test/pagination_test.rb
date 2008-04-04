@@ -171,7 +171,7 @@ class PaginationTest < Test::Unit::TestCase
         assert_select elements.last, 'a', "Next &raquo;"
       end
       assert_select 'span.current', entries.current_page.to_s
-      assert_equal '&laquo; Previous 1 2 ... 5 6 7 ... 10 11 Next &raquo;', pagination.first.inner_text
+      assert_equal '&laquo; Previous 1 2 &hellip; 5 6 7 &hellip; 10 11 Next &raquo;', pagination.first.inner_text
     end
   end
 
