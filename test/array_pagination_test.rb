@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/helper'
-require 'will_paginate/core_ext'
+require 'will_paginate/array'
 
 class ArrayPaginationTest < Test::Unit::TestCase
   def test_simple
@@ -11,7 +11,8 @@ class ArrayPaginationTest < Test::Unit::TestCase
      { :page => 3,  :per_page => 5,  :expected => [] },
     ].
     each do |conditions|
-      assert_equal conditions[:expected], collection.paginate(conditions.slice(:page, :per_page))
+      expected = conditions.delete :expected
+      assert_equal expected, collection.paginate(conditions)
     end
   end
 
