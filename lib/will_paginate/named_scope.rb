@@ -1,4 +1,5 @@
-# stolen from: http://dev.rubyonrails.org/browser/trunk/activerecord/lib/active_record/named_scope.rb?rev=9084
+## stolen from: http://dev.rubyonrails.org/browser/trunk/activerecord/lib/active_record/named_scope.rb?rev=9084
+
 module WillPaginate
   # This is a feature backported from Rails 2.1 because of its usefullness not only with will_paginate,
   # but in other aspects when managing complex conditions that you want to be reusable.
@@ -20,7 +21,7 @@ module WillPaginate
     end
 
     module ClassMethods
-      def scopes
+      def scopes #:nodoc:
         read_inheritable_attribute(:scopes) || write_inheritable_attribute(:scopes, {})
       end
 
@@ -92,7 +93,7 @@ module WillPaginate
       end
     end
     
-    class Scope
+    class Scope #:nodoc:
       attr_reader :proxy_scope, :proxy_options
       [].methods.each { |m| delegate m, :to => :proxy_found unless m =~ /(^__|^nil\?|^send|class|extend|find|count|sum|average|maximum|minimum|paginate)/ }
       delegate :scopes, :with_scope, :to => :proxy_scope

@@ -1,3 +1,5 @@
+## based on http://dev.rubyonrails.org/changeset/9084
+
 ActiveRecord::Associations::AssociationProxy.class_eval do
   protected
   def with_scope(*args, &block)
@@ -5,7 +7,6 @@ ActiveRecord::Associations::AssociationProxy.class_eval do
   end
 end
 
-# support pagination on associations
 [ ActiveRecord::Associations::AssociationCollection,
     ActiveRecord::Associations::HasManyThroughAssociation ].each do |klass|
   klass.class_eval do
