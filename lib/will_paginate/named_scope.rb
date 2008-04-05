@@ -1,7 +1,7 @@
 # stolen from: http://dev.rubyonrails.org/browser/trunk/activerecord/lib/active_record/named_scope.rb?rev=9084
 module WillPaginate
   # This is a feature backported from Rails 2.1 because of its usefullness not only with will_paginate,
-  # but in other aspects when managing complex parameters with AR finders.
+  # but in other aspects when managing complex conditions that you want to be reusable.
   module NamedScope
     # All subclasses of ActiveRecord::Base have two named_scopes:
     # * <tt>all</tt>, which is similar to a <tt>find(:all)</tt> query, and
