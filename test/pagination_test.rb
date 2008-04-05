@@ -157,8 +157,17 @@ class PaginationTest < Test::Unit::TestCase
   end
   
   def test_complex_custom_page_param
-    get :list_developers, { :developers => {:page => 2} }, :wp => { :param_name => 'developers[page]' }
+    get :list_developers, { :developers => {:page => 1} }, :wp => { :param_name => 'developers[page]' }
+    entries = assigns :developers
+    
     assert_links_match /\?developers%5Bpage%5D=\d+$/
+
+    assert_select 'div.pagination', 1, 'no main DIV' do
+      assert_select 'a[href]', 3 do |elements|
+        validate_page_numbers [2,3,2], elements, 'developers[page]'
+      end
+      assert_select 'span.current', entries.current_page.to_s
+    end    
   end
 
   def test_will_paginate_windows
@@ -268,7 +277,7 @@ class PaginationTest < Test::Unit::TestCase
 protected
 
   def validate_page_numbers expected, links, param_name = :page
-    param_pattern = /\W#{param_name}=([^&]*)/
+    param_pattern = /\W#{CGI.escape(param_name.to_s)}=([^&]*)/
     
     assert_equal(expected, links.map { |e|
       e['href'] =~ param_pattern
