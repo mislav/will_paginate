@@ -33,68 +33,26 @@ module WillPaginate
       require 'will_paginate/finder'
       ActiveRecord::Base.class_eval { include Finder }
 
-      if patch_named_scope = !defined?(ActiveRecord::NamedScope)
-        # bring in a Rails 2.1 feature
-        require 'will_paginate/named_scope'
-
-        ActiveRecord::Base.class_eval do
-          include WillPaginate::NamedScope
-        end
-        
-        ActiveRecord::Associations::AssociationProxy.class_eval do
-          protected
-          def with_scope(*args, &block)
-            @reflection.klass.send :with_scope, *args, &block
-          end
-        end
-      end
-
       # support pagination on associations
       [ ActiveRecord::Associations::AssociationCollection,
           ActiveRecord::Associations::HasManyThroughAssociation ].each do |klass|
-        klass.class_eval do
-          protected
-          def method_missing(method, *args)
-            if @target.respond_to?(method) || (!@reflection.klass.respond_to?(method) && Class.respond_to?(method))
-              if block_given?
-                super { |*block_args| yield(*block_args) }
-              else
-                super
-              end
-            elsif @reflection.klass.scopes.include?(method)
-              @reflection.klass.scopes[method].call(self, *args)
-            else
-              with_scope construct_scope do
-                if block_given?
-                  @reflection.klass.send(method, *args) { |*block_args| yield(*block_args) }
-                else
-                  @reflection.klass.send(method, *args)
-                end
-              end
-            end
-          end
-        end if patch_named_scope
-        
         klass.class_eval do
           include Finder::ClassMethods
           alias_method_chain :method_missing, :paginate
         end
       end
+    end
 
-      ActiveRecord::Associations::HasAndBelongsToManyAssociation.class_eval do
-        protected
-        def method_missing(method, *args, &block)
-          if @target.respond_to?(method) || (!@reflection.klass.respond_to?(method) && Class.respond_to?(method))
-            super
-          elsif @reflection.klass.scopes.include?(method)
-            @reflection.klass.scopes[method].call(self, *args)
-          else
-            @reflection.klass.with_scope(:find => { :conditions => @finder_sql, :joins => @join_sql, :readonly => false }) do
-              @reflection.klass.send(method, *args, &block)
-            end
-          end
-        end
-      end if ActiveRecord::VERSION::MAJOR < 2 and patch_named_scope
+    # Enable named_scope, a feature of Rails 2.1, even if you have older Rails
+    # (tested on Rails 2.0.2 and 1.2.6).
+    def enable_named_scope(patch = true)
+      return if defined? ActiveRecord::NamedScope
+      require 'will_paginate/named_scope'
+      require 'will_paginate/named_scope_patch' if patch
+
+      ActiveRecord::Base.class_eval do
+        include WillPaginate::NamedScope
+      end
     end
   end
 

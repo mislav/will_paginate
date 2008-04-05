@@ -3,6 +3,7 @@ require 'lib/activerecord_test_case'
 
 require 'will_paginate'
 WillPaginate.enable_activerecord
+WillPaginate.enable_named_scope
 
 class FinderTest < ActiveRecordTestCase
   fixtures :topics, :replies, :users, :projects, :developers_projects
