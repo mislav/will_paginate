@@ -39,7 +39,7 @@ class ActiveRecordTestConnector
     
     ActiveRecord::Base.establish_connection(configuration)
     ActiveRecord::Base.configurations = { db => configuration }
-    add_counting ActiveRecord::Base.connection
+    prepare ActiveRecord::Base.connection
 
     unless Object.const_defined?(:QUOTED_TYPE)
       Object.send :const_set, :QUOTED_TYPE, ActiveRecord::Base.connection.quote_column_name('type')
@@ -53,7 +53,7 @@ class ActiveRecordTestConnector
     end
   end
 
-  def self.add_counting(conn)
+  def self.prepare(conn)
     class << conn
       IGNORED_SQL = [/^PRAGMA/, /^SELECT currval/, /^SELECT CAST/, /^SELECT @@IDENTITY/, /^SELECT @@ROWCOUNT/]
 

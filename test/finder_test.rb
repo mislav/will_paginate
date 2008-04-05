@@ -85,11 +85,14 @@ class FinderTest < ActiveRecordTestCase
   end
   
   def test_paginate_with_include_and_order
-    entries = Topic.paginate \
-      :page     => 1, 
-      :include  => :replies,  
-      :order    => 'replies.created_at asc, topics.created_at asc', 
-      :per_page => 10
+    entries = nil
+    assert_queries(2) do
+      entries = Topic.paginate \
+        :page     => 1, 
+        :include  => :replies,  
+        :order    => 'replies.created_at asc, topics.created_at asc', 
+        :per_page => 10
+    end
 
     expected = Topic.find :all, 
       :include => 'replies', 
@@ -104,7 +107,7 @@ class FinderTest < ActiveRecordTestCase
     entries, project = nil, projects(:active_record)
 
     assert_nothing_raised "THIS IS A BUG in Rails 1.2.3 that was fixed in [7326]. " +
-        "Please upgrade to the 1-2-stable branch or edge Rails." do
+        "Please upgrade to a newer version of Rails." do
       entries = project.topics.paginate \
         :page     => 1, 
         :include  => :replies,  
@@ -125,10 +128,12 @@ class FinderTest < ActiveRecordTestCase
     expected_name_ordered = [projects(:action_controller), projects(:active_record)]
     expected_id_ordered   = [projects(:active_record), projects(:action_controller)]
 
-    # with association-specified order
-    entries = dhh.projects.paginate(:page => 1)
-    assert_equal expected_name_ordered, entries
-    assert_equal 2, entries.total_entries
+    assert_queries(2) do
+      # with association-specified order
+      entries = dhh.projects.paginate(:page => 1)
+      assert_equal expected_name_ordered, entries
+      assert_equal 2, entries.total_entries
+    end
 
     # with explicit order
     entries = dhh.projects.paginate(:page => 1, :order => 'projects.id')
@@ -148,29 +153,43 @@ class FinderTest < ActiveRecordTestCase
 
   def test_paginate_association_extension
     project = Project.find(:first)
-    entries = project.replies.paginate_recent :page => 1
-    assert_equal [replies(:brave)], entries
+    
+    assert_queries(2) do
+      entries = project.replies.paginate_recent :page => 1
+      assert_equal [replies(:brave)], entries
+    end
   end
   
   def test_paginate_with_joins
-    entries = Developer.paginate :page => 1,
-                        :joins => 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id',
-                        :conditions => 'project_id = 1'        
-    assert_equal 2, entries.size
-    developer_names = entries.map { |d| d.name }
-    assert developer_names.include?('David')
-    assert developer_names.include?('Jamis')
+    entries = nil
+    
+    assert_queries(1) do
+      entries = Developer.paginate :page => 1,
+                          :joins => 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id',
+                          :conditions => 'project_id = 1'        
+      assert_equal 2, entries.size
+      developer_names = entries.map &:name
+      assert developer_names.include?('David')
+      assert developer_names.include?('Jamis')
+    end
 
-    expected = entries.to_a
-    entries = Developer.paginate :page => 1,
-                        :joins => 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id',
-                        :conditions => 'project_id = 1', :count => { :select => "users.id" }
-    assert_equal expected, entries.to_a
+    assert_queries(1) do
+      expected = entries.to_a
+      entries = Developer.paginate :page => 1,
+                          :joins => 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id',
+                          :conditions => 'project_id = 1', :count => { :select => "users.id" }
+      assert_equal expected, entries.to_a
+      assert_equal 2, entries.total_entries
+    end
   end
 
   def test_paginate_with_group
-    entries = Developer.paginate :page => 1, :per_page => 10,
-                                 :group => 'salary', :select => 'salary', :order => 'salary'
+    entries = nil
+    assert_queries(1) do
+      entries = Developer.paginate :page => 1, :per_page => 10,
+                                   :group => 'salary', :select => 'salary', :order => 'salary'
+    end
+    
     expected = [ users(:david), users(:jamis), users(:dev_10), users(:poor_jamis) ].map(&:salary).sort
     assert_equal expected, entries.map(&:salary)
   end
@@ -220,9 +239,11 @@ class FinderTest < ActiveRecordTestCase
     def test_paginate_array_of_ids
       # AR finders also accept arrays of IDs
       # (this was broken in Rails before [6912])
-      entries = Developer.paginate((1..8).to_a, :per_page => 3, :page => 2, :order => 'id')
-      assert_equal (4..6).to_a, entries.map(&:id)
-      assert_equal 8, entries.total_entries
+      assert_queries(1) do
+        entries = Developer.paginate((1..8).to_a, :per_page => 3, :page => 2, :order => 'id')
+        assert_equal (4..6).to_a, entries.map(&:id)
+        assert_equal 8, entries.total_entries
+      end
     end
   end
 
