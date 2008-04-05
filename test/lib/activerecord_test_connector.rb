@@ -6,6 +6,8 @@ class ActiveRecordTestConnector
   cattr_accessor :able_to_connect
   cattr_accessor :connected
 
+  FIXTURES_PATH = File.join(File.dirname(__FILE__), '..', 'fixtures')
+
   # Set our defaults
   self.connected = false
   self.able_to_connect = true
@@ -14,8 +16,7 @@ class ActiveRecordTestConnector
     unless self.connected || !self.able_to_connect
       setup_connection
       load_schema
-      # require_fixture_models
-      Dependencies.load_paths.unshift(File.dirname(__FILE__) + "/../fixtures")
+      Dependencies.load_paths.unshift FIXTURES_PATH
       self.connected = true
     end
   rescue Exception => e  # errors from ActiveRecord setup
@@ -38,7 +39,7 @@ class ActiveRecordTestConnector
     
     ActiveRecord::Base.establish_connection(configuration)
     ActiveRecord::Base.configurations = { db => configuration }
-    ActiveRecord::Base.connection
+    add_counting ActiveRecord::Base.connection
 
     unless Object.const_defined?(:QUOTED_TYPE)
       Object.send :const_set, :QUOTED_TYPE, ActiveRecord::Base.connection.quote_column_name('type')
@@ -48,13 +49,21 @@ class ActiveRecordTestConnector
   def self.load_schema
     ActiveRecord::Base.silence do
       ActiveRecord::Migration.verbose = false
-      load File.dirname(__FILE__) + "/../fixtures/schema.rb"
+      load File.join(FIXTURES_PATH, 'schema.rb')
     end
   end
 
-  def self.require_fixture_models
-    models = Dir.glob(File.dirname(__FILE__) + "/../fixtures/*.rb")
-    models = (models.grep(/user.rb/) + models).uniq
-    models.each { |f| require f }
+  def self.add_counting(conn)
+    class << conn
+      IGNORED_SQL = [/^PRAGMA/, /^SELECT currval/, /^SELECT CAST/, /^SELECT @@IDENTITY/, /^SELECT @@ROWCOUNT/]
+
+      def execute_with_counting(sql, name = nil, &block)
+        $query_count ||= 0
+        $query_count  += 1 unless IGNORED_SQL.any? { |r| sql =~ r }
+        execute_without_counting(sql, name, &block)
+      end
+
+      alias_method_chain :execute, :counting
+    end
   end
 end

@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/helper'
+require 'helper'
 require 'action_controller'
-require File.dirname(__FILE__) + '/lib/html_inner_text'
+require 'lib/html_inner_text'
 
 ActionController::Routing::Routes.draw do |map|
   map.connect ':controller/:action/:id'

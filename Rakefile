@@ -9,6 +9,7 @@ desc 'Test the will_paginate plugin.'
 Rake::TestTask.new(:test) do |t|
   t.pattern = 'test/**/*_test.rb'
   t.verbose = true
+  t.libs << 'test'
 end
 
 # I want to specify environment variables at call time
@@ -27,6 +28,7 @@ for configuration in %w( sqlite3 mysql postgres )
     t.pattern = 'test/finder_test.rb'
     t.verbose = true
     t.env = { 'DB' => configuration }
+    t.libs << 'test'
   end
 end
 

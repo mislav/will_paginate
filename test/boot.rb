@@ -19,5 +19,3 @@ else
     gem 'activerecord'
   end
 end
-
-$:.unshift "#{plugin_root}/lib"

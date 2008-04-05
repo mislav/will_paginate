@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/helper'
+require 'helper'
 require 'will_paginate/array'
 
 class ArrayPaginationTest < Test::Unit::TestCase

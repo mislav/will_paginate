@@ -1,5 +1,5 @@
-require File.dirname(__FILE__) + '/helper'
-require File.dirname(__FILE__) + '/lib/activerecord_test_case'
+require 'helper'
+require 'lib/activerecord_test_case'
 
 require 'will_paginate'
 WillPaginate.enable_activerecord
@@ -12,18 +12,18 @@ class FinderTest < ActiveRecordTestCase
   end
   
   def test_simple_paginate
-    entries = Topic.paginate :page => nil
-    assert_equal 1, entries.current_page
-    assert_nil entries.previous_page
-    assert_nil entries.next_page
-    assert_equal 1, entries.total_pages
-    assert_equal 4, entries.size
+    assert_queries(1) do
+      entries = Topic.paginate :page => nil
+      assert_equal 1, entries.current_page
+      assert_equal 1, entries.total_pages
+      assert_equal 4, entries.size
+    end
     
-    entries = Topic.paginate :page => 2
-    assert_equal 2, entries.current_page
-    assert_equal 1, entries.previous_page
-    assert_equal 1, entries.total_pages
-    assert entries.empty?
+    assert_queries(2) do
+      entries = Topic.paginate :page => 2
+      assert_equal 1, entries.total_pages
+      assert entries.empty?
+    end
   end
 
   def test_parameter_api
