@@ -55,7 +55,7 @@ class ActiveRecordTestConnector
 
   def self.prepare(conn)
     class << conn
-      IGNORED_SQL = [/^PRAGMA/, /^SELECT currval/, /^SELECT CAST/, /^SELECT @@IDENTITY/, /^SELECT @@ROWCOUNT/]
+      IGNORED_SQL = [/^PRAGMA/, /^SELECT currval/, /^SELECT CAST/, /^SELECT @@IDENTITY/, /^SELECT @@ROWCOUNT/, /^SHOW FIELDS /]
 
       def execute_with_counting(sql, name = nil, &block)
         $query_count ||= 0
