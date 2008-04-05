@@ -34,15 +34,8 @@ module WillPaginate
       ActiveRecord::Base.class_eval { include Finder }
 
       # support paginating finders on associations
-      associations = ActiveRecord::Associations
-      collection = associations::AssociationCollection
-      classes = [collection]
-      # before [9200], HMT wasn't a subclass of AssociationCollection
-      unless associations::HasManyThroughAssociation.superclass == collection
-        classes << associations::HasManyThroughAssociation
-      end
-      
-      classes.each do |klass|
+      a = ActiveRecord::Associations
+      [a::AssociationCollection, a::HasManyThroughAssociation].each do |klass|
         klass.class_eval do
           include Finder::ClassMethods
           alias_method_chain :method_missing, :paginate
