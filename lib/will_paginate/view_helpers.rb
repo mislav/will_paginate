@@ -243,7 +243,7 @@ module WillPaginate
     def page_link_or_span(page, span_class = 'current', text = nil)
       text ||= page.to_s
       if page and page != current_page
-        @template.link_to text, url_options(page), :rel => rel_value(page)
+        @template.link_to text, url_params(page), :rel => rel_value(page)
       else
         @template.content_tag :span, text, :class => span_class
       end
@@ -251,12 +251,30 @@ module WillPaginate
 
     # Returns URL params for +page_link_or_span+, taking the current GET params
     # and <tt>:params</tt> option into account.
-    def url_options(page)
-      options = { param_name => page }
-      # page links should preserve GET parameters
-      options = params.merge(options) if @template.request.get?
-      options.rec_merge!(@options[:params]) if @options[:params]
-      return options
+    def url_params(page)
+      unless @url_params
+        @url_params = @param_hash = { }
+        # page links should preserve GET parameters
+        stringified_merge @url_params, @template.params if @template.request.get?
+        stringified_merge @url_params, @options[:params] if @options[:params]
+        
+        if param_name.index(/[^\w-]/)
+          page_param = if defined? CGIMethods
+            CGIMethods.parse_query_parameters(param_name)
+          else
+            ActionController::AbstractRequest.parse_query_parameters(param_name)
+          end
+          
+          stringified_merge @url_params, page_param
+
+          until page_param[@param_name = page_param.keys.first].nil?
+            @param_hash = @param_hash[@param_name]
+            page_param = page_param[@param_name]
+          end 
+        end
+      end
+      @param_hash[param_name] = page
+      @url_params
     end
 
   private
@@ -278,11 +296,19 @@ module WillPaginate
     end
 
     def param_name
-      @param_name ||= @options[:param_name].to_sym
+      @param_name ||= @options[:param_name].to_s
     end
 
-    def params
-      @params ||= @template.params.to_hash.symbolize_keys
+    def stringified_merge(target, other)
+      other.each do |key, value|
+        key = key.to_s
+        existing = target[key]
+        if existing.is_a?(Hash) and value.is_a?(Hash)
+          stringified_merge(existing, value)
+        else
+          target[key] = value
+        end
+      end
     end
   end
 end

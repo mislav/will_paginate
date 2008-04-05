@@ -47,21 +47,3 @@ unless Hash.instance_methods.include? 'rec_merge'
     end 
   end
 end
-
-unless Hash.instance_methods.include? 'rec_merge!'
-  Hash.class_eval do
-    # Same as Hash#merge!, but recursively merges sub-hashes
-    # (stolen from Haml)
-    def rec_merge!(other)
-      other.each do |key, other_value|
-        value = self[key]
-        if value.is_a?(Hash) and other_value.is_a?(Hash)
-          value.rec_merge! other_value
-        else
-          self[key] = other_value
-        end
-      end
-      self
-    end
-  end
-end

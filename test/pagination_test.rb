@@ -155,6 +155,11 @@ class PaginationTest < Test::Unit::TestCase
       assert_select 'span.current', entries.current_page.to_s
     end    
   end
+  
+  def test_complex_custom_page_param
+    get :list_developers, { :developers => {:page => 2} }, :wp => { :param_name => 'developers[page]' }
+    assert_links_match /\?developers%5Bpage%5D=\d+$/
+  end
 
   def test_will_paginate_windows
     get :list_developers, { :page => 6, :per_page => 1 }, :wp => { :inner_window => 1 }
