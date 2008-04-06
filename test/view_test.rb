@@ -182,9 +182,17 @@ class ViewTest < Test::Unit::TestCase
         collection = [1].paginate(page_options)
       end
 
-      @html_result = @view.render_template nil, @template, nil,
-        :collection => collection, :options => options
+      locals = { :collection => collection, :options => options }
 
+      if defined? ActionView::Template
+        # Rails 2.1
+        args = [ ActionView::Template.new(@view, @template, false, locals, true, nil) ]
+      else
+        # older Rails versions
+        args = [nil, @template, nil, locals]
+      end
+      
+      @html_result = @view.render_template(*args)
       @html_document = HTML::Document.new(@html_result, true, false)
 
       if block_given?
