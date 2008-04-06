@@ -13,6 +13,7 @@ ActionController::Base.perform_caching = false
 class DummyRequest
   def initialize
     @get = true
+    @params = {}
   end
   
   def get?
@@ -30,6 +31,11 @@ class DummyRequest
   def relative_url_root
     ''
   end
+
+  def params(more = nil)
+    @params.update(more) if more
+    @params
+  end
 end
 
 class DummyController
@@ -38,7 +44,7 @@ class DummyController
   
   def initialize
     @request = DummyRequest.new
-    @url = ActionController::UrlRewriter.new(@request, {})
+    @url = ActionController::UrlRewriter.new(@request, @request.params)
   end
   
   def url_for(params)

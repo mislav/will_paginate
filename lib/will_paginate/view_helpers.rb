@@ -260,6 +260,7 @@ module WillPaginate
         
         if param_name.index(/[^\w-]/)
           page_param = if defined? CGIMethods
+            # Rails 1.2
             CGIMethods.parse_query_parameters(param_name)
           else
             ActionController::AbstractRequest.parse_query_parameters(param_name)
@@ -303,11 +304,16 @@ module WillPaginate
       other.each do |key, value|
         key = key.to_s
         existing = target[key]
-        if existing.is_a?(Hash) and value.is_a?(Hash)
-          stringified_merge(existing, value)
-        else
-          target[key] = value
+
+        if value.is_a?(Hash)
+          target[key] = existing = {} if existing.nil?
+          if existing.is_a?(Hash)
+            stringified_merge(existing, value)
+            return
+          end
         end
+        
+        target[key] = value
       end
     end
   end

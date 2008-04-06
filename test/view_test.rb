@@ -12,10 +12,12 @@ class ViewTest < Test::Unit::TestCase
     @template    = '<%= will_paginate collection, options %>'
     
     @view = ActionView::Base.new
-    @view.assigns['_params']    = {}
     @view.assigns['controller'] = @controller
     @view.assigns['_request']   = @request
+    @view.assigns['_params']    = @request.params
   end
+
+  ## basic pagination ##
 
   def test_will_paginate
     paginate do |pagination|
@@ -55,6 +57,8 @@ class ViewTest < Test::Unit::TestCase
     end
   end
 
+  ## advanced options for pagination ##
+
   def test_will_paginate_without_container
     paginate({}, :container => false)
     assert_select 'div.pagination', 0, 'main DIV present when it shouldn\'t'
@@ -88,6 +92,101 @@ class ViewTest < Test::Unit::TestCase
       end
     end
   end
+  
+  def test_container_id
+    paginate do |div|
+      assert_nil div.first['id']
+    end
+    
+    # magic ID
+    paginate({}, :id => true) do |div|
+      assert_equal 'fixnums_pagination', div.first['id']
+    end
+    
+    # explicit ID
+    paginate({}, :id => 'custom_id') do |div|
+      assert_equal 'custom_id', div.first['id']
+    end
+  end
+
+  ## other helpers ##
+  
+  def test_paginated_section
+    @template = <<-ERB
+      <% paginated_section collection, options do %>
+        <%= content_tag :div, '', :id => "developers" %>
+      <% end %>
+    ERB
+    
+    paginate
+    assert_select 'div.pagination', 2
+    assert_select 'div.pagination + div#developers', 1
+  end
+
+  def test_page_entries_info
+    @template = '<%= page_entries_info collection %>'
+    array = ('a'..'z').to_a
+    
+    paginate array.paginate(:page => 2, :per_page => 5)
+    assert_equal %{Displaying entries <b>6&nbsp;-&nbsp;10</b> of <b>26</b> in total},
+      @html_result
+    
+    paginate array.paginate(:page => 7, :per_page => 4)
+    assert_equal %{Displaying entries <b>25&nbsp;-&nbsp;26</b> of <b>26</b> in total},
+      @html_result
+  end
+  
+  ## parameter handling in page links ##
+  
+  def test_will_paginate_preserves_parameters_on_get
+    @request.params :foo => { :bar => 'baz' }
+    paginate
+    assert_links_match /foo%5Bbar%5D=baz/
+  end
+  
+  def test_will_paginate_doesnt_preserve_parameters_on_post
+    @request.post
+    @request.params :foo => 'bar'
+    paginate
+    assert_no_links_match /foo=bar/
+  end
+  
+  def test_adding_additional_parameters
+    paginate({}, :params => { :foo => 'bar' })
+    assert_links_match /foo=bar/
+  end
+  
+  def test_removing_arbitrary_parameters
+    @request.params :foo => 'bar'
+    paginate({}, :params => { :foo => nil })
+    assert_no_links_match /foo=bar/
+  end
+    
+  def test_adding_additional_route_parameters
+    paginate({}, :params => { :controller => 'baz', :action => 'list' })
+    assert_links_match %r{\Wbaz/list\W}
+  end
+  
+  def test_will_paginate_with_custom_page_param
+    paginate({ :page => 2 }, :param_name => :developers_page) do
+      assert_select 'a[href]', 4 do |elements|
+        validate_page_numbers [1,1,3,3], elements, :developers_page
+      end
+    end    
+  end
+  
+  def test_complex_custom_page_param
+    @request.params :developers => { :page => 2 }
+    
+    paginate({ :page => 2 }, :param_name => 'developers[page]') do
+      assert_select 'a[href]', 4 do |links|
+        assert_links_match /\?developers%5Bpage%5D=\d+$/, links
+        validate_page_numbers [1,1,3,3], links, 'developers[page]'
+      end
+    end
+  end
+
+  ## internal hardcore stuff ##
 
   class LegacyCollection < WillPaginate::Collection
     alias :page_count :total_pages
@@ -124,55 +223,15 @@ class ViewTest < Test::Unit::TestCase
     end
     assert e.message.include?('@developers')
   end
-  
-  def test_container_id
-    paginate do |div|
-      assert_nil div.first['id']
-    end
-    
-    # magic ID
-    paginate({}, :id => true) do |div|
-      assert_equal 'fixnums_pagination', div.first['id']
-    end
-    
-    # explicit ID
-    paginate({}, :id => 'custom_id') do |div|
-      assert_equal 'custom_id', div.first['id']
-    end
-  end
 
-  # only on Rails 2
   if ActionController::Base.respond_to? :rescue_responses
+    # only on Rails 2
     def test_rescue_response_hook_presence
       assert_equal :not_found,
         ActionController::Base.rescue_responses['WillPaginate::InvalidPage']
     end
   end
-
-  def test_paginated_section
-    @template = <<-ERB
-      <% paginated_section collection, options do %>
-        <%= content_tag :div, '', :id => "developers" %>
-      <% end %>
-    ERB
-    
-    paginate
-    assert_select 'div.pagination', 2
-    assert_select 'div.pagination + div#developers', 1
-  end
-
-  def test_page_entries_info
-    @template = '<%= page_entries_info collection %>'
-    array = ('a'..'z').to_a
-    
-    paginate array.paginate(:page => 2, :per_page => 5)
-    assert_equal %{Displaying entries <b>6&nbsp;-&nbsp;10</b> of <b>26</b> in total},
-      @html_result
-    
-    paginate array.paginate(:page => 7, :per_page => 4)
-    assert_equal %{Displaying entries <b>25&nbsp;-&nbsp;26</b> of <b>26</b> in total},
-      @html_result
-  end
+  
   
   protected
 
@@ -214,11 +273,13 @@ class ViewTest < Test::Unit::TestCase
       })
     end
 
-    def assert_links_match pattern
-      assert_select 'div.pagination a[href]' do |elements|
-        elements.each do |el|
-          assert_match pattern, el['href']
-        end
+    def assert_links_match pattern, links = nil
+      links ||= assert_select 'div.pagination a[href]' do |elements|
+        elements
+      end
+      
+      links.each do |el|
+        assert_match pattern, el['href']
       end
     end
 
