@@ -53,10 +53,11 @@ end
 
 desc 'Generate RDoc documentation for the will_paginate plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
-  files = ['README', 'LICENSE', FileList.new('lib/**/*.rb').exclude('lib/**/named_scope*')]
+  files = ['README.rdoc', 'LICENSE']
+  files << FileList.new('lib/**/*.rb').exclude('lib/will_paginate/named_scope*').exclude('lib/will_paginate/array.rb')
   rdoc.rdoc_files.add(files)
-  rdoc.main = "README" # page to start on
-  rdoc.title = "will_paginate"
+  rdoc.main = "README.rdoc" # page to start on
+  rdoc.title = "will_paginate documentation"
   
   templates = %w[/Users/chris/ruby/projects/err/rock/template.rb /var/www/rock/template.rb]
   rdoc.template = templates.find { |t| File.exists? t }
@@ -64,4 +65,5 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'doc' # rdoc output folder
   rdoc.options << '--inline-source'
   rdoc.options << '--charset=UTF-8'
+  rdoc.options << '--webcvs="http://github.com/mislav/will_paginate/tree/master/%s"'
 end

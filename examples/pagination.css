@@ -1,0 +1,86 @@
+.digg-pagination {
+  background: white;
+  /* self-clearing method: */ }
+  .digg-pagination a, .digg-pagination span {
+    padding: .2em .5em;
+    display: block;
+    float: left;
+    margin-right: 1px; }
+  .digg-pagination span.disabled {
+    color: #999;
+    border: 1px solid #DDD; }
+  .digg-pagination span.current {
+    font-weight: bold;
+    background: #2E6AB1;
+    color: white;
+    border: 1px solid #2E6AB1; }
+  .digg-pagination a {
+    text-decoration: none;
+    color: #105CB6;
+    border: 1px solid #9AAFE5; }
+    .digg-pagination a:hover, .digg-pagination a:focus {
+      color: #003;
+      border-color: #003; }
+  .digg-pagination .page-info {
+    background: #2E6AB1;
+    color: white;
+    padding: .4em .6em;
+    width: 22em;
+    margin-bottom: .3em;
+    text-align: center; }
+    .digg-pagination .page-info b {
+      color: #003;
+      background: #6aa6ed;
+      padding: .1em .25em; }
+  .digg-pagination:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden; }
+  * html .digg-pagination {
+    height: 1%; }
+  *:first-child+html .digg-pagination {
+    overflow: hidden; }
+
+.apple-pagination {
+  background: #F1F1F1;
+  border: 1px solid #E5E5E5;
+  text-align: center;
+  padding: 1em; }
+  .apple-pagination a, .apple-pagination span {
+    padding: .2em .3em; }
+  .apple-pagination span.disabled {
+    color: #AAA; }
+  .apple-pagination span.current {
+    font-weight: bold;
+    background: transparent url(apple-circle.gif) no-repeat 50% 50%; }
+  .apple-pagination a {
+    text-decoration: none;
+    color: black; }
+    .apple-pagination a:hover, .apple-pagination a:focus {
+      text-decoration: underline; }
+
+.flickr-pagination {
+  text-align: center;
+  padding: .3em; }
+  .flickr-pagination a, .flickr-pagination span {
+    padding: .2em .5em; }
+  .flickr-pagination span.disabled {
+    color: #AAA; }
+  .flickr-pagination span.current {
+    font-weight: bold;
+    color: #FF0084; }
+  .flickr-pagination a {
+    border: 1px solid #DDDDDD;
+    color: #0063DC;
+    text-decoration: none; }
+    .flickr-pagination a:hover, .flickr-pagination a:focus {
+      border-color: #003366;
+      background: #0063DC;
+      color: white; }
+    .flickr-pagination a[rel="next"] {
+      border-width: 2px; }
+  .flickr-pagination .page-info {
+    color: #aaa;
+    padding-top: .8em; }
