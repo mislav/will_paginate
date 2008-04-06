@@ -13,6 +13,18 @@ class Test::Unit::TestCase
       [method.to_s, method.to_sym].each { |m| assert_respond_to object, m }
     end
   end
+  
+  def collect_deprecations
+    old_behavior = WillPaginate::Deprecation.behavior
+    deprecations = []
+    WillPaginate::Deprecation.behavior = Proc.new do |message, callstack|
+      deprecations << message
+    end
+    result = yield
+    [result, deprecations]
+  ensure
+    WillPaginate::Deprecation.behavior = old_behavior
+  end
 end
 
 # Wrap tests that use Mocha and skip if unavailable.

@@ -1,15 +1,5 @@
 require 'helper'
-require 'action_controller'
-require 'lib/html_inner_text'
-
-ActionController::Routing::Routes.draw do |map|
-  map.connect ':controller/:action/:id'
-end
-
-ActionController::Base.perform_caching = false
-
-require 'will_paginate'
-WillPaginate.enable_actionpack
+require 'lib/view_test_process'
 
 class PaginationTest < Test::Unit::TestCase
   
@@ -25,24 +15,6 @@ class PaginationTest < Test::Unit::TestCase
       render :inline => '<%= will_paginate @developers, @options %>'
     end
 
-    def guess_collection_name
-      @developers = session[:wp]
-      @options    = session[:wp_options]
-      
-      render :inline => '<%= will_paginate @options %>'
-    end
-
-    def paginated_section
-      @developers = session[:wp]
-      @options    = session[:wp_options]
-      
-      render :inline => <<-ERB
-        <% paginated_section @options do %>
-          <%= content_tag :div, '', :id => "developers" %>
-        <% end %>
-      ERB
-    end
-
     protected
       def rescue_errors(e) raise e end
       def rescue_action(e) raise e end
@@ -53,66 +25,6 @@ class PaginationTest < Test::Unit::TestCase
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
     super
-  end
-
-  def test_will_paginate
-    get :list_developers
-
-    entries = assigns :developers
-    assert entries
-    assert_equal 4, entries.size
-
-    assert_select 'div.pagination', 1, 'no main DIV' do |pagination|
-      assert_select 'a[href]', 3 do |elements|
-        validate_page_numbers [2,3,2], elements
-        assert_select elements.last, ':last-child', "Next &raquo;"
-      end
-      assert_select 'span', 2
-      assert_select 'span.disabled:first-child', "&laquo; Previous"
-      assert_select 'span.current', entries.current_page.to_s
-      assert_equal '&laquo; Previous 1 2 3 Next &raquo;', pagination.first.inner_text
-    end
-  end
-
-  def test_will_paginate_with_options
-    get :list_developers, { :page => 2 }, :wp => {
-      :class => 'will_paginate', :prev_label => 'Prev', :next_label => 'Next'
-    }
-    assert_response :success
-    
-    entries = assigns :developers
-    assert entries
-    assert_equal 4, entries.size
-
-    assert_select 'div.will_paginate', 1, 'no main DIV' do
-      assert_select 'a[href]', 4 do |elements|
-        validate_page_numbers [1,1,3,3], elements
-        # test rel attribute values:
-        assert_select elements[1], 'a', '1' do |link|
-          assert_equal 'prev start', link.first['rel']
-        end
-        assert_select elements.first, 'a', "Prev" do |link|
-          assert_equal 'prev start', link.first['rel']
-        end
-        assert_select elements.last, 'a', "Next" do |link|
-          assert_equal 'next', link.first['rel']
-        end
-      end
-      assert_select 'span.current', entries.current_page.to_s
-    end
-  end
-
-  def test_will_paginate_without_container
-    get :list_developers, {}, :wp => { :container => false }
-    assert_select 'div.pagination', 0, 'no main DIV'
-    assert_select 'a[href]', 3
-  end
-
-  def test_will_paginate_without_page_links
-    get :list_developers, { :page => 2 }, :wp => { :page_links => false }
-    assert_select 'a[href]', 2 do |elements|
-      validate_page_numbers [1,3], elements
-    end
   end
   
   def test_will_paginate_preserves_parameters_on_get
@@ -169,110 +81,6 @@ class PaginationTest < Test::Unit::TestCase
       assert_select 'span.current', entries.current_page.to_s
     end    
   end
-
-  def test_will_paginate_windows
-    get :list_developers, { :page => 6, :per_page => 1 }, :wp => { :inner_window => 1 }
-    assert_response :success
-    
-    entries = assigns :developers
-    assert entries
-    assert_equal 1, entries.size
-
-    assert_select 'div.pagination', 1, 'no main DIV' do |pagination|
-      assert_select 'a[href]', 8 do |elements|
-        validate_page_numbers [5,1,2,5,7,10,11,7], elements
-        assert_select elements.first, 'a', "&laquo; Previous"
-        assert_select elements.last, 'a', "Next &raquo;"
-      end
-      assert_select 'span.current', entries.current_page.to_s
-      assert_equal '&laquo; Previous 1 2 &hellip; 5 6 7 &hellip; 10 11 Next &raquo;', pagination.first.inner_text
-    end
-  end
-
-  def test_will_paginate_eliminates_small_gaps
-    get :list_developers, { :page => 6, :per_page => 1 }, :wp => { :inner_window => 2 }
-    assert_response :success
-    
-    assert_select 'div.pagination', 1, 'no main DIV' do
-      assert_select 'a[href]', 12 do |elements|
-        validate_page_numbers [5,1,2,3,4,5,7,8,9,10,11,7], elements
-      end
-    end
-  end
-
-  def test_no_pagination
-    get :list_developers, :per_page => 12
-    entries = assigns :developers
-    assert_equal 1, entries.total_pages
-    assert_equal 11, entries.size
-
-    assert_equal '', @response.body
-  end
-  
-  def test_faulty_input_raises_error
-    assert_raise WillPaginate::InvalidPage do
-      get :list_developers, :page => 'foo'
-    end
-  end
-
-  class LegacyCollection < WillPaginate::Collection
-    alias :page_count :total_pages
-    undef :total_pages
-  end
-  
-  uses_mocha 'helper internals' do
-    def test_collection_name_can_be_guessed
-      collection = mock
-      collection.expects(:total_pages).returns(1)
-      get :guess_collection_name, {}, :wp => collection
-    end
-
-    def test_deprecation_notices_with_page_count
-      collection = LegacyCollection.new 1, 1, 2
-
-      assert_deprecated collection.class.name do
-        get :guess_collection_name, {}, :wp => collection
-      end
-    end
-  end
-  
-  def test_inferred_collection_name_raises_error_when_nil
-    ex = assert_raise ArgumentError do
-      get :guess_collection_name, {}, :wp => nil
-    end
-    assert ex.message.include?('@developers')
-  end
-
-  def test_setting_id_for_container
-    get :list_developers
-    assert_select 'div.pagination', 1 do |div|
-      assert_nil div.first['id']
-    end
-    # magic ID
-    get :list_developers, {}, :wp => { :id => true }
-    assert_select 'div.pagination', 1 do |div|
-      assert_equal 'fixnums_pagination', div.first['id']
-    end
-    # explicit ID
-    get :list_developers, {}, :wp => { :id => 'custom_id' }
-    assert_select 'div.pagination', 1 do |div|
-      assert_equal 'custom_id', div.first['id']
-    end
-  end
-
-  if ActionController::Base.respond_to? :rescue_responses
-    def test_rescue_response_hook_presence
-      assert_equal :not_found,
-        DevelopersController.rescue_responses['WillPaginate::InvalidPage']
-    end
-  end
-
-  def test_paginated_section
-    collection = WillPaginate::Collection.new 1, 1, 2
-    get :paginated_section, {}, :wp => collection, :wp_options => { :class => 'will_paginate' }
-    assert_select 'div.will_paginate', 2
-    assert_select 'div.will_paginate + div#developers', 1
-  end
   
 protected
 
@@ -299,32 +107,5 @@ protected
         assert_no_match pattern, el['href']
       end
     end
-  end
-  
-  def collect_deprecations
-    old_behavior = WillPaginate::Deprecation.behavior
-    deprecations = []
-    WillPaginate::Deprecation.behavior = Proc.new do |message, callstack|
-      deprecations << message
-    end
-    result = yield
-    [result, deprecations]
-  ensure
-    WillPaginate::Deprecation.behavior = old_behavior
-  end
-end
-
-class ViewHelpersTest < Test::Unit::TestCase
-  include WillPaginate::ViewHelpers
-
-  def test_page_entries_info
-    arr = ('a'..'z').to_a
-    collection = arr.paginate :page => 2, :per_page => 5
-    assert_equal %{Displaying entries <b>6&nbsp;-&nbsp;10</b> of <b>26</b> in total},
-      page_entries_info(collection)
-    
-    collection = arr.paginate :page => 7, :per_page => 4
-    assert_equal %{Displaying entries <b>25&nbsp;-&nbsp;26</b> of <b>26</b> in total},
-      page_entries_info(collection)
   end
 end

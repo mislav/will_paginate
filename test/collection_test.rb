@@ -53,6 +53,20 @@ class ArrayPaginationTest < Test::Unit::TestCase
     assert !collection.out_of_bounds?
   end
 
+  def test_previous_next_pages
+    collection = create(1, 1, 3)
+    assert_nil collection.previous_page
+    assert_equal 2, collection.next_page
+    
+    collection = create(2, 1, 3)
+    assert_equal 1, collection.previous_page
+    assert_equal 3, collection.next_page
+    
+    collection = create(3, 1, 3)
+    assert_equal 2, collection.previous_page
+    assert_nil collection.next_page
+  end
+
   def test_out_of_bounds
     entries = create(2, 3, 2){}
     assert entries.out_of_bounds?
@@ -95,9 +109,9 @@ class ArrayPaginationTest < Test::Unit::TestCase
   end
 
   def test_invalid_page
-    bad_input = [0, -1, nil, '', 'Schnitzel']
+    bad_inputs = [0, -1, nil, '', 'Schnitzel']
 
-    bad_input.each do |bad|
+    bad_inputs.each do |bad|
       assert_raise(WillPaginate::InvalidPage) { create bad }
     end
   end

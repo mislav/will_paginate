@@ -21,7 +21,7 @@ module WillPaginate
       require 'will_paginate/view_helpers'
       ActionView::Base.class_eval { include ViewHelpers }
 
-      if ActionController::Base.respond_to? :rescue_responses
+      if defined?(ActionController::Base) and ActionController::Base.respond_to? :rescue_responses
         ActionController::Base.rescue_responses['WillPaginate::InvalidPage'] = :not_found
       end
     end
