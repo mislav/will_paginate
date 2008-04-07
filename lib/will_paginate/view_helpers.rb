@@ -245,7 +245,7 @@ module WillPaginate
       classnames = Array[*span_class]
       
       if page and page != current_page
-        @template.link_to text, url_params(page), :rel => rel_value(page), :class => classnames[1]
+        @template.link_to text, url_for(page), :rel => rel_value(page), :class => classnames[1]
       else
         @template.content_tag :span, text, :class => classnames.join(' ')
       end
@@ -253,31 +253,31 @@ module WillPaginate
 
     # Returns URL params for +page_link_or_span+, taking the current GET params
     # and <tt>:params</tt> option into account.
-    def url_params(page)
-      unless @url_params
-        @url_params = @param_hash = { }
+    def url_for(page)
+      unless @url_string
+        @url_params = { :escape => false }
         # page links should preserve GET parameters
         stringified_merge @url_params, @template.params if @template.request.get?
         stringified_merge @url_params, @options[:params] if @options[:params]
         
         if param_name.index(/[^\w-]/)
-          page_param = if defined? CGIMethods
-            # Rails 1.2
-            CGIMethods.parse_query_parameters(param_name)
+          page_param = unless defined? CGIMethods
+            ActionController::AbstractRequest
           else
-            ActionController::AbstractRequest.parse_query_parameters(param_name)
-          end
+            # Rails 1.2
+            CGIMethods
+          end.parse_query_parameters("#{param_name}=#{page}")
           
           stringified_merge @url_params, page_param
-
-          until page_param[@param_name = page_param.keys.first].nil?
-            @param_hash = @param_hash[@param_name]
-            page_param = page_param[@param_name]
-          end 
+        else
+          @url_params[param_name] = page
         end
+
+        url = @template.url_for(@url_params)
+        @url_string = url.sub(/([?&]#{CGI.escape param_name}=)#{page}/, '\1@')
+        return url
       end
-      @param_hash[param_name] = page
-      @url_params
+      @url_string.sub '@', page.to_s
     end
 
   private
