@@ -67,3 +67,17 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.options << '--charset=UTF-8'
   rdoc.options << '--webcvs=http://github.com/mislav/will_paginate/tree/master/'
 end
+
+task :manifest do
+  list = Dir['**/*']
+  
+  File.read('.gitignore').each_line do |glob|
+    glob = glob.chomp.sub(/^\//, '')
+    list -= Dir[glob]
+    puts "excluding #{glob}"
+  end
+  
+  File.open('.manifest', 'w') do |file|
+    file.write list.sort.join("\n")
+  end
+end
