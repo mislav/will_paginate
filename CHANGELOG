@@ -1,3 +1,12 @@
+== 2.2.1, released 2008-04-08
+
+* take less risky path when monkeypatching named_scope; fix that it no longer
+  requires ActiveRecord::VERSION
+* use strings in "respond_to?" calls to work around a bug in acts_as_ferret
+  stable (ugh)
+* add rake release task
+
+
 == 2.2.0, released 2008-04-07
 
 === API changes
@@ -30,4 +39,5 @@
     
 * Add "paginated_each" method for iterating through every record by loading only
   one page of records at the time
-* Rails 2: Rescue from WillPaginate::InvalidPage error with 404 Not Found by default
+* Rails 2: Rescue from WillPaginate::InvalidPage error with 404 Not Found by
+  default
