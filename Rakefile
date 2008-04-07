@@ -90,3 +90,12 @@ task :examples do
   %x(haml examples/index.haml examples/index.html)
   %x(sass examples/pagination.sass examples/pagination.css)
 end
+
+task :rcov do
+  excludes = %w( lib/will_paginate/named_scope*
+                 lib/will_paginate/core_ext.rb
+                 lib/will_paginate.rb
+                 rails* )
+  
+  system %[rcov -Itest:lib test/*.rb -x #{excludes.join(',')}]
+end

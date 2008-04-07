@@ -220,6 +220,8 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 2, entries.size
     assert_equal 2, entries.total_entries
   end
+
+  ## named_scope ##
   
   def test_paginate_in_named_scope
     entries = Developer.poor.paginate :page => 1, :per_page => 1
@@ -260,6 +262,15 @@ class FinderTest < ActiveRecordTestCase
     end
   end
 
+  ## misc ##
+
+  def test_count_and_total_entries_options_are_mutually_exclusive
+    e = assert_raise ArgumentError do
+      Developer.paginate :page => 1, :count => {}, :total_entries => 1
+    end
+    assert_match /exclusive/, e.to_s
+  end
+  
   def test_readonly
     assert_nothing_raised { Developer.paginate :readonly => true, :page => 1 }
   end

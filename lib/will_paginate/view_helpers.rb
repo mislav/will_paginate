@@ -226,9 +226,11 @@ module WillPaginate
       if window_to > total_pages
         window_from -= window_to - total_pages
         window_to = total_pages
-      elsif window_from < 1
+      end
+      if window_from < 1
         window_to += 1 - window_from
         window_from = 1
+        window_to = total_pages if window_to > total_pages
       end
       
       visible   = (1..total_pages).to_a
@@ -261,12 +263,8 @@ module WillPaginate
         stringified_merge @url_params, @options[:params] if @options[:params]
         
         if param_name.index(/[^\w-]/)
-          page_param = unless defined? CGIMethods
-            ActionController::AbstractRequest
-          else
-            # Rails 1.2
-            CGIMethods
-          end.parse_query_parameters("#{param_name}=#{page}")
+          page_param = (defined?(CGIMethods) ? CGIMethods : ActionController::AbstractRequest).
+            parse_query_parameters("#{param_name}=#{page}")
           
           stringified_merge @url_params, page_param
         else

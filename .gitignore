@@ -1,3 +1,4 @@
 /doc
 /rails
 *.gem
+/coverage
