@@ -81,3 +81,8 @@ task :manifest do
     file.write list.sort.join("\n")
   end
 end
+
+task :examples do
+  %x(haml examples/index.haml examples/index.html)
+  %x(sass examples/pagination.sass examples/pagination.css)
+end

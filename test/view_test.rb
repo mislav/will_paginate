@@ -57,6 +57,27 @@ class ViewTest < Test::Unit::TestCase
     end
   end
 
+  def test_prev_next_links_have_classnames
+    paginate do |pagination|
+      assert_select 'span.disabled.prev_page:first-child'
+      assert_select 'a.next_page[href]:last-child'
+    end
+  end
+
+  def test_full_output
+    paginate
+    expected = <<-HTML
+      <div class="pagination"><span class="disabled prev_page">&laquo; Previous</span>
+      <span class="current">1</span>
+      <a href="/foo/bar?page=2" rel="next">2</a>
+      <a href="/foo/bar?page=3">3</a>
+      <a href="/foo/bar?page=2" class="next_page" rel="next">Next &raquo;</a></div>
+    HTML
+    expected.strip!.gsub!(/\s{2,}/, ' ')
+    
+    assert_dom_equal expected, @html_result
+  end
+
   ## advanced options for pagination ##
 
   def test_will_paginate_without_container

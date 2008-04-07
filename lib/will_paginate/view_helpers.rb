@@ -174,8 +174,8 @@ module WillPaginate
     def to_html
       links = @options[:page_links] ? windowed_links : []
       # previous/next buttons
-      links.unshift page_link_or_span(@collection.previous_page, 'disabled', @options[:prev_label])
-      links.push    page_link_or_span(@collection.next_page,     'disabled', @options[:next_label])
+      links.unshift page_link_or_span(@collection.previous_page, %w(disabled prev_page), @options[:prev_label])
+      links.push    page_link_or_span(@collection.next_page,     %w(disabled next_page), @options[:next_label])
       
       html = links.join(@options[:separator])
       @options[:container] ? @template.content_tag(:div, html, html_attributes) : html
@@ -209,7 +209,7 @@ module WillPaginate
       visible_page_numbers.inject [] do |links, n|
         # detect gaps:
         links << gap_marker if prev and n > prev + 1
-        links << page_link_or_span(n)
+        links << page_link_or_span(n, 'current')
         prev = n
         links
       end
@@ -240,12 +240,14 @@ module WillPaginate
       visible
     end
     
-    def page_link_or_span(page, span_class = 'current', text = nil)
+    def page_link_or_span(page, span_class, text = nil)
       text ||= page.to_s
+      classnames = Array[*span_class]
+      
       if page and page != current_page
-        @template.link_to text, url_params(page), :rel => rel_value(page)
+        @template.link_to text, url_params(page), :rel => rel_value(page), :class => classnames[1]
       else
-        @template.content_tag :span, text, :class => span_class
+        @template.content_tag :span, text, :class => classnames.join(' ')
       end
     end
 

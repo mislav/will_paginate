@@ -27,8 +27,8 @@
         :font-size 13px
         :font-family Monaco, "DejaVu Sans Mono", "Bitstream Vera Mono", "Courier New", monospace
 
-- pagination = '<span class="disabled">&laquo; Previous</span> <span class="current">1</span> <a href="./?page=2" rel="next">2</a> <a href="./?page=3">3</a> <a href="./?page=4">4</a> <a href="./?page=5">5</a> <a href="./?page=6">6</a> <a href="./?page=7">7</a> <a href="./?page=8">8</a> <a href="./?page=9">9</a> <span class="gap">&hellip;</span> <a href="./?page=29">29</a> <a href="./?page=30">30</a> <a href="./?page=2" rel="next">Next &raquo;</a>'
-- pagination_no_page_links = '<span class="disabled">&laquo; Previous</span>  <a href="./?page=2" rel="next">Next &raquo;</a>'
+- pagination = '<span class="disabled prev_page">&laquo; Previous</span> <span class="current">1</span> <a href="./?page=2" rel="next">2</a> <a href="./?page=3">3</a> <a href="./?page=4">4</a> <a href="./?page=5">5</a> <a href="./?page=6">6</a> <a href="./?page=7">7</a> <a href="./?page=8">8</a> <a href="./?page=9">9</a> <span class="gap">&hellip;</span> <a href="./?page=29">29</a> <a href="./?page=30">30</a> <a href="./?page=2" rel="next" class="next_page">Next &raquo;</a>'
+- pagination_no_page_links = '<span class="disabled prev_page">&laquo; Previous</span>  <a href="./?page=2" rel="next" class="next_page">Next &raquo;</a>'
 
 %body
   %h1 Samples of pagination styling for will_paginate
@@ -46,24 +46,24 @@
   %div= pagination
   
   %h2 Digg.com
-  .digg-pagination= pagination
+  .digg_pagination= pagination
 
   %h2 Digg-style, no page links
-  .digg-pagination= pagination_no_page_links
+  .digg_pagination= pagination_no_page_links
   %p Code that renders this:
   %pre= '<code>%s</code>' % %[<%= will_paginate @posts, :page_links => false %>].gsub('<', '&lt;').gsub('>', '&gt;')
   
   %h2 Digg-style, extra content
-  .digg-pagination
-    .page-info Displaying entries <b>1&nbsp;-&nbsp;6</b> of <b>180</b> in total
+  .digg_pagination
+    .page_info Displaying entries <b>1&nbsp;-&nbsp;6</b> of <b>180</b> in total
     = pagination
   %p Code that renders this:
-  %pre= '<code>%s</code>' % %[<div class="digg-pagination">\n  <div clas="page-info">\n    <%= page_entries_info @posts %>\n  </div>\n  <%= will_paginate @posts, :container => false %>\n</div>].gsub('<', '&lt;').gsub('>', '&gt;')
+  %pre= '<code>%s</code>' % %[<div class="digg_pagination">\n  <div clas="page_info">\n    <%= page_entries_info @posts %>\n  </div>\n  <%= will_paginate @posts, :container => false %>\n</div>].gsub('<', '&lt;').gsub('>', '&gt;')
   
   %h2 Apple.com store
-  .apple-pagination= pagination
+  .apple_pagination= pagination
   
   %h2 Flickr.com
-  .flickr-pagination
+  .flickr_pagination
     = pagination
-    .page-info (118 photos)
+    .page_info (118 photos)
