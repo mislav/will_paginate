@@ -78,6 +78,7 @@ task :manifest do
   File.read('.gitignore').each_line do |glob|
     glob = glob.chomp.sub(/^\//, '')
     list -= Dir[glob]
+    list -= Dir["#{glob}/**/*"] if File.directory?(glob) and !File.symlink?(glob)
     puts "excluding #{glob}"
   end
   
