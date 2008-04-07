@@ -9,27 +9,29 @@ you ever want to be able to do just this on a model:
 ... and then render the page links with a single view helper? Well, now you
 can.
 
-Ryan Bates made an awesome screencast[http://railscasts.com/episodes/51],
-check it out.
+Some resources to get you started:
 
-Your mind reels with questions? Join our Google
-group[http://groups.google.com/group/will_paginate].
+* Your mind reels with questions? Join our Google
+  group[http://groups.google.com/group/will_paginate].
+* The will_paginate project page: http://github.com/mislav/will_paginate
+* How to report bugs: http://github.com/mislav/will_paginate/wikis/report-bugs
+* Ryan Bates made an awesome screencast[http://railscasts.com/episodes/51],
+  check it out.
 
 == Installation
-
-Will Paginate officially supports Rails versions 1.2.6 and 2.0.x.
 
 Previously, the plugin was available on the following SVN location:
 
   svn://errtheblog.com/svn/plugins/will_paginate
 
-In February 2008, it moved to GitHub[http://github.com/mislav/will_paginate/tree]
-to be tracked with git. The SVN repo continued to have updates, but not
-forever. Therefore you should switch to using the gem:
+In February 2008, it moved to GitHub to be tracked with git version control.
+The SVN repo continued to have updates for some time, but now it doesn't.
+
+You should switch to using the gem:
 
   gem install will_paginate
 
-After that, you can remove the plugin from your applications and add
+After that, you can remove the plugin from your application and add
 a simple require to the end of config/environment.rb:
 
   require 'will_paginate'
@@ -37,13 +39,10 @@ a simple require to the end of config/environment.rb:
 That's it, just remember to install the gem on all machines that
 you are deploying to.
 
-The second option is to download and extract the tarball from GitHub. Here is the
-link for downloading the current state of the master branch:
-http://github.com/mislav/will_paginate/tarball/master
+<i>There are extensive
+installation[http://github.com/mislav/will_paginate/wikis/installation]
+instructions on the wiki[http://github.com/mislav/will_paginate/wikis].</i>
 
-Extract it to <tt>vendor/plugins</tt>. The directory will have a default name
-like "mislav-will_paginate-master"; you can rename it to "will_paginate" for
-simplicity.
 
 == Example usage
 
@@ -102,23 +101,6 @@ More detailed documentation:
 * WillPaginate::Finder::ClassMethods for pagination on your models;
 * WillPaginate::ViewHelpers for your views.
 
-== Oh noes, a bug!
-
-Tell us what happened so we can fix it, quick! Issues are filed on the Lighthouse project:
-http://err.lighthouseapp.com/projects/466-plugins/tickets?q=tagged:will_paginate
-
-Steps to make an awesome bug report:
-
-1. Run <tt>rake test</tt> in the <i>will_paginate</i> directory. (You will need SQLite3.)
-   Copy the output if there are failing tests.
-2. Register on Lighthouse to create a new ticket.
-3. Write a descriptive, short title. Provide as much info as you can in the body.
-   Assign the ticket to Mislav and tag it with meaningful tags, <tt>"will_paginate"</tt>
-   being among them.
-4. Yay! You will be notified on updates automatically.
-
-Here is an example of a great bug report and patch:
-http://err.lighthouseapp.com/projects/466/tickets/172-total_entries-ignored-in-paginate_by_sql
 
 == Authors, credits, contact
 
@@ -137,39 +119,11 @@ Golda, Matt Aimonetti, Charles Brian Quinn, Desi McAdam, James Coglan, Matijs
 van Zuijlen, Maria, Brendan Ribera, Todd Willey, Bryan Helmkamp, Jan Berkel,
 Lourens Naudé.
 
+
 == Usable pagination in the UI
 
-Copy the following CSS into your stylesheet for a good start:
-
-  .pagination {
-    padding: 3px;
-    margin: 3px;
-  }
-  .pagination a {
-    padding: 2px 5px 2px 5px;
-    margin: 2px;
-    border: 1px solid #aaaadd;
-    text-decoration: none;
-    color: #000099;
-  }
-  .pagination a:hover, .pagination a:active {
-    border: 1px solid #000099;
-    color: #000;
-  }
-  .pagination span.current {
-    padding: 2px 5px 2px 5px;
-    margin: 2px;
-    border: 1px solid #000099;
-    font-weight: bold;
-    background-color: #000099;
-    color: #FFF;
-  }
-  .pagination span.disabled {
-    padding: 2px 5px 2px 5px;
-    margin: 2px;
-    border: 1px solid #eee;
-    color: #ddd;
-  }
+There are some CSS styles to get you started in the "examples/" directory. They
+are showcased in the <b>"examples/index.html"</b> file.
 
 More reading about pagination as design pattern:
 

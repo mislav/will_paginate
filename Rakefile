@@ -65,5 +65,5 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'doc' # rdoc output folder
   rdoc.options << '--inline-source'
   rdoc.options << '--charset=UTF-8'
-  rdoc.options << '--webcvs="http://github.com/mislav/will_paginate/tree/master/%s"'
+  rdoc.options << '--webcvs=http://github.com/mislav/will_paginate/tree/master/'
 end
