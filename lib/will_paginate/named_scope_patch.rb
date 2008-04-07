@@ -11,23 +11,12 @@ end
     ActiveRecord::Associations::HasManyThroughAssociation ].each do |klass|
   klass.class_eval do
     protected
-    def method_missing_without_paginate(method, *args)
-      if @target.respond_to?(method) || (!@reflection.klass.respond_to?(method) && Class.respond_to?(method))
-        if block_given?
-          super { |*block_args| yield(*block_args) }
-        else
-          super
-        end
-      elsif @reflection.klass.scopes.include?(method)
-        @reflection.klass.scopes[method].call(self, *args)
+    alias :method_missing_without_scopes :method_missing_without_paginate
+    def method_missing_without_paginate(method, *args, &block)
+      if @reflection.klass.scopes.include?(method)
+        @reflection.klass.scopes[method].call(self, *args, &block)
       else
-        with_scope construct_scope do
-          if block_given?
-            @reflection.klass.send(method, *args) { |*block_args| yield(*block_args) }
-          else
-            @reflection.klass.send(method, *args)
-          end
-        end
+        method_missing_without_scopes(method, *args, &block)
       end
     end
   end
@@ -47,4 +36,4 @@ ActiveRecord::Associations::HasAndBelongsToManyAssociation.class_eval do
       end
     end
   end
-end if ActiveRecord::VERSION::MAJOR < 2
+end if ActiveRecord::Base.respond_to? :find_first
