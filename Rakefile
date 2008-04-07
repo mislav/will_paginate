@@ -53,7 +53,7 @@ end
 
 desc 'Generate RDoc documentation for the will_paginate plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
-  files = ['README.rdoc', 'LICENSE']
+  files = ['README.rdoc', 'LICENSE', 'CHANGELOG']
   files << FileList.new('lib/**/*.rb').
     exclude('lib/will_paginate/named_scope*').
     exclude('lib/will_paginate/array.rb').

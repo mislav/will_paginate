@@ -1,0 +1,33 @@
+== 2.2.0, released 2008-04-07
+
+=== API changes
+* Rename WillPaginate::Collection#page_count to "total_pages" for consistency.
+  If you implemented this interface, change your implementation accordingly.
+* Remove old, deprecated style of calling Array#paginate as "paginate(page,
+  per_page)". If you want to specify :page, :per_page or :total_entries, use a
+  parameter hash.
+* Rename LinkRenderer#url_options to "url_for" and drastically optimize it
+
+=== View changes
+* Added "prev_page" and "next_page" CSS classes on previous/next page buttons
+* Add examples of pagination links styling in "examples/index.html"
+* Change gap in pagination links from "..." to
+  "<span class="gap">&hellip;</span>".
+* Add "paginated_section", a block helper that renders pagination both above and
+  below content in the block
+* Add rel="prev|next|start" to page links
+
+=== Other
+
+* Add ability to opt-in for Rails 2.1 feature "named_scope" by calling
+  WillPaginate.enable_named_scope (tested in Rails 1.2.6 and 2.0.2)
+* Support complex page parameters like "developers[page]"
+* Move Array#paginate definition to will_paginate/array.rb. You can now easily
+  use pagination on arrays outside of Rails:
+
+    gem 'will_paginate'
+    require 'will_paginate/array'
+    
+* Add "paginated_each" method for iterating through every record by loading only
+  one page of records at the time
+* Rails 2: Rescue from WillPaginate::InvalidPage error with 404 Not Found by default

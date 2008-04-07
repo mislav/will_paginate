@@ -80,3 +80,7 @@ module WillPaginate
     end
   end
 end
+
+if defined?(Rails) and defined?(ActiveRecord) and defined?(ActionController)
+  WillPaginate.enable
+end
