@@ -87,6 +87,33 @@ task :manifest do
   end
 end
 
+desc 'Package and upload the release to rubyforge.'
+task :release do
+  require 'yaml'
+  require 'rubyforge'
+  
+  meta = YAML::load open('.gemified')
+  version = meta[:version]
+  
+  v = ENV['VERSION'] or abort "Must supply VERSION=x.y.z"
+  abort "Version doesn't match #{version}" if v != version
+  
+  gem = "#{meta[:name]}-#{version}.gem"
+  project = meta[:rubyforge_project]
+ 
+  rf = RubyForge.new
+  puts "Logging in to RubyForge"
+  rf.login
+ 
+  c = rf.userconfig
+  c['release_notes'] = meta[:summary]
+  c['release_changes'] = File.read('CHANGELOG').split(/^== .+\n/)[1].strip
+  c['preformatted'] = true
+ 
+  puts "Releasing #{meta[:name]} #{version}"
+  rf.add_release project, project, version, gem
+end
+
 task :examples do
   %x(haml examples/index.haml examples/index.html)
   %x(sass examples/pagination.sass examples/pagination.css)
