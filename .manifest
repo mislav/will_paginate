@@ -17,6 +17,7 @@ lib/will_paginate/core_ext.rb
 lib/will_paginate/finder.rb
 lib/will_paginate/named_scope.rb
 lib/will_paginate/named_scope_patch.rb
+lib/will_paginate/version.rb
 lib/will_paginate/view_helpers.rb
 test
 test/boot.rb
