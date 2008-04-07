@@ -20,8 +20,8 @@ class ActiveRecordTestConnector
       self.connected = true
     end
   rescue Exception => e  # errors from ActiveRecord setup
-    $stderr.puts "\nSkipping ActiveRecord assertion tests: #{e}"
-    #$stderr.puts "  #{e.backtrace.join("\n  ")}\n"
+    $stderr.puts "\nSkipping ActiveRecord tests: #{e}"
+    $stderr.puts "Install SQLite3 to run the full test suite for will_paginate.\n\n"
     self.able_to_connect = false
   end
 

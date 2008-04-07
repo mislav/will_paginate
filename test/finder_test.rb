@@ -275,7 +275,7 @@ class FinderTest < ActiveRecordTestCase
   end
 
   # Is this Rails 2.0? Find out by testing find_all which was removed in [6998]
-  unless Developer.respond_to? :find_all
+  unless ActiveRecord::Base.respond_to? :find_all
     def test_paginate_array_of_ids
       # AR finders also accept arrays of IDs
       # (this was broken in Rails before [6912])
