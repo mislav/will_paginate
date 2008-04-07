@@ -140,7 +140,7 @@ module WillPaginate
     end
 
     def self.total_pages_for_collection(collection) #:nodoc:
-      if collection.respond_to? :page_count and !collection.respond_to? :total_pages
+      if collection.respond_to?('page_count') and !collection.respond_to?('total_pages')
         WillPaginate::Deprecation.warn <<-MSG
           You are using a paginated collection of class #{collection.class.name}
           which conforms to the old API of WillPaginate::Collection by using
