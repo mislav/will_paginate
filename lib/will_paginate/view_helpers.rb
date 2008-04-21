@@ -280,7 +280,7 @@ module WillPaginate
         end
 
         url = @template.url_for(@url_params)
-        @url_string = url.sub(/([?&]#{CGI.escape param_name}=)#{page}/, '\1@')
+        @url_string = url.sub(%r!([?&/]#{CGI.escape param_name}[=/])#{page}!, '\1@')
         return url
       end
       @url_string.sub '@', page.to_s

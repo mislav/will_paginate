@@ -5,15 +5,19 @@ require 'will_paginate'
 WillPaginate.enable_actionpack
 
 ActionController::Routing::Routes.draw do |map|
+  map.connect 'dummy/page/:page', :controller => 'dummy'
   map.connect ':controller/:action/:id'
 end
 
 ActionController::Base.perform_caching = false
 
 class DummyRequest
+  attr_accessor :symbolized_path_parameters
+  
   def initialize
     @get = true
     @params = {}
+    @symbolized_path_parameters = { :controller => 'foo', :action => 'bar' }
   end
   
   def get?
@@ -22,10 +26,6 @@ class DummyRequest
 
   def post
     @get = false
-  end
-
-  def symbolized_path_parameters
-    { :controller => 'foo', :action => 'bar' }
   end
 
   def relative_url_root

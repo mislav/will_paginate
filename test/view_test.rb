@@ -220,6 +220,15 @@ class ViewTest < Test::Unit::TestCase
     end
   end
 
+  def test_custom_routing_page_param
+    @request.symbolized_path_parameters.update :controller => 'dummy', :action => nil
+    paginate :per_page => 2 do
+      assert_select 'a[href]', 6 do |links|
+        assert_links_match %r{/page/(\d+)$}, links, [2, 3, 4, 5, 6, 2]
+      end
+    end
+  end
+
   ## internal hardcore stuff ##
 
   class LegacyCollection < WillPaginate::Collection
@@ -307,14 +316,22 @@ class ViewTest < Test::Unit::TestCase
       })
     end
 
-    def assert_links_match pattern, links = nil
+    def assert_links_match pattern, links = nil, numbers = nil
       links ||= assert_select 'div.pagination a[href]' do |elements|
         elements
       end
+
+      pages = [] if numbers
       
       links.each do |el|
         assert_match pattern, el['href']
+        if numbers
+          el['href'] =~ pattern
+          pages << $1.to_i
+        end
       end
+
+      assert_equal pages, numbers, "page numbers don't match" if numbers
     end
 
     def assert_no_links_match pattern
