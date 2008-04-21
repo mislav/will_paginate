@@ -156,6 +156,19 @@ class ViewTest < Test::Unit::TestCase
     assert_equal %{Displaying entries <b>25&nbsp;-&nbsp;26</b> of <b>26</b> in total},
       @html_result
   end
+
+  def test_page_entries_info_with_single_page_collection
+    @template = '<%= page_entries_info collection %>'
+    
+    paginate(('a'..'d').to_a.paginate(:page => 1, :per_page => 5))
+    assert_equal %{Displaying <b>all 4</b> entries}, @html_result
+    
+    paginate(['a'].paginate(:page => 1, :per_page => 5))
+    assert_equal %{Displaying <b>1</b> entry}, @html_result
+    
+    paginate([].paginate(:page => 1, :per_page => 5))
+    assert_equal %{No entries found}, @html_result
+  end
   
   ## parameter handling in page links ##
   
