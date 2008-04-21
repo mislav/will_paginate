@@ -4,6 +4,6 @@
 :homepage: http://github.com/mislav/will_paginate
 :name: will_paginate
 :rubyforge_project: will-paginate
-:version: 2.2.1
+:version: 2.2.2
 :author: "Mislav Marohni\xC4\x87"
 :summary: Most awesome pagination solution for Rails
