@@ -234,6 +234,15 @@ class ViewTest < Test::Unit::TestCase
     end
   end
 
+  def test_custom_routing_page_param_with_dot_separator
+    @request.symbolized_path_parameters.update :controller => 'dummy', :action => 'dots'
+    paginate :per_page => 2 do
+      assert_select 'a[href]', 6 do |links|
+        assert_links_match %r{/page\.(\d+)$}, links, [2, 3, 4, 5, 6, 2]
+      end
+    end
+  end
+
   ## internal hardcore stuff ##
 
   class LegacyCollection < WillPaginate::Collection
@@ -336,7 +345,7 @@ class ViewTest < Test::Unit::TestCase
         end
       end
 
-      assert_equal pages, numbers, "page numbers don't match" if numbers
+      assert_equal numbers, pages, "page numbers don't match" if numbers
     end
 
     def assert_no_links_match pattern

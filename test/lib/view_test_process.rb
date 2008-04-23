@@ -6,6 +6,7 @@ WillPaginate.enable_actionpack
 
 ActionController::Routing::Routes.draw do |map|
   map.connect 'dummy/page/:page', :controller => 'dummy'
+  map.connect 'dummy/dots/page.:page', :controller => 'dummy', :action => 'dots'
   map.connect ':controller/:action/:id'
 end
 
