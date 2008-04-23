@@ -190,6 +190,11 @@ class ViewTest < Test::Unit::TestCase
     assert_links_match /foo=bar/
   end
   
+  def test_adding_anchor_parameter
+    paginate({}, :params => { :anchor => 'anchor' })
+    assert_links_match /#anchor$/
+  end
+  
   def test_removing_arbitrary_parameters
     @request.params :foo => 'bar'
     paginate({}, :params => { :foo => nil })
