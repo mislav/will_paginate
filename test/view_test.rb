@@ -1,22 +1,8 @@
 require 'helper'
-require 'action_controller'
 require 'lib/view_test_process'
 
-class ViewTest < Test::Unit::TestCase
+class ViewTest < WillPaginate::ViewTestCase
   
-  def setup
-    super
-    @controller  = DummyController.new
-    @request     = @controller.request
-    @html_result = nil
-    @template    = '<%= will_paginate collection, options %>'
-    
-    @view = ActionView::Base.new
-    @view.assigns['controller'] = @controller
-    @view.assigns['_request']   = @request
-    @view.assigns['_params']    = @request.params
-  end
-
   ## basic pagination ##
 
   def test_will_paginate
@@ -289,70 +275,4 @@ class ViewTest < Test::Unit::TestCase
     end
   end
   
-  
-  protected
-
-    def paginate(collection = {}, options = {}, &block)
-      if collection.instance_of? Hash
-        page_options = { :page => 1, :total_entries => 11, :per_page => 4 }.merge(collection)
-        collection = [1].paginate(page_options)
-      end
-
-      locals = { :collection => collection, :options => options }
-
-      if defined? ActionView::Template
-        # Rails 2.1
-        args = [ ActionView::Template.new(@view, @template, false, locals, true, nil) ]
-      else
-        # older Rails versions
-        args = [nil, @template, nil, locals]
-      end
-      
-      @html_result = @view.render_template(*args)
-      @html_document = HTML::Document.new(@html_result, true, false)
-
-      if block_given?
-        classname = options[:class] || WillPaginate::ViewHelpers.pagination_options[:class]
-        assert_select("div.#{classname}", 1, 'no main DIV', &block)
-      end
-    end
-
-    def response_from_page_or_rjs
-      @html_document.root
-    end
-
-    def validate_page_numbers expected, links, param_name = :page
-      param_pattern = /\W#{CGI.escape(param_name.to_s)}=([^&]*)/
-      
-      assert_equal(expected, links.map { |e|
-        e['href'] =~ param_pattern
-        $1 ? $1.to_i : $1
-      })
-    end
-
-    def assert_links_match pattern, links = nil, numbers = nil
-      links ||= assert_select 'div.pagination a[href]' do |elements|
-        elements
-      end
-
-      pages = [] if numbers
-      
-      links.each do |el|
-        assert_match pattern, el['href']
-        if numbers
-          el['href'] =~ pattern
-          pages << $1.to_i
-        end
-      end
-
-      assert_equal numbers, pages, "page numbers don't match" if numbers
-    end
-
-    def assert_no_links_match pattern
-      assert_select 'div.pagination a[href]' do |elements|
-        elements.each do |el|
-          assert_no_match pattern, el['href']
-        end
-      end
-    end
 end
