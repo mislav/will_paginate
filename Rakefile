@@ -72,10 +72,13 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.options << '--webcvs=http://github.com/mislav/will_paginate/tree/master/'
 end
 
+desc %{Update ".manifest" with the latest list of project filenames. Respect\
+.gitignore by excluding everything that git ignores. Update `files` and\
+`test_files` arrays in "*.gemspec" file if it's present.}
 task :manifest do
   list = Dir['**/*'].sort
   spec_file = Dir['*.gemspec'].first
-  list -= [spec_file]
+  list -= [spec_file] if spec_file
   
   File.read('.gitignore').each_line do |glob|
     glob = glob.chomp.sub(/^\//, '')
@@ -84,14 +87,16 @@ task :manifest do
     puts "excluding #{glob}"
   end
 
-  spec = File.read spec_file
-  spec.gsub! /^(\s* s.(test_)?files \s* = \s* )( \[ [^\]]* \] | %w\( [^)]* \) )/mx do
-    assignment = $1
-    bunch = $2 ? list.grep(/^test\//) : list
-    '%s%%w(%s)' % [assignment, bunch.join(' ')]
+  if spec_file
+    spec = File.read spec_file
+    spec.gsub! /^(\s* s.(test_)?files \s* = \s* )( \[ [^\]]* \] | %w\( [^)]* \) )/mx do
+      assignment = $1
+      bunch = $2 ? list.grep(/^test\//) : list
+      '%s%%w(%s)' % [assignment, bunch.join(' ')]
+    end
+      
+    File.open(spec_file,   'w') {|f| f << spec }
   end
-    
-  File.open(spec_file,   'w') {|f| f << spec }
   File.open('.manifest', 'w') {|f| f << list.join("\n") }
 end
 
