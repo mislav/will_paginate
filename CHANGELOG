@@ -1,3 +1,16 @@
+== 2.2.3, released 2008-04-26
+
+* will_paginate gem is no longer published on RubyForge, but on
+  gems.github.com:
+  
+    gem sources -a http://gems.github.com/  (you only need to do this once)
+    gem install mislav-will_paginate
+    
+* extract reusable pagination testing stuff into WillPaginate::View
+* rethink the page URL construction mechanizm to be more bulletproof when
+  combined with custom routing for page parameter
+* test that anchor parameter can be used in pagination links
+
 == 2.2.2, released 2008-04-21
 
 * Add support for page parameter in custom routes like "/foo/page/2"

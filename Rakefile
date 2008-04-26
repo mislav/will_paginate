@@ -73,7 +73,9 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
 end
 
 task :manifest do
-  list = Dir['**/*']
+  list = Dir['**/*'].sort
+  spec_file = Dir['*.gemspec'].first
+  list -= [spec_file]
   
   File.read('.gitignore').each_line do |glob|
     glob = glob.chomp.sub(/^\//, '')
@@ -81,37 +83,16 @@ task :manifest do
     list -= Dir["#{glob}/**/*"] if File.directory?(glob) and !File.symlink?(glob)
     puts "excluding #{glob}"
   end
-  
-  File.open('.manifest', 'w') do |file|
-    file.write list.sort.join("\n")
-  end
-end
 
-desc 'Package and upload the release to rubyforge.'
-task :release do
-  require 'yaml'
-  require 'rubyforge'
-  
-  meta = YAML::load open('.gemified')
-  version = meta[:version]
-  
-  v = ENV['VERSION'] or abort "Must supply VERSION=x.y.z"
-  abort "Version doesn't match #{version}" if v != version
-  
-  gem = "#{meta[:name]}-#{version}.gem"
-  project = meta[:rubyforge_project]
- 
-  rf = RubyForge.new
-  puts "Logging in to RubyForge"
-  rf.login
- 
-  c = rf.userconfig
-  c['release_notes'] = meta[:summary]
-  c['release_changes'] = File.read('CHANGELOG').split(/^== .+\n/)[1].strip
-  c['preformatted'] = true
- 
-  puts "Releasing #{meta[:name]} #{version}"
-  rf.add_release project, project, version, gem
+  spec = File.read spec_file
+  spec.gsub! /^(\s* s.(test_)?files \s* = \s* )( \[ [^\]]* \] | %w\( [^)]* \) )/mx do
+    assignment = $1
+    bunch = $2 ? list.grep(/^test\//) : list
+    '%s%%w(%s)' % [assignment, bunch.join(' ')]
+  end
+    
+  File.open(spec_file,   'w') {|f| f << spec }
+  File.open('.manifest', 'w') {|f| f << list.join("\n") }
 end
 
 task :examples do

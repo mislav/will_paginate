@@ -11,8 +11,8 @@ can.
 
 Some resources to get you started:
 
-* Your mind reels with questions? Join our Google
-  group[http://groups.google.com/group/will_paginate].
+* Your mind reels with questions? Join our
+  {Google group}[http://groups.google.com/group/will_paginate].
 * The will_paginate project page: http://github.com/mislav/will_paginate
 * How to report bugs: http://github.com/mislav/will_paginate/wikis/report-bugs
 * Ryan Bates made an awesome screencast[http://railscasts.com/episodes/51],
@@ -20,35 +20,34 @@ Some resources to get you started:
 
 == Installation
 
-Previously, the plugin was available on the following SVN location:
+The recommended way is that you get the gem:
 
-  svn://errtheblog.com/svn/plugins/will_paginate
+  # add GitHub to your local list of gem sources:
+  gem sources -a http://gems.github.com/
+  
+  # install the gem:
+  gem install mislav-will_paginate
 
-In February 2008, it moved to GitHub to be tracked with git version control.
-The SVN repo continued to have updates for some time, but now it doesn't.
+After that you don't need the will_paginate <i>plugin</i> in your Rails
+application anymore. Just add a simple require to the end of
+"config/environment.rb":
 
-You should switch to using the gem:
-
-  gem install will_paginate
-
-After that, you can remove the plugin from your application and add
-a simple require to the end of config/environment.rb:
-
+  gem 'mislav-will_paginate', '~> 2.2'
   require 'will_paginate'
 
-That's it, just remember to install the gem on all machines that
-you are deploying to.
+That's it. Remember to install the gem on <b>all</b> machines that you are
+deploying to.
 
 <i>There are extensive
-installation[http://github.com/mislav/will_paginate/wikis/installation]
-instructions on the wiki[http://github.com/mislav/will_paginate/wikis].</i>
+{installation instructions}[http://github.com/mislav/will_paginate/wikis/installation]
+on {the wiki}[http://github.com/mislav/will_paginate/wikis].</i>
 
 
 == Example usage
 
 Use a paginate finder in the controller:
 
-    @posts = Post.paginate_by_board_id @board.id, :page => params[:page], :order => 'updated_at DESC'
+  @posts = Post.paginate_by_board_id @board.id, :page => params[:page], :order => 'updated_at DESC'
 
 Yeah, +paginate+ works just like +find+ -- it just doesn't fetch all the
 records.  Don't forget to tell it which page you want, or it will complain!
@@ -57,7 +56,7 @@ Read more on WillPaginate::Finder::ClassMethods.
 Render the posts in your view like you would normally do. When you need to render
 pagination, just stick this in:
 
-    <%= will_paginate @posts %>
+  <%= will_paginate @posts %>
 
 You're done. (Copy and paste the example fancy CSS styles from the bottom.) You
 can find the option list at WillPaginate::ViewHelpers.
@@ -65,36 +64,36 @@ can find the option list at WillPaginate::ViewHelpers.
 How does it know how much items to fetch per page? It asks your model by calling
 its <tt>per_page</tt> class method. You can define it like this:
 
-    class Post < ActiveRecord::Base
-      cattr_reader :per_page
-      @@per_page = 50
-    end
+  class Post < ActiveRecord::Base
+    cattr_reader :per_page
+    @@per_page = 50
+  end
 
 ... or like this:
 
-    class Post < ActiveRecord::Base
-      def self.per_page
-        50
-      end
+  class Post < ActiveRecord::Base
+    def self.per_page
+      50
     end
+  end
 
 ... or don't worry about it at all. WillPaginate defines it to be <b>30</b> by default.
 But you can always specify the count explicitly when calling +paginate+:
 
-    @posts = Post.paginate :page => params[:page], :per_page => 50
+  @posts = Post.paginate :page => params[:page], :per_page => 50
 
 The +paginate+ finder wraps the original finder and returns your resultset that now has
 some new properties. You can use the collection as you would with any ActiveRecord
 resultset. WillPaginate view helpers also need that object to be able to render pagination:
 
-    <ol>
-      <% for post in @posts -%>
-        <li>Render `post` in some nice way.</li>
-      <% end -%>
-    </ol>
+  <ol>
+    <% for post in @posts -%>
+      <li>Render `post` in some nice way.</li>
+    <% end -%>
+  </ol>
 
-    <p>Now let's render us some pagination!</p>
-    <%= will_paginate @posts %>
+  <p>Now let's render us some pagination!</p>
+  <%= will_paginate @posts %>
 
 More detailed documentation:
 
@@ -131,5 +130,6 @@ More reading about pagination as design pattern:
 * Pagination on Yahoo Design Pattern Library:
   http://developer.yahoo.com/ypatterns/parent.php?pattern=pagination
 
-Want to discuss, request features, ask questions? Join the Google group:
-http://groups.google.com/group/will_paginate
+Want to discuss, request features, ask questions? Join the
+{Google group}[http://groups.google.com/group/will_paginate].
+
