@@ -156,6 +156,29 @@ class ViewTest < WillPaginate::ViewTestCase
     assert_equal %{No entries found}, @html_result
   end
   
+  def test_page_entries_info_with_custom_entry_name
+    @template = '<%= page_entries_info collection, :entry_name => "author" %>'
+    
+    entries = (1..20).to_a
+    entry_name = 'author'
+    
+    paginate(entries.paginate(:page => 1, :per_page => 5))
+    assert_equal %{Displaying authors <b>1&nbsp;-&nbsp;5</b> of <b>20</b> in total}, @html_result
+    
+    paginate(entries.paginate(:page => 1, :per_page => 20))
+    assert_equal %{Displaying <b>all 20</b> authors}, @html_result
+    
+    paginate(['a'].paginate(:page => 1, :per_page => 5))
+    assert_equal %{Displaying <b>1</b> author}, @html_result
+    
+    paginate([].paginate(:page => 1, :per_page => 5))
+    assert_equal %{No authors found}, @html_result
+    
+    @template = '<%= page_entries_info collection %>'
+    paginate([].paginate(:page => 1, :per_page => 5))
+    assert_equal %{No entries found}, @html_result
+  end
+  
   ## parameter handling in page links ##
   
   def test_will_paginate_preserves_parameters_on_get

@@ -131,15 +131,17 @@ module WillPaginate
     #
     #   <%= page_entries_info @posts %>
     #   #-> Displaying entries 6 - 10 of 26 in total
-    def page_entries_info(collection)
+    def page_entries_info(collection, opts = {})
+      entry_name = opts[:entry_name] || 'entry'
+      
       if collection.total_pages < 2
         case collection.size
-        when 0; 'No entries found'
-        when 1; 'Displaying <b>1</b> entry'
-        else;   "Displaying <b>all #{collection.size}</b> entries"
+        when 0; "No #{entry_name.pluralize} found"
+        when 1; "Displaying <b>1</b> #{entry_name}"
+        else;   "Displaying <b>all #{collection.size}</b> #{entry_name.pluralize}"
         end
       else
-        %{Displaying entries <b>%d&nbsp;-&nbsp;%d</b> of <b>%d</b> in total} % [
+        %{Displaying #{entry_name.pluralize} <b>%d&nbsp;-&nbsp;%d</b> of <b>%d</b> in total} % [
           collection.offset + 1,
           collection.offset + collection.length,
           collection.total_entries
