@@ -49,12 +49,13 @@ module WillPaginate
     # * <tt>:param_name</tt> -- parameter name for page number in URLs (default: <tt>:page</tt>)
     # * <tt>:params</tt> -- additional parameters when generating pagination links
     #   (eg. <tt>:controller => "foo", :action => nil</tt>)
-    # * <tt>:renderer</tt> -- class name of the link renderer (default: WillPaginate::LinkRenderer)
+    # * <tt>:renderer</tt> -- class name, class or instance of a link renderer (default:
+    #   <tt>WillPaginate::LinkRenderer</tt>)
     # * <tt>:page_links</tt> -- when false, only previous/next links are rendered (default: true)
     # * <tt>:container</tt> -- toggles rendering of the DIV container for pagination links, set to
     #   false only when you are rendering your own pagination markup (default: true)
-    # * <tt>:id</tt> -- HTML ID for the container (default: nil). Pass +true+ to have the ID automatically
-    #   generated from the class name of objects in collection: for example, paginating
+    # * <tt>:id</tt> -- HTML ID for the container (default: nil). Pass +true+ to have the ID
+    #   automatically generated from the class name of objects in collection: for example, paginating
     #   ArticleComment models would yield an ID of "article_comments_pagination".
     #
     # All options beside listed ones are passed as HTML attributes to the container
@@ -91,19 +92,18 @@ module WillPaginate
       return nil unless WillPaginate::ViewHelpers.total_pages_for_collection(collection) > 1
       
       options = options.symbolize_keys.reverse_merge WillPaginate::ViewHelpers.pagination_options
-      # create the renderer instance
+      
+      # get the renderer instance
       renderer = case options[:renderer]
-      when String, Class
-        renderer_class = options[:renderer].to_s.constantize
-        renderer_class.new collection, options, self
+      when String
+        options[:renderer].to_s.constantize.new
+      when Class
+        options[:renderer].new
       else
-        returning(options[:renderer]) do |r|
-          r.collection = collection
-          r.options = options
-          r.template = self
-        end
+        options[:renderer]
       end
       # render HTML for pagination
+      renderer.prepare collection, options, self
       renderer.to_html
     end
     
@@ -179,16 +179,26 @@ module WillPaginate
   # links. It is used by +will_paginate+ helper internally.
   class LinkRenderer
 
-    attr_accessor :collection, :options, :template
-
+    # The gap in page links is represented by:
+    #
+    #   <span class="gap">&hellip;</span>
+    attr_accessor :gap_marker
+    
+    def initialize
+      @gap_marker = '<span class="gap">&hellip;</span>'
+    end
+    
     # * +collection+ is a WillPaginate::Collection instance or any other object
     #   that conforms to that API
     # * +options+ are forwarded from +will_paginate+ view helper
     # * +template+ is the reference to the template being rendered
-    def initialize(collection, options, template)
+    def prepare(collection, options, template)
       @collection = collection
       @options    = options
       @template   = template
+
+      # reset values in case we're re-using this instance
+      @total_pages = @param_name = @url_string = nil
     end
 
     # Process it! This method returns the complete HTML string which contains
@@ -197,8 +207,8 @@ module WillPaginate
     def to_html
       links = @options[:page_links] ? windowed_links : []
       # previous/next buttons
-      links.unshift page_link_or_span(@collection.previous_page, %w(disabled prev_page), @options[:prev_label])
-      links.push    page_link_or_span(@collection.next_page,     %w(disabled next_page), @options[:next_label])
+      links.unshift page_link_or_span(@collection.previous_page, 'disabled prev_page', @options[:prev_label])
+      links.push    page_link_or_span(@collection.next_page,     'disabled next_page', @options[:next_label])
       
       html = links.join(@options[:separator])
       @options[:container] ? @template.content_tag(:div, html, html_attributes) : html
@@ -218,13 +228,6 @@ module WillPaginate
     
   protected
 
-    # The gap in page links is represented by:
-    #
-    #   <span class="gap">&hellip;</span>
-    def gap_marker
-      '<span class="gap">&hellip;</span>'
-    end
-    
     # Collects link items for visible page numbers.
     def windowed_links
       prev = nil
@@ -267,12 +270,12 @@ module WillPaginate
     
     def page_link_or_span(page, span_class, text = nil)
       text ||= page.to_s
-      classnames = Array[*span_class]
       
       if page and page != current_page
-        page_link page, text, :rel => rel_value(page), :class => classnames[1]
+        classnames = span_class && span_class.index(' ') && span_class.split(' ', 2).last
+        page_link page, text, :rel => rel_value(page), :class => classnames
       else
-        page_span page, text, :class => classnames.join(' ')
+        page_span page, text, :class => span_class
       end
     end
 
@@ -283,7 +286,6 @@ module WillPaginate
     def page_span(page, text, attributes = {})
       @template.content_tag :span, text, attributes
     end
-
 
     # Returns URL params for +page_link_or_span+, taking the current GET params
     # and <tt>:params</tt> option into account.

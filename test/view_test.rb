@@ -2,20 +2,15 @@ require 'helper'
 require 'lib/view_test_process'
 
 class AdditionalLinkAttributesRenderer < WillPaginate::LinkRenderer
-  def initialize(*arguments)
-    if arguments.size == 3
-      super(*arguments)
-      @additional_link_attributes = {:default => 'true'}
-    else
-      @additional_link_attributes = arguments.extract_options!
-    end
+  def initialize(link_attributes = nil)
+    super()
+    @additional_link_attributes = link_attributes || { :default => 'true' }
   end
 
   def page_link(page, text, attributes = {})
     @template.link_to text, url_for(page), attributes.merge(@additional_link_attributes)
   end
 end
-
 
 class ViewTest < WillPaginate::ViewTestCase
   
@@ -60,14 +55,22 @@ class ViewTest < WillPaginate::ViewTestCase
   end
 
   def test_will_paginate_using_renderer_class
-    paginate({},:renderer => AdditionalLinkAttributesRenderer) do
-      assert_select 'a[default~=true]'
+    paginate({}, :renderer => AdditionalLinkAttributesRenderer) do
+      assert_select 'a[default=true]', 3
     end
   end
 
   def test_will_paginate_using_renderer_instance
-    paginate({},:renderer => AdditionalLinkAttributesRenderer.new(:title => 'rendered')) do
-      assert_select 'a[title=rendered]'
+    renderer = WillPaginate::LinkRenderer.new
+    renderer.gap_marker = '<span class="my-gap">~~</span>'
+    
+    paginate({ :per_page => 2 }, :inner_window => 0, :outer_window => 0, :renderer => renderer) do
+      assert_select 'span.my-gap', '~~'
+    end
+    
+    renderer = AdditionalLinkAttributesRenderer.new(:title => 'rendered')
+    paginate({}, :renderer => renderer) do
+      assert_select 'a[title=rendered]', 3
     end
   end
 
