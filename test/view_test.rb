@@ -1,6 +1,22 @@
 require 'helper'
 require 'lib/view_test_process'
 
+class AdditionalLinkAttributesRenderer < WillPaginate::LinkRenderer
+  def initialize(*arguments)
+    if arguments.size == 3
+      super(*arguments)
+      @additional_link_attributes = {:default => 'true'}
+    else
+      @additional_link_attributes = arguments.extract_options!
+    end
+  end
+
+  def page_link(page, text, attributes = {})
+    @template.link_to text, url_for(page), attributes.merge(@additional_link_attributes)
+  end
+end
+
+
 class ViewTest < WillPaginate::ViewTestCase
   
   ## basic pagination ##
@@ -40,6 +56,18 @@ class ViewTest < WillPaginate::ViewTestCase
         end
       end
       assert_select 'span.current', '2'
+    end
+  end
+
+  def test_will_paginate_using_renderer_class
+    paginate({},:renderer => AdditionalLinkAttributesRenderer) do
+      assert_select 'a[default~=true]'
+    end
+  end
+
+  def test_will_paginate_using_renderer_instance
+    paginate({},:renderer => AdditionalLinkAttributesRenderer.new(:title => 'rendered')) do
+      assert_select 'a[title=rendered]'
     end
   end
 
