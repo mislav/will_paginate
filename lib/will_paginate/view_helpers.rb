@@ -131,8 +131,9 @@ module WillPaginate
     #
     #   <%= page_entries_info @posts %>
     #   #-> Displaying entries 6 - 10 of 26 in total
-    def page_entries_info(collection, opts = {})
-      entry_name = opts[:entry_name] || 'entry'
+    def page_entries_info(collection, options = {})
+      entry_name = options[:entry_name] ||
+        (collection.empty?? 'entry' : collection.first.class.name.underscore.sub('_', ' '))
       
       if collection.total_pages < 2
         case collection.size
