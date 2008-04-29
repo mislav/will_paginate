@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name    = 'will_paginate'
-  s.version = '2.2.3'
+  s.version = '2.3.0'
   s.date    = '2008-04-26'
   
   s.summary = "Most awesome pagination solution for Rails"

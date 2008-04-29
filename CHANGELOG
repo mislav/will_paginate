@@ -1,3 +1,18 @@
+== 2.3.0, released 2008-04-29
+
+* Changed LinkRenderer to receive collection, options and reference to view template NOT in
+  constructor, but with the #prepare method. This is a step towards supporting passing of
+  LinkRenderer (or subclass) instances that may be preconfigured in some way
+* LinkRenderer now has #page_link and #page_span methods for easier customization of output in
+  subclasses
+* Changed page_entries_info() method to adjust its output according to humanized class name of
+  collection items. Override this with :entry_name parameter (singular).
+    
+    page_entries_info(@posts)
+    #-> "Displaying all 12 posts"
+    page_entries_info(@posts, :entry_name => 'item')
+    #-> "Displaying all 12 items"
+    
 == 2.2.3, released 2008-04-26
 
 * will_paginate gem is no longer published on RubyForge, but on
