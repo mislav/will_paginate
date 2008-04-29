@@ -139,7 +139,14 @@ module WillPaginate
     # You can use this as a blueprint for your own, similar helpers.
     #
     #   <%= page_entries_info @posts %>
-    #   #-> Displaying entries 6 - 10 of 26 in total
+    #   #-> Displaying posts 6 - 10 of 26 in total
+    #
+    # By default, the message will use the humanized class name of objects
+    # in collection: for instance, "project types" for ProjectType models.
+    # Override this to your liking with the <tt>:entry_name</tt> parameter:
+    #
+    #   <%= page_entries_info @posts, :entry_name => 'item' %>
+    #   #-> Displaying items 6 - 10 of 26 in total
     def page_entries_info(collection, options = {})
       entry_name = options[:entry_name] ||
         (collection.empty?? 'entry' : collection.first.class.name.underscore.sub('_', ' '))
