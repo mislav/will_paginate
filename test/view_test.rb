@@ -160,7 +160,6 @@ class ViewTest < WillPaginate::ViewTestCase
     @template = '<%= page_entries_info collection, :entry_name => "author" %>'
     
     entries = (1..20).to_a
-    entry_name = 'author'
     
     paginate(entries.paginate(:page => 1, :per_page => 5))
     assert_equal %{Displaying authors <b>1&nbsp;-&nbsp;5</b> of <b>20</b> in total}, @html_result

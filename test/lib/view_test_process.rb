@@ -38,9 +38,9 @@ class WillPaginate::ViewTestCase < Test::Unit::TestCase
 
       locals = { :collection => collection, :options => options }
 
-      if defined? ActionView::Template
+      if defined? ActionView::InlineTemplate
         # Rails 2.1
-        args = [ ActionView::Template.new(@view, @template, false, locals, true, nil) ]
+        args = [ ActionView::InlineTemplate.new(@view, @template, locals) ]
       else
         # older Rails versions
         args = [nil, @template, nil, locals]
@@ -129,6 +129,10 @@ class DummyController
   def initialize
     @request = DummyRequest.new
     @url = ActionController::UrlRewriter.new(@request, @request.params)
+  end
+
+  def params
+    @request.params
   end
   
   def url_for(params)
