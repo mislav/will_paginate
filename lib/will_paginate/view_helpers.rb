@@ -92,8 +92,17 @@ module WillPaginate
       
       options = options.symbolize_keys.reverse_merge WillPaginate::ViewHelpers.pagination_options
       # create the renderer instance
-      renderer_class = options[:renderer].to_s.constantize
-      renderer = renderer_class.new collection, options, self
+      renderer = case options[:renderer]
+      when String, Class
+        renderer_class = options[:renderer].to_s.constantize
+        renderer_class.new collection, options, self
+      else
+        returning(options[:renderer]) do |r|
+          r.collection = collection
+          r.options = options
+          r.template = self
+        end
+      end
       # render HTML for pagination
       renderer.to_html
     end
@@ -169,6 +178,9 @@ module WillPaginate
   # This class does the heavy lifting of actually building the pagination
   # links. It is used by +will_paginate+ helper internally.
   class LinkRenderer
+
+    attr_accessor :collection, :options, :template
+
     # * +collection+ is a WillPaginate::Collection instance or any other object
     #   that conforms to that API
     # * +options+ are forwarded from +will_paginate+ view helper
@@ -258,11 +270,20 @@ module WillPaginate
       classnames = Array[*span_class]
       
       if page and page != current_page
-        @template.link_to text, url_for(page), :rel => rel_value(page), :class => classnames[1]
+        page_link page, text, :rel => rel_value(page), :class => classnames[1]
       else
-        @template.content_tag :span, text, :class => classnames.join(' ')
+        page_span page, text, :class => classnames.join(' ')
       end
     end
+
+    def page_link(page, text, attributes = {})
+      @template.link_to text, url_for(page), attributes
+    end
+
+    def page_span(page, text, attributes = {})
+      @template.content_tag :span, text, attributes
+    end
+
 
     # Returns URL params for +page_link_or_span+, taking the current GET params
     # and <tt>:params</tt> option into account.
