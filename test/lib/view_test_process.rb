@@ -7,6 +7,10 @@ WillPaginate.enable_actionpack
 ActionController::Routing::Routes.draw do |map|
   map.connect 'dummy/page/:page', :controller => 'dummy'
   map.connect 'dummy/dots/page.:page', :controller => 'dummy', :action => 'dots'
+  map.connect 'ibocorp/:page', :controller => 'ibocorp',
+                               :requirements => { :page => /\d+/ },
+                               :defaults => { :page => 1 }
+                               
   map.connect ':controller/:action/:id'
 end
 
@@ -79,7 +83,7 @@ class WillPaginate::ViewTestCase < Test::Unit::TestCase
         assert_match pattern, el['href']
         if numbers
           el['href'] =~ pattern
-          pages << $1.to_i
+          pages << ($1.nil?? nil : $1.to_i)
         end
       end
 

@@ -287,6 +287,15 @@ class ViewTest < WillPaginate::ViewTestCase
     end
   end
 
+  def test_custom_routing_with_first_page_hidden
+    @request.symbolized_path_parameters.update :controller => 'ibocorp', :action => nil
+    paginate :page => 2, :per_page => 2 do
+      assert_select 'a[href]', 7 do |links|
+        assert_links_match %r{/ibocorp(?:/(\d+))?$}, links, [nil, nil, 3, 4, 5, 6, 3]
+      end
+    end
+  end
+
   ## internal hardcore stuff ##
 
   class LegacyCollection < WillPaginate::Collection
