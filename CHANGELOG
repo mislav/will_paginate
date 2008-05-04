@@ -1,3 +1,8 @@
+== 2.3.1, released 2008-05-04
+
+* Fixed page numbers not showing with custom routes and implicit first page
+* Try to use Hanna for documentation (falls back to default RDoc template if not)
+
 == 2.3.0, released 2008-04-29
 
 * Changed LinkRenderer to receive collection, options and reference to view template NOT in
