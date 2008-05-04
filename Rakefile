@@ -1,5 +1,12 @@
-require 'rake'
-require 'rake/rdoctask'
+require 'rubygems'
+begin
+  hanna_dir = '/home/mislav/projects/hanna/lib'
+  $:.unshift hanna_dir if File.exists? hanna_dir
+  require 'hanna/rdoctask'
+rescue LoadError
+  require 'rake'
+  require 'rake/rdoctask'
+end
 load 'test/tasks.rake'
 
 desc 'Default: run unit tests.'
@@ -7,22 +14,17 @@ task :default => :test
 
 desc 'Generate RDoc documentation for the will_paginate plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
-  files = ['README.rdoc', 'LICENSE', 'CHANGELOG']
-  files << FileList.new('lib/**/*.rb').
+  rdoc.rdoc_files.include('README.rdoc', 'LICENSE', 'CHANGELOG').
+    include('lib/**/*.rb').
     exclude('lib/will_paginate/named_scope*').
     exclude('lib/will_paginate/array.rb').
     exclude('lib/will_paginate/version.rb')
-    
-  rdoc.rdoc_files.add(files)
+  
   rdoc.main = "README.rdoc" # page to start on
   rdoc.title = "will_paginate documentation"
   
-  templates = %w[/Users/chris/ruby/projects/err/rock/template.rb /var/www/rock/template.rb]
-  rdoc.template = templates.find { |t| File.exists? t }
-  
   rdoc.rdoc_dir = 'doc' # rdoc output folder
-  rdoc.options << '--inline-source'
-  rdoc.options << '--charset=UTF-8'
+  rdoc.options << '--inline-source' << '--charset=UTF-8'
   rdoc.options << '--webcvs=http://github.com/mislav/will_paginate/tree/master/'
 end
 
