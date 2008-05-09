@@ -10,6 +10,7 @@ require 'will_paginate/deprecation'
 module WillPaginate
   # no-op
   def self.enable
+    Deprecation.warn "WillPaginate::enable() doesn't do anything anymore"
   end
 
   # Enable named_scope, a feature of Rails 2.1, even if you have older Rails

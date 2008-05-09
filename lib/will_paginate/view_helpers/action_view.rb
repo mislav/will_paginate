@@ -17,23 +17,8 @@ module WillPaginate
           raise ArgumentError, "The #{collection_name} variable appears to be empty. Did you " +
             "forget to pass the collection object for will_paginate?" unless collection
         end
-        # early exit if there is nothing to render
-        return nil unless WillPaginate::ViewHelpers.total_pages_for_collection(collection) > 1
-        
-        options = options.symbolize_keys.reverse_merge WillPaginate::ViewHelpers.pagination_options
-        
-        # get the renderer instance
-        renderer = case options[:renderer]
-        when String
-          options[:renderer].to_s.constantize.new
-        when Class
-          options[:renderer].new
-        else
-          options[:renderer]
-        end
-        # render HTML for pagination
-        renderer.prepare collection, options, self
-        renderer.to_html
+
+        super(collection, options.symbolize_keys)
       end
       
       # Wrapper for rendering pagination links at both top and bottom of a block
