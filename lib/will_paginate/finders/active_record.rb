@@ -99,6 +99,26 @@ module WillPaginate::Finders
       paginate(*args, &block)
     end
 
+    def wp_query(options, pager, args, &block)
+      finder = (options.delete(:finder) || 'find').to_s
+      find_options = options.except(:count).update(:offset => pager.offset, :limit => pager.per_page) 
+
+      if finder == 'find'
+        if Array === args.first and !pager.total_entries
+          pager.total_entries = args.first.size
+        end
+        args << :all if args.empty?
+      end
+      
+      args << find_options
+      pager.replace send(finder, *args, &block)
+      
+      unless pager.total_entries
+        # magic counting
+        pager.total_entries = wp_count(options, args, finder) 
+      end
+    end
+
     # Does the not-so-trivial job of finding out the total number of entries
     # in the database. It relies on the ActiveRecord +count+ method.
     def wp_count(options, args, finder)

@@ -1,8 +1,8 @@
 # borrowed from ActiveSupport::Deprecation
 module WillPaginate
   module Deprecation
-    def self.debug() @debug end
-    def self.debug=(value) @debug = value end
+    def self.debug() @debug; end
+    def self.debug=(value) @debug = value; end
     self.debug = false
 
     # Choose the default warn behavior according to RAILS_ENV.
@@ -35,8 +35,8 @@ module WillPaginate
     end
 
     # Behavior is a block that takes a message argument.
-    def self.debug() @behavior end
-    def self.behavior=(value) @behavior = value end
+    def self.behavior() @behavior; end
+    def self.behavior=(value) @behavior = value; end
     self.behavior = default_behavior
 
     def self.silence
