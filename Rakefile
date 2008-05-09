@@ -18,7 +18,6 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('README.rdoc', 'LICENSE', 'CHANGELOG').
     include('lib/**/*.rb').
     exclude('lib/will_paginate/named_scope*').
-    exclude('lib/will_paginate/array.rb').
     exclude('lib/will_paginate/version.rb')
   
   rdoc.main = "README.rdoc" # page to start on
