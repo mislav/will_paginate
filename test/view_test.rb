@@ -160,59 +160,6 @@ class ViewTest < WillPaginate::ViewTestCase
     assert_select 'div.pagination', 2
     assert_select 'div.pagination + div#developers', 1
   end
-
-  def test_page_entries_info
-    @template = '<%= page_entries_info collection %>'
-    array = ('a'..'z').to_a
-    
-    paginate array.paginate(:page => 2, :per_page => 5)
-    assert_equal %{Displaying strings <b>6&nbsp;-&nbsp;10</b> of <b>26</b> in total},
-      @html_result
-    
-    paginate array.paginate(:page => 7, :per_page => 4)
-    assert_equal %{Displaying strings <b>25&nbsp;-&nbsp;26</b> of <b>26</b> in total},
-      @html_result
-  end
-
-  def test_page_entries_info_with_longer_class_name
-    @template = '<%= page_entries_info collection %>'
-    collection = ('a'..'z').to_a.paginate
-    collection.first.stubs(:class).returns(mock('class', :name => 'ProjectType'))
-    
-    paginate collection
-    assert @html_result.index('project types'), "expected <#{@html_result.inspect}> to mention 'project types'"
-  end
-
-  def test_page_entries_info_with_single_page_collection
-    @template = '<%= page_entries_info collection %>'
-    
-    paginate(('a'..'d').to_a.paginate(:page => 1, :per_page => 5))
-    assert_equal %{Displaying <b>all 4</b> strings}, @html_result
-    
-    paginate(['a'].paginate(:page => 1, :per_page => 5))
-    assert_equal %{Displaying <b>1</b> string}, @html_result
-    
-    paginate([].paginate(:page => 1, :per_page => 5))
-    assert_equal %{No entries found}, @html_result
-  end
-  
-  def test_page_entries_info_with_custom_entry_name
-    @template = '<%= page_entries_info collection, :entry_name => "author" %>'
-    
-    entries = (1..20).to_a
-    
-    paginate(entries.paginate(:page => 1, :per_page => 5))
-    assert_equal %{Displaying authors <b>1&nbsp;-&nbsp;5</b> of <b>20</b> in total}, @html_result
-    
-    paginate(entries.paginate(:page => 1, :per_page => 20))
-    assert_equal %{Displaying <b>all 20</b> authors}, @html_result
-    
-    paginate(['a'].paginate(:page => 1, :per_page => 5))
-    assert_equal %{Displaying <b>1</b> author}, @html_result
-    
-    paginate([].paginate(:page => 1, :per_page => 5))
-    assert_equal %{No authors found}, @html_result
-  end
   
   ## parameter handling in page links ##
   

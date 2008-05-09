@@ -30,3 +30,27 @@ unless Hash.instance_methods.include? 'slice'
     end
   end
 end
+
+unless String.instance_methods.include? 'constantize'
+  String.class_eval do
+    def constantize
+      unless /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/ =~ self
+        raise NameError, "#{self.inspect} is not a valid constant name!"
+      end
+
+      Object.module_eval("::#{$1}", __FILE__, __LINE__)
+    end
+  end
+end
+
+unless String.instance_methods.include? 'underscore'
+  String.class_eval do
+    def underscore
+      self.to_s.gsub(/::/, '/').
+        gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+        gsub(/([a-z\d])([A-Z])/,'\1_\2').
+        tr("-", "_").
+        downcase
+    end
+  end
+end

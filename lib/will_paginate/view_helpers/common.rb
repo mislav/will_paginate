@@ -80,18 +80,46 @@ module WillPaginate
       #
       #   <%= page_entries_info @posts, :entry_name => 'item' %>
       #   #-> Displaying items 6 - 10 of 26 in total
+      #
+      # Entry name is entered in singular and pluralized with
+      # <tt>String#pluralize</tt> method from ActiveSupport. If it isn't
+      # loaded, specify plural with <tt>:plural_name</tt> parameter:
+      #
+      #   <%= page_entries_info @posts, :entry_name => 'item', :plural_name => 'items' %>
+      #
+      # By default, this method produces HTML output. You can trigger plain
+      # text output by passing <tt>:html => false</tt> in options.
       def page_entries_info(collection, options = {})
-        entry_name = options[:entry_name] ||
-          (collection.empty?? 'entry' : collection.first.class.name.underscore.sub('_', ' '))
+        entry_name  = options[:entry_name] || (collection.empty?? 'entry' :
+                      collection.first.class.name.underscore.gsub('_', ' '))
+        
+        plural_name = if options[:plural_name]
+          options[:plural_name]
+        elsif entry_name == 'entry'
+          plural_name = 'entries'
+        elsif entry_name.respond_to? :pluralize
+          plural_name = entry_name.pluralize
+        else
+          entry_name + 's'
+        end
+
+        unless options[:html] == false
+          b  = '<b>'
+          eb = '</b>'
+          sp = '&nbsp;'
+        else
+          b  = eb = ''
+          sp = ' '
+        end
         
         if collection.total_pages < 2
           case collection.size
-          when 0; "No #{entry_name.pluralize} found"
-          when 1; "Displaying <b>1</b> #{entry_name}"
-          else;   "Displaying <b>all #{collection.size}</b> #{entry_name.pluralize}"
+          when 0; "No #{plural_name} found"
+          when 1; "Displaying #{b}1#{eb} #{entry_name}"
+          else;   "Displaying #{b}all #{collection.size}#{eb} #{plural_name}"
           end
         else
-          %{Displaying #{entry_name.pluralize} <b>%d&nbsp;-&nbsp;%d</b> of <b>%d</b> in total} % [
+          %{Displaying #{plural_name} #{b}%d#{sp}-#{sp}%d#{eb} of #{b}%d#{eb} in total} % [
             collection.offset + 1,
             collection.offset + collection.length,
             collection.total_entries
