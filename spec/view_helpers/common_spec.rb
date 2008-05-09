@@ -9,7 +9,11 @@ describe WillPaginate::ViewHelpers::Common do
   describe "will_paginate" do
     it "should render" do
       collection = WillPaginate::Collection.new(1, 2, 4)
-      will_paginate(collection).should_not be_nil
+      renderer   = mock 'Renderer'
+      renderer.expects(:prepare).with(collection, instance_of(Hash), self)
+      renderer.expects(:to_html).returns('<PAGES>')
+      
+      will_paginate(collection, :renderer => renderer).should == '<PAGES>'
     end
     
     it "should return nil for single-page collections" do

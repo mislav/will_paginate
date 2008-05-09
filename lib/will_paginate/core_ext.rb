@@ -1,6 +1,8 @@
 require 'set'
 require 'will_paginate/array'
 
+## Everything below blatantly stolen from ActiveSupport  :o
+
 unless Hash.instance_methods.include? 'except'
   Hash.class_eval do
     # Returns a new hash without the given keys.

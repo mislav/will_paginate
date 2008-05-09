@@ -57,7 +57,7 @@ module WillPaginate
         # get the renderer instance
         renderer = case options[:renderer]
         when String
-          options[:renderer].to_s.constantize.new
+          options[:renderer].constantize.new
         when Class
           options[:renderer].new
         else
