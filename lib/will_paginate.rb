@@ -12,7 +12,6 @@ module WillPaginate
     # shortcut for <tt>enable_actionpack; enable_activerecord</tt>
     def enable
       enable_actionpack
-      enable_activerecord
     end
     
     # mixes in WillPaginate::ViewHelpers in ActionView::Base
@@ -23,28 +22,6 @@ module WillPaginate
 
       if defined?(ActionController::Base) and ActionController::Base.respond_to? :rescue_responses
         ActionController::Base.rescue_responses['WillPaginate::InvalidPage'] = :not_found
-      end
-    end
-    
-    # mixes in WillPaginate::Finder in ActiveRecord::Base and classes that deal
-    # with associations
-    def enable_activerecord
-      return if ActiveRecord::Base.respond_to? :paginate
-      require 'will_paginate/finder'
-      ActiveRecord::Base.class_eval { include Finder }
-
-      # support pagination on associations
-      a = ActiveRecord::Associations
-      returning([ a::AssociationCollection ]) { |classes|
-        # detect http://dev.rubyonrails.org/changeset/9230
-        unless a::HasManyThroughAssociation.superclass == a::HasManyAssociation
-          classes << a::HasManyThroughAssociation
-        end
-      }.each do |klass|
-        klass.class_eval do
-          include Finder::ClassMethods
-          alias_method_chain :method_missing, :paginate
-        end
       end
     end
 
@@ -68,6 +45,7 @@ module WillPaginate
   end
 end
 
-if defined?(Rails) and defined?(ActiveRecord) and defined?(ActionController)
-  WillPaginate.enable
+if defined?(Rails)
+  WillPaginate.enable_actionpack if defined?(ActionController)
+  require 'will_paginate/finders/active_record' if defined?(ActiveRecord)
 end

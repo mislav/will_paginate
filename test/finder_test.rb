@@ -2,7 +2,7 @@ require 'helper'
 require 'lib/activerecord_test_case'
 
 require 'will_paginate'
-WillPaginate.enable_activerecord
+require 'will_paginate/finders/active_record'
 WillPaginate.enable_named_scope
 
 class FinderTest < ActiveRecordTestCase
