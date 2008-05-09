@@ -1,4 +1,4 @@
-require 'active_support'
+require 'will_paginate/deprecation'
 
 # = You *will* paginate!
 #
@@ -64,19 +64,6 @@ module WillPaginate
       ActiveRecord::Base.class_eval do
         include WillPaginate::NamedScope
       end
-    end
-  end
-
-  module Deprecation #:nodoc:
-    extend ActiveSupport::Deprecation
-
-    def self.warn(message, callstack = caller)
-      message = 'WillPaginate: ' + message.strip.gsub(/\s+/, ' ')
-      behavior.call(message, callstack) if behavior && !silenced?
-    end
-
-    def self.silenced?
-      ActiveSupport::Deprecation.silenced?
     end
   end
 end

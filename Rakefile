@@ -8,6 +8,7 @@ rescue LoadError
   require 'rake/rdoctask'
 end
 load 'test/tasks.rake'
+load 'spec/tasks.rake'
 
 desc 'Default: run unit tests.'
 task :default => :test
