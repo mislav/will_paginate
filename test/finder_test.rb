@@ -28,10 +28,6 @@ class FinderTest < ActiveRecordTestCase
   end
 
   def test_parameter_api
-    # :page parameter in options is required!
-    assert_raise(ArgumentError){ Topic.paginate }
-    assert_raise(ArgumentError){ Topic.paginate({}) }
-    
     # explicit :all should not break anything
     assert_equal Topic.paginate(:page => nil), Topic.paginate(:all, :page => 1)
 
@@ -263,13 +259,6 @@ class FinderTest < ActiveRecordTestCase
   end
 
   ## misc ##
-
-  def test_count_and_total_entries_options_are_mutually_exclusive
-    e = assert_raise ArgumentError do
-      Developer.paginate :page => 1, :count => {}, :total_entries => 1
-    end
-    assert_match /exclusive/, e.to_s
-  end
   
   def test_readonly
     assert_nothing_raised { Developer.paginate :readonly => true, :page => 1 }
@@ -396,21 +385,6 @@ class FinderTest < ActiveRecordTestCase
       
       Developer.paginate(options)
       assert_equal options, options_before
-    end
-
-    def test_paginated_each
-      collection = stub('collection', :size => 5, :empty? => false, :per_page => 5)
-      collection.expects(:each).times(2).returns(collection)
-      last_collection = stub('collection', :size => 4, :empty? => false, :per_page => 5)
-      last_collection.expects(:each).returns(last_collection)
-      
-      params = { :order => 'id', :total_entries => 0 }
-      
-      Developer.expects(:paginate).with(params.merge(:page => 2)).returns(collection)
-      Developer.expects(:paginate).with(params.merge(:page => 3)).returns(collection)
-      Developer.expects(:paginate).with(params.merge(:page => 4)).returns(last_collection)
-      
-      assert_equal 14, Developer.paginated_each(:page => '2') { }
     end
   end
 end

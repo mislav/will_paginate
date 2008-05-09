@@ -56,8 +56,8 @@ module WillPaginate
       protected
         
         def wp_parse_options(options) #:nodoc:
-          raise ArgumentError, 'parameter hash expected' unless options.respond_to? :symbolize_keys
-          options = options.symbolize_keys
+          raise ArgumentError, 'parameter hash expected' unless Hash === options
+          # options = options.symbolize_keys
           raise ArgumentError, ':page parameter required' unless options.key? :page
           
           if options[:count] and options[:total_entries]
@@ -67,7 +67,8 @@ module WillPaginate
           page     = options[:page] || 1
           per_page = options[:per_page] || self.per_page
           total    = options[:total_entries]
-          [page, per_page, total]
+          
+          return [page, per_page, total]
         end
         
     end
