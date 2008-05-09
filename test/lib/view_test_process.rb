@@ -1,8 +1,7 @@
 require 'action_controller'
 require 'action_controller/test_process'
 
-require 'will_paginate'
-WillPaginate.enable_actionpack
+require 'will_paginate/view_helpers/action_view'
 
 ActionController::Routing::Routes.draw do |map|
   map.connect 'dummy/page/:page', :controller => 'dummy'

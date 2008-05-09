@@ -1,7 +1,7 @@
 require 'helper'
 require 'lib/view_test_process'
 
-class AdditionalLinkAttributesRenderer < WillPaginate::LinkRenderer
+class AdditionalLinkAttributesRenderer < WillPaginate::ViewHelpers::LinkRenderer
   def initialize(link_attributes = nil)
     super()
     @additional_link_attributes = link_attributes || { :default => 'true' }
@@ -61,7 +61,7 @@ class ViewTest < WillPaginate::ViewTestCase
   end
 
   def test_will_paginate_using_renderer_instance
-    renderer = WillPaginate::LinkRenderer.new
+    renderer = WillPaginate::ViewHelpers::LinkRenderer.new
     renderer.gap_marker = '<span class="my-gap">~~</span>'
     
     paginate({ :per_page => 2 }, :inner_window => 0, :outer_window => 0, :renderer => renderer) do
