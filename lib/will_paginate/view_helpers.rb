@@ -299,7 +299,7 @@ module WillPaginate
     def url_for(page)
       page_one = page == 1
       unless @url_string and !page_one
-        @url_params = { :escape => false }
+        @url_params = {}
         # page links should preserve GET parameters
         stringified_merge @url_params, @template.params if @template.request.get?
         stringified_merge @url_params, @options[:params] if @options[:params]
@@ -317,7 +317,7 @@ module WillPaginate
         return url if page_one
         
         if complex
-          @url_string = url.sub(%r!([?&]#{CGI.escape param_name}=)#{page}!, '\1@')
+          @url_string = url.sub(%r!((?:\?|&amp;)#{CGI.escape param_name}=)#{page}!, '\1@')
           return url
         else
           @url_string = url

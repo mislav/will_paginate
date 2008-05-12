@@ -95,6 +95,16 @@ class ViewTest < WillPaginate::ViewTestCase
     assert_dom_equal expected, @html_result
   end
 
+  def test_escaping_of_urls
+    paginate({:page => 1, :per_page => 1, :total_entries => 2},
+             :page_links => false, :params => { :tag => '<br>' })
+    
+    assert_select 'a[href]', 1 do |links|
+      query = links.first['href'].split('?', 2)[1]
+      assert_equal %w(page=2 tag=%3Cbr%3E), query.split('&amp;').sort
+    end
+  end
+
   ## advanced options for pagination ##
 
   def test_will_paginate_without_container
