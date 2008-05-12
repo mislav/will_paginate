@@ -84,7 +84,7 @@ module WillPaginate
       # Returns URL params for +page_link_or_span+, taking the current GET params
       # and <tt>:params</tt> option into account.
       def url_for(page)
-        url_params = { :escape => false }
+        url_params = { }
         # page links should preserve GET parameters
         stringified_merge url_params, @template.params if @template.request.get?
         stringified_merge url_params, @options[:params] if @options[:params]

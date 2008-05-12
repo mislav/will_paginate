@@ -118,6 +118,16 @@ describe WillPaginate::ViewHelpers::ActionView do
     html_document.root.should == expected_dom
   end
   
+  it "should output escaped URLs" do
+    paginate({:page => 1, :per_page => 1, :total_entries => 2},
+             :page_links => false, :params => { :tag => '<br>' })
+    
+    assert_select 'a[href]', 1 do |links|
+      query = links.first['href'].split('?', 2)[1]
+      query.split('&amp;').sort.should == %w(page=2 tag=%3Cbr%3E)
+    end
+  end
+  
   ## advanced options for pagination ##
 
   it "should be able to render without container" do
