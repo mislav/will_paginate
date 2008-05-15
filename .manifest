@@ -45,4 +45,5 @@ test/lib/activerecord_test_case.rb
 test/lib/activerecord_test_connector.rb
 test/lib/load_fixtures.rb
 test/lib/view_test_process.rb
+test/tasks.rake
 test/view_test.rb
