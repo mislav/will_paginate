@@ -1,3 +1,8 @@
+== master branch
+
+* Fix LinkRenderer#stringified_merge by removing "return" from iterator block
+* Ensure that 'href' values in pagination links are escaped URLs
+
 == 2.3.1, released 2008-05-04
 
 * Fixed page numbers not showing with custom routes and implicit first page

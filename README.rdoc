@@ -22,11 +22,7 @@ Some resources to get you started:
 
 The recommended way is that you get the gem:
 
-  # add GitHub to your local list of gem sources:
-  gem sources -a http://gems.github.com/
-  
-  # install the gem:
-  gem install mislav-will_paginate
+  gem install mislav-will_paginate --source http://gems.github.com/
 
 After that you don't need the will_paginate <i>plugin</i> in your Rails
 application anymore. Just add a simple require to the end of
