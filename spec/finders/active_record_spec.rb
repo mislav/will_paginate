@@ -225,6 +225,24 @@ describe WillPaginate::Finders::ActiveRecord do
       result.should == expected
       result.total_entries.should == 4
     end
+    
+    # detect ActiveRecord 2.1
+    if ActiveRecord::Base.private_methods.include?('references_eager_loaded_tables?')
+      it "should remove :include for count" do
+        Developer.expects(:find).returns([1])
+        Developer.expects(:count).with({}).returns(0)
+    
+        Developer.paginate :page => 1, :per_page => 1, :include => :projects
+      end
+    
+      it "should keep :include for count when they are referenced in :conditions" do
+        Developer.expects(:find).returns([1])
+        Developer.expects(:count).with({ :include => :projects, :conditions => 'projects.id > 2' }).returns(0)
+    
+        Developer.paginate :page => 1, :per_page => 1,
+          :include => :projects, :conditions => 'projects.id > 2'
+      end
+    end
   end
   
   protected

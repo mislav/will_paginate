@@ -158,7 +158,14 @@ module WillPaginate::Finders
       # merge the hash found in :count
       # this allows you to specify :select, :order, or anything else just for the count query
       count_options.update options[:count] if options[:count]
-            
+      
+      # forget about includes if they are irrelevant (Rails 2.1)
+      if count_options[:include] and
+          klass.private_methods.include?('references_eager_loaded_tables?') and
+          !klass.send(:references_eager_loaded_tables?, count_options)
+        count_options.delete :include
+      end
+      
       count_options
     end
   end
