@@ -356,20 +356,17 @@ module WillPaginate
       @param_name ||= @options[:param_name].to_s
     end
 
+    # Recursively merge into target hash by using stringified keys from the other one
     def stringified_merge(target, other)
       other.each do |key, value|
-        key = key.to_s
+        key = key.to_s # this line is what it's all about!
         existing = target[key]
 
-        if value.is_a?(Hash)
-          target[key] = existing = {} if existing.nil?
-          if existing.is_a?(Hash)
-            stringified_merge(existing, value)
-            return
-          end
+        if value.is_a?(Hash) and (existing.is_a?(Hash) or existing.nil?)
+          stringified_merge(existing || (target[key] = {}), value)
+        else
+          target[key] = value
         end
-        
-        target[key] = value
       end
     end
   end
