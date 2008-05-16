@@ -412,5 +412,23 @@ class FinderTest < ActiveRecordTestCase
       
       assert_equal 14, Developer.paginated_each(:page => '2') { }
     end
+
+    # detect ActiveRecord 2.1
+    if ActiveRecord::Base.private_methods.include?('references_eager_loaded_tables?')
+      def test_removes_irrelevant_includes_in_count
+        Developer.expects(:find).returns([1])
+        Developer.expects(:count).with({}).returns(0)
+
+        Developer.paginate :page => 1, :per_page => 1, :include => :projects
+      end
+
+      def test_doesnt_remove_referenced_includes_in_count
+        Developer.expects(:find).returns([1])
+        Developer.expects(:count).with({ :include => :projects, :conditions => 'projects.id > 2' }).returns(0)
+
+        Developer.paginate :page => 1, :per_page => 1,
+          :include => :projects, :conditions => 'projects.id > 2'
+      end
+    end
   end
 end
