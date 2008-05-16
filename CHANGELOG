@@ -1,3 +1,8 @@
+== master
+
+* ActiveRecord 2.1: remove :include from count query when tables are not
+  referenced in :conditions
+
 == 2.3.2, released 2008-05-16
 
 * Fixed LinkRenderer#stringified_merge by removing "return" from iterator block
