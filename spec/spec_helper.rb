@@ -2,15 +2,24 @@ require 'rubygems'
 gem 'rspec', '~> 1.1.3'
 require 'spec'
 
-module StringMatchers
+module MyExtras
+  protected
   def include_words(string)
     WordsInclusionMatcher.new(string)
+  end
+
+  def collection(params = {})
+    if params[:total_pages]
+      params[:per_page] = 1
+      params[:total_entries] = params[:total_pages]
+    end
+    WillPaginate::Collection.new(params[:page] || 1, params[:per_page] || 30, params[:total_entries])
   end
 end
 
 Spec::Runner.configure do |config|
   # config.include My::Pony, My::Horse, :type => :farm
-  config.include StringMatchers
+  config.include MyExtras
   # config.predicate_matchers[:swim] = :can_swim?
   
   config.mock_with :mocha
