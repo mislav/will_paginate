@@ -2,7 +2,7 @@ require 'will_paginate/view_helpers'
 
 module WillPaginate
   module ViewHelpers
-    module Common
+    module Base
       # Renders Digg/Flickr-style pagination for a WillPaginate::Collection
       # object. Nil is returned if there is only one page in total; no point in
       # rendering the pagination in that case...

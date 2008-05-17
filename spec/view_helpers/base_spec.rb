@@ -1,10 +1,10 @@
 require 'spec_helper'
-require 'will_paginate/view_helpers/common'
+require 'will_paginate/view_helpers/base'
 require 'will_paginate/array'
 
-describe WillPaginate::ViewHelpers::Common do
+describe WillPaginate::ViewHelpers::Base do
 
-  include WillPaginate::ViewHelpers::Common
+  include WillPaginate::ViewHelpers::Base
   
   describe "will_paginate" do
     it "should render" do
