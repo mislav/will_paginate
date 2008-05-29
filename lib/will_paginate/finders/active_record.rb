@@ -122,22 +122,12 @@ module WillPaginate::Finders
     # Does the not-so-trivial job of finding out the total number of entries
     # in the database. It relies on the ActiveRecord +count+ method.
     def wp_count(options, args, finder)
-      excludees = [:count, :order, :limit, :offset, :readonly]
-      unless options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
-        excludees << :select # only exclude the select param if it doesn't begin with DISTINCT
-      end
-      # count expects (almost) the same options as find
-      count_options = options.except *excludees
-
-      # merge the hash found in :count
-      # this allows you to specify :select, :order, or anything else just for the count query
-      count_options.update options[:count] if options[:count]
+      # find out if we are in a model or an association proxy
+      klass = (@owner and @reflection) ? @reflection.klass : self
+      count_options = wp_parse_count_options(options, klass)
 
       # we may have to scope ...
       counter = Proc.new { count(count_options) }
-
-      # we may be in a model or an association proxy!
-      klass = (@owner and @reflection) ? @reflection.klass : self
 
       count = if finder.index('find_') == 0 and klass.respond_to?(scoper = finder.sub('find', 'with'))
                 # scope_out adds a 'with_finder' method which acts like with_scope, if it's present
@@ -153,6 +143,23 @@ module WillPaginate::Finders
               end
 
       count.respond_to?(:length) ? count.length : count
+    end
+    
+    def wp_parse_count_options(options, klass)
+      excludees = [:count, :order, :limit, :offset, :readonly]
+      
+      unless options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
+        # only exclude the select param if it doesn't begin with DISTINCT
+        excludees << :select
+      end
+      # count expects (almost) the same options as find
+      count_options = options.except *excludees
+
+      # merge the hash found in :count
+      # this allows you to specify :select, :order, or anything else just for the count query
+      count_options.update options[:count] if options[:count]
+            
+      count_options
     end
   end
 end
