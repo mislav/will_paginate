@@ -21,19 +21,19 @@ describe WillPaginate::Finders::Common do
   end
 
   it "should complain when no hash parameters given" do
-    Proc.new {
+    lambda {
       Model.paginate
     }.should raise_error(ArgumentError, 'parameter hash expected')
   end
 
   it "should complain when no :page parameter present" do
-    Proc.new {
+    lambda {
       Model.paginate :per_page => 6
     }.should raise_error(ArgumentError, ':page parameter required')
   end
 
   it "should complain when both :count and :total_entries are given" do
-    Proc.new {
+    lambda {
       Model.paginate :page => 1, :count => {}, :total_entries => 1
     }.should raise_error(ArgumentError, ':count and :total_entries are mutually exclusive')
   end
