@@ -9,8 +9,36 @@ ActiverecordTestConnector.setup
 
 describe WillPaginate::Finders::ActiveRecord do
   
-  before :all do
-    # Fixtures.create_fixtures ActiverecordTestConnector::FIXTURES_PATH, %w()
+  def self.fixtures(*tables)
+    table_names = tables.map { |t| t.to_s }
+    
+    fixtures = Fixtures.create_fixtures ActiverecordTestConnector::FIXTURES_PATH, table_names
+    @@loaded_fixtures = {}
+    @@fixture_cache = {}
+    
+    unless fixtures.nil?
+      if fixtures.instance_of?(Fixtures)
+        @@loaded_fixtures[fixtures.table_name] = fixtures
+      else
+        fixtures.each { |f| @@loaded_fixtures[f.table_name] = f }
+      end
+    end
+    
+    table_names.each do |table_name|
+      define_method(table_name) do |*fixtures|
+        @@fixture_cache[table_name] ||= {}
+
+        instances = fixtures.map do |fixture|
+          if @@loaded_fixtures[table_name][fixture.to_s]
+            @@fixture_cache[table_name][fixture] ||= @@loaded_fixtures[table_name][fixture.to_s].find
+          else
+            raise StandardError, "No fixture with name '#{fixture}' found for table '#{table_name}'"
+          end
+        end
+
+        instances.size == 1 ? instances.first : instances
+      end
+    end
   end
   
   it "should integrate with ActiveRecord::Base" do
@@ -132,7 +160,98 @@ describe WillPaginate::Finders::ActiveRecord do
   end
   
   if ActiverecordTestConnector.able_to_connect
-    # fixture-dependent tests here
+    fixtures :topics, :replies, :users, :projects, :developers_projects
+    
+    it "should get first page of Topics with a single query" do
+      lambda {
+        result = Topic.paginate :page => nil
+        result.current_page.should == 1
+        result.total_pages.should == 1
+        result.size.should == 4
+      }.should run_queries
+    end
+    
+    it "should get second (inexistent) page of Topics, requiring 2 queries" do
+      lambda {
+        result = Topic.paginate :page => 2
+        result.total_pages.should == 1
+        result.should be_empty
+      }.should run_queries(2)
+    end
+    
+    it "should paginate with :order" do
+      result = Topic.paginate :page => 1, :order => 'created_at DESC'
+      result.should == topics(:futurama, :harvey_birdman, :rails, :ar).reverse
+      result.total_pages.should == 1
+    end
+    
+    it "should paginate with :conditions" do
+      result = Topic.paginate :page => 1, :conditions => ["created_at > ?", 30.minutes.ago]
+      result.should == topics(:rails, :ar)
+      result.total_pages.should == 1
+    end
+
+    it "should paginate with :include and :conditions" do
+      result = Topic.paginate \
+        :page     => 1, 
+        :include  => :replies,  
+        :conditions => "replies.content LIKE 'Bird%' ", 
+        :per_page => 10
+
+      expected = Topic.find :all, 
+        :include => 'replies', 
+        :conditions => "replies.content LIKE 'Bird%' ", 
+        :limit   => 10
+
+      result.should == expected
+      result.total_entries.should == 1
+    end
+
+    it "should paginate with :include and :order" do
+      result = nil
+      lambda {
+        result = Topic.paginate \
+          :page     => 1, 
+          :include  => :replies,  
+          :order    => 'replies.created_at asc, topics.created_at asc', 
+          :per_page => 10
+      }.should run_queries(2)
+
+      expected = Topic.find :all, 
+        :include => 'replies', 
+        :order   => 'replies.created_at asc, topics.created_at asc', 
+        :limit   => 10
+
+      result.should == expected
+      result.total_entries.should == 4
+    end
+  end
+  
+  protected
+  
+    def run_queries(num = 1)
+      QueryCountMatcher.new(num)
+    end
+
+end
+
+class QueryCountMatcher
+  def initialize(num)
+    @queries = num
+    @old_query_count = $query_count
   end
 
+  def matches?(block)
+    block.call
+    @queries_run = $query_count - @old_query_count
+    @queries == @queries_run
+  end
+
+  def failure_message
+    "expected #{@queries} queries, got #{@queries_run}"
+  end
+
+  def negative_failure_message
+    "expected query count not to be #{$queries}"
+  end
 end

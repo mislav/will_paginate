@@ -6,72 +6,7 @@ require 'will_paginate/finders/active_record'
 WillPaginate.enable_named_scope
 
 class FinderTest < ActiveRecordTestCase
-  fixtures :topics, :replies, :users, :projects, :developers_projects
-
-  def test_simple_paginate
-    assert_queries(1) do
-      entries = Topic.paginate :page => nil
-      assert_equal 1, entries.current_page
-      assert_equal 1, entries.total_pages
-      assert_equal 4, entries.size
-    end
-    
-    assert_queries(2) do
-      entries = Topic.paginate :page => 2
-      assert_equal 1, entries.total_pages
-      assert entries.empty?
-    end
-  end
   
-  def test_paginate_with_order
-    entries = Topic.paginate :page => 1, :order => 'created_at desc'
-    expected = [topics(:futurama), topics(:harvey_birdman), topics(:rails), topics(:ar)].reverse
-    assert_equal expected, entries.to_a
-    assert_equal 1, entries.total_pages
-  end
-  
-  def test_paginate_with_conditions
-    entries = Topic.paginate :page => 1, :conditions => ["created_at > ?", 30.minutes.ago]
-    expected = [topics(:rails), topics(:ar)]
-    assert_equal expected, entries.to_a
-    assert_equal 1, entries.total_pages
-  end
-
-  def test_paginate_with_include_and_conditions
-    entries = Topic.paginate \
-      :page     => 1, 
-      :include  => :replies,  
-      :conditions => "replies.content LIKE 'Bird%' ", 
-      :per_page => 10
-
-    expected = Topic.find :all, 
-      :include => 'replies', 
-      :conditions => "replies.content LIKE 'Bird%' ", 
-      :limit   => 10
-
-    assert_equal expected, entries.to_a
-    assert_equal 1, entries.total_entries
-  end
-  
-  def test_paginate_with_include_and_order
-    entries = nil
-    assert_queries(2) do
-      entries = Topic.paginate \
-        :page     => 1, 
-        :include  => :replies,  
-        :order    => 'replies.created_at asc, topics.created_at asc', 
-        :per_page => 10
-    end
-
-    expected = Topic.find :all, 
-      :include => 'replies', 
-      :order   => 'replies.created_at asc, topics.created_at asc', 
-      :limit   => 10
-
-    assert_equal expected, entries.to_a
-    assert_equal 4, entries.total_entries
-  end
-
   def test_paginate_associations_with_include
     entries, project = nil, projects(:active_record)
 
