@@ -2,7 +2,7 @@ require 'active_record'
 require 'active_record/version'
 require 'active_record/fixtures'
 
-class ActiveRecordTestConnector
+class ActiverecordTestConnector
   cattr_accessor :able_to_connect
   cattr_accessor :connected
 

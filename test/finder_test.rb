@@ -8,10 +8,6 @@ WillPaginate.enable_named_scope
 class FinderTest < ActiveRecordTestCase
   fixtures :topics, :replies, :users, :projects, :developers_projects
 
-  def test_new_methods_presence
-    assert_respond_to_all Topic, %w(per_page paginate paginate_by_sql)
-  end
-  
   def test_simple_paginate
     assert_queries(1) do
       entries = Topic.paginate :page => nil
@@ -25,30 +21,6 @@ class FinderTest < ActiveRecordTestCase
       assert_equal 1, entries.total_pages
       assert entries.empty?
     end
-  end
-
-  def test_parameter_api
-    # explicit :all should not break anything
-    assert_equal Topic.paginate(:page => nil), Topic.paginate(:all, :page => 1)
-
-    # :count could be nil and we should still not cry
-    assert_nothing_raised { Topic.paginate :page => 1, :count => nil }
-  end
-  
-  def test_paginate_with_per_page
-    entries = Topic.paginate :page => 1, :per_page => 1
-    assert_equal 1, entries.size
-    assert_equal 4, entries.total_pages
-
-    # Developer class has explicit per_page at 10
-    entries = Developer.paginate :page => 1
-    assert_equal 10, entries.size
-    assert_equal 2, entries.total_pages
-
-    entries = Developer.paginate :page => 1, :per_page => 5
-    assert_equal 11, entries.total_entries
-    assert_equal 5, entries.size
-    assert_equal 3, entries.total_pages
   end
   
   def test_paginate_with_order
@@ -284,107 +256,6 @@ class FinderTest < ActiveRecordTestCase
         assert_equal (4..6).to_a, entries.map(&:id)
         assert_equal 8, entries.total_entries
       end
-    end
-  end
-
-  uses_mocha 'internals' do
-    def test_implicit_all_with_dynamic_finders
-      Topic.expects(:find_all_by_foo).returns([])
-      Topic.expects(:count).returns(0)
-      Topic.paginate_by_foo :page => 2
-    end
-    
-    def test_guessing_the_total_count
-      Topic.expects(:find).returns(Array.new(2))
-      Topic.expects(:count).never
-      
-      entries = Topic.paginate :page => 2, :per_page => 4
-      assert_equal 6, entries.total_entries
-    end
-    
-    def test_guessing_that_there_are_no_records
-      Topic.expects(:find).returns([])
-      Topic.expects(:count).never
-      
-      entries = Topic.paginate :page => 1, :per_page => 4
-      assert_equal 0, entries.total_entries
-    end
-    
-    def test_extra_parameters_stay_untouched
-      Topic.expects(:find).with(:all, {:foo => 'bar', :limit => 4, :offset => 0 }).returns(Array.new(5))
-      Topic.expects(:count).with({:foo => 'bar'}).returns(1)
-
-      Topic.paginate :foo => 'bar', :page => 1, :per_page => 4
-    end
-
-    def test_count_skips_select
-      Developer.stubs(:find).returns([])
-      Developer.expects(:count).with({}).returns(0)
-      Developer.paginate :select => 'salary', :page => 2
-    end
-
-    def test_count_select_when_distinct
-      Developer.stubs(:find).returns([])
-      Developer.expects(:count).with(:select => 'DISTINCT salary').returns(0)
-      Developer.paginate :select => 'DISTINCT salary', :page => 2
-    end
-
-    def test_should_use_scoped_finders_if_present
-      # scope-out compatibility
-      Topic.expects(:find_best).returns(Array.new(5))
-      Topic.expects(:with_best).returns(1)
-      
-      Topic.paginate_best :page => 1, :per_page => 4
-    end
-
-    def test_paginate_by_sql
-      assert_respond_to Developer, :paginate_by_sql
-      Developer.expects(:find_by_sql).with(regexp_matches(/sql LIMIT 3(,| OFFSET) 3/)).returns([])
-      Developer.expects(:count_by_sql).with('SELECT COUNT(*) FROM (sql) AS count_table').returns(0)
-      
-      entries = Developer.paginate_by_sql 'sql', :page => 2, :per_page => 3
-    end
-
-    def test_paginate_by_sql_respects_total_entries_setting
-      Developer.expects(:find_by_sql).returns([])
-      Developer.expects(:count_by_sql).never
-      
-      entries = Developer.paginate_by_sql 'sql', :page => 1, :total_entries => 999
-      assert_equal 999, entries.total_entries
-    end
-
-    def test_paginate_by_sql_strips_order_by_when_counting
-      Developer.expects(:find_by_sql).returns([])
-      Developer.expects(:count_by_sql).with("SELECT COUNT(*) FROM (sql\n ) AS count_table").returns(0)
-      
-      Developer.paginate_by_sql "sql\n ORDER\nby foo, bar, `baz` ASC", :page => 2
-    end
-
-    # TODO: counts are still wrong
-    def test_ability_to_use_with_custom_finders
-      # acts_as_taggable defines find_tagged_with(tag, options)
-      Topic.expects(:find_tagged_with).with('will_paginate', :offset => 5, :limit => 5).returns([])
-      Topic.expects(:count).with({}).returns(0)
-      
-      Topic.paginate_tagged_with 'will_paginate', :page => 2, :per_page => 5
-    end
-    
-    def test_array_argument_doesnt_eliminate_count
-      ids = (1..8).to_a
-      Developer.expects(:find_all_by_id).returns([])
-      Developer.expects(:count).returns(0)
-      
-      Developer.paginate_by_id(ids, :per_page => 3, :page => 2, :order => 'id')
-    end
-
-    def test_paginating_finder_doesnt_mangle_options
-      Developer.expects(:find).returns([])
-      options = { :page => 1 }
-      options.expects(:delete).never
-      options_before = options.dup
-      
-      Developer.paginate(options)
-      assert_equal options, options_before
     end
   end
 end
