@@ -1,11 +1,11 @@
 require 'spec_helper'
-require 'will_paginate/finders/common'
+require 'will_paginate/finders/base'
 
 class Model
-  extend WillPaginate::Finders::Common
+  extend WillPaginate::Finders::Base
 end
 
-describe WillPaginate::Finders::Common do
+describe WillPaginate::Finders::Base do
   it "should define default per_page of 30" do
     Model.per_page.should == 30
   end

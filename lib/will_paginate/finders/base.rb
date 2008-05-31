@@ -3,7 +3,7 @@ require 'will_paginate/core_ext'
 module WillPaginate
   module Finders
     # Database-agnostic finder logic
-    module Common
+    module Base
       # Default per-page limit
       def per_page() 30 end
       

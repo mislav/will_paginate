@@ -1,4 +1,4 @@
-require 'will_paginate/finders/common'
+require 'will_paginate/finders/base'
 require 'active_record'
 
 module WillPaginate::Finders
@@ -36,7 +36,7 @@ module WillPaginate::Finders
   # most sense in the current context. Make that obvious to the user, also.
   # For perfomance reasons you will also want to add an index to that column.
   module ActiveRecord
-    include WillPaginate::Finders::Common
+    include WillPaginate::Finders::Base
     
     # Wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
     # based on the params otherwise used by paginating finds: +page+ and

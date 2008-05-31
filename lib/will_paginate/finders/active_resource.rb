@@ -1,4 +1,4 @@
-require 'will_paginate/finders/common'
+require 'will_paginate/finders/base'
 require 'active_resource'
 
 module WillPaginate::Finders
@@ -6,7 +6,7 @@ module WillPaginate::Finders
   # 
   #   @posts = Post.paginate :all, :params => { :page => params[:page], :order => 'created_at DESC' }
   module ActiveResource
-    include WillPaginate::Finders::Common
+    include WillPaginate::Finders::Base
     
   protected
   

@@ -1,9 +1,9 @@
-require 'will_paginate/finders/common'
+require 'will_paginate/finders/base'
 require 'data_mapper'
 
 module WillPaginate::Finders
   module DataMapper
-    include WillPaginate::Finders::Common
+    include WillPaginate::Finders::Base
 
     protected
     

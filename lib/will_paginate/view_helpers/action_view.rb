@@ -1,5 +1,5 @@
 require 'will_paginate/core_ext'
-require 'will_paginate/view_helpers/common'
+require 'will_paginate/view_helpers/base'
 require 'action_view'
 require 'will_paginate/view_helpers/link_renderer'
 
@@ -7,7 +7,7 @@ module WillPaginate
   module ViewHelpers
     # ActionView helpers for Rails integration
     module ActionView
-      include WillPaginate::ViewHelpers::Common
+      include WillPaginate::ViewHelpers::Base
       
       def will_paginate(collection = nil, options = {})
         options, collection = collection, nil if collection.is_a? Hash
