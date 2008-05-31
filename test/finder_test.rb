@@ -7,63 +7,6 @@ WillPaginate.enable_named_scope
 
 class FinderTest < ActiveRecordTestCase
   
-  def test_paginate_associations_with_include
-    entries, project = nil, projects(:active_record)
-
-    assert_nothing_raised "THIS IS A BUG in Rails 1.2.3 that was fixed in [7326]. " +
-        "Please upgrade to a newer version of Rails." do
-      entries = project.topics.paginate \
-        :page     => 1, 
-        :include  => :replies,  
-        :conditions => "replies.content LIKE 'Nice%' ", 
-        :per_page => 10
-    end
-
-    expected = Topic.find :all, 
-      :include => 'replies', 
-      :conditions => "project_id = #{project.id} AND replies.content LIKE 'Nice%' ", 
-      :limit   => 10
-
-    assert_equal expected, entries.to_a
-  end
-
-  def test_paginate_associations
-    dhh = users :david
-    expected_name_ordered = [projects(:action_controller), projects(:active_record)]
-    expected_id_ordered   = [projects(:active_record), projects(:action_controller)]
-
-    assert_queries(2) do
-      # with association-specified order
-      entries = dhh.projects.paginate(:page => 1)
-      assert_equal expected_name_ordered, entries
-      assert_equal 2, entries.total_entries
-    end
-
-    # with explicit order
-    entries = dhh.projects.paginate(:page => 1, :order => 'projects.id')
-    assert_equal expected_id_ordered, entries
-    assert_equal 2, entries.total_entries
-
-    assert_nothing_raised { dhh.projects.find(:all, :order => 'projects.id', :limit => 4) }
-    entries = dhh.projects.paginate(:page => 1, :order => 'projects.id', :per_page => 4)
-    assert_equal expected_id_ordered, entries
-
-    # has_many with implicit order
-    topic = Topic.find(1)
-    expected = [replies(:spam), replies(:witty_retort)]
-    assert_equal expected.map(&:id).sort, topic.replies.paginate(:page => 1).map(&:id).sort
-    assert_equal expected.reverse, topic.replies.paginate(:page => 1, :order => 'replies.id ASC')
-  end
-
-  def test_paginate_association_extension
-    project = Project.find(:first)
-    
-    assert_queries(2) do
-      entries = project.replies.paginate_recent :page => 1
-      assert_equal [replies(:brave)], entries
-    end
-  end
-  
   def test_paginate_with_joins
     entries = nil
     
@@ -181,16 +124,4 @@ class FinderTest < ActiveRecordTestCase
     assert User.methods.include?(pager), "`#{pager}` method should be defined on User"
   end
 
-  # Is this Rails 2.0? Find out by testing find_all which was removed in [6998]
-  unless ActiveRecord::Base.respond_to? :find_all
-    def test_paginate_array_of_ids
-      # AR finders also accept arrays of IDs
-      # (this was broken in Rails before [6912])
-      assert_queries(1) do
-        entries = Developer.paginate((1..8).to_a, :per_page => 3, :page => 2, :order => 'id')
-        assert_equal (4..6).to_a, entries.map(&:id)
-        assert_equal 8, entries.total_entries
-      end
-    end
-  end
 end

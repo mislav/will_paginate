@@ -148,6 +148,19 @@ describe WillPaginate::Finders::ActiveRecord do
     
     ArProject.paginate_by_id(ids, :per_page => 3, :page => 2, :order => 'id')
   end
+  
+  # Is this Rails 2.0? Find out by testing find_all which was removed in [6998]
+  unless ActiveRecord::Base.respond_to? :find_all
+    it "should paginate array of IDs" do
+      # AR finders also accept arrays of IDs
+      # (this was broken in Rails before [6912])
+      lambda {
+        result = Developer.paginate((1..8).to_a, :per_page => 3, :page => 2, :order => 'id')
+        result.map(&:id).should == (4..6).to_a
+        result.total_entries.should == 8
+      }.should run_queries(1)
+    end
+  end
 
   it "doesn't mangle options" do
     ArProject.expects(:find).returns([])
@@ -241,6 +254,66 @@ describe WillPaginate::Finders::ActiveRecord do
     
         Developer.paginate :page => 1, :per_page => 1,
           :include => :projects, :conditions => 'projects.id > 2'
+      end
+    end
+    
+    describe "associations" do
+      it "should paginate with include" do
+        project = projects(:active_record)
+
+        result = project.topics.paginate \
+          :page       => 1, 
+          :include    => :replies,  
+          :conditions => ["replies.content LIKE ?", 'Nice%'],
+          :per_page   => 10
+
+        expected = Topic.find :all, 
+          :include    => 'replies', 
+          :conditions => ["project_id = #{project.id} AND replies.content LIKE ?", 'Nice%'],
+          :limit      => 10
+
+        result.should == expected
+      end
+
+      it "should paginate" do
+        dhh = users(:david)
+        expected_name_ordered = projects(:action_controller, :active_record)
+        expected_id_ordered   = projects(:active_record, :action_controller)
+
+        lambda {
+          # with association-specified order
+          result = dhh.projects.paginate(:page => 1)
+          result.should == expected_name_ordered
+          result.total_entries.should == 2
+        }.should run_queries(2)
+
+        # with explicit order
+        result = dhh.projects.paginate(:page => 1, :order => 'projects.id')
+        result.should == expected_id_ordered
+        result.total_entries.should == 2
+
+        lambda {
+          dhh.projects.find(:all, :order => 'projects.id', :limit => 4)
+        }.should_not raise_error
+        
+        result = dhh.projects.paginate(:page => 1, :order => 'projects.id', :per_page => 4)
+        result.should == expected_id_ordered
+
+        # has_many with implicit order
+        topic = Topic.find(1)
+        expected = replies(:spam, :witty_retort)
+        # FIXME: wow, this is ugly
+        topic.replies.paginate(:page => 1).map(&:id).sort.should == expected.map(&:id).sort
+        topic.replies.paginate(:page => 1, :order => 'replies.id ASC').should == expected.reverse
+      end
+
+      it "should paginate through association extension" do
+        project = Project.find(:first)
+
+        lambda {
+          result = project.replies.paginate_recent :page => 1
+          result.should == [replies(:brave)]
+        }.should run_queries(2)
       end
     end
   end
