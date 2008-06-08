@@ -66,4 +66,38 @@ class ActiverecordTestConnector
       alias_method_chain :execute, :counting
     end
   end
+  
+  module FixtureSetup
+    def fixtures(*tables)
+      table_names = tables.map { |t| t.to_s }
+
+      fixtures = Fixtures.create_fixtures ActiverecordTestConnector::FIXTURES_PATH, table_names
+      @@loaded_fixtures = {}
+      @@fixture_cache = {}
+
+      unless fixtures.nil?
+        if fixtures.instance_of?(Fixtures)
+          @@loaded_fixtures[fixtures.table_name] = fixtures
+        else
+          fixtures.each { |f| @@loaded_fixtures[f.table_name] = f }
+        end
+      end
+
+      table_names.each do |table_name|
+        define_method(table_name) do |*fixtures|
+          @@fixture_cache[table_name] ||= {}
+
+          instances = fixtures.map do |fixture|
+            if @@loaded_fixtures[table_name][fixture.to_s]
+              @@fixture_cache[table_name][fixture] ||= @@loaded_fixtures[table_name][fixture.to_s].find
+            else
+              raise StandardError, "No fixture with name '#{fixture}' found for table '#{table_name}'"
+            end
+          end
+
+          instances.size == 1 ? instances.first : instances
+        end
+      end
+    end
+  end
 end
