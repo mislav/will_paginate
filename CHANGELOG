@@ -1,3 +1,18 @@
+== "agnostic" branch
+
+* setup Autotest
+* added per_page=(limit) attribute writer to set default per_page
+* Remove :include option from count_all query when possible (Rails 2.1)
+* added WP::ViewHelpers::ActionView and LinkRenderer
+* specs for ViewHelpers::Base and LinkRendererBase
+* created LinkRendererBase that implements windowed visible page numbers logic
+* created WP::ViewHelpers::Base abstract module that implements generic view helpers
+* converted finder tests to specs
+* added WP::Finders::DataMapper
+* added WP::Finders::ActiveRecord mixin for ActiveRecord::Base
+* created WP::Finders::Base abstract module that implements generic pagination logic
+* removed dependency to ActiveSupport
+
 == 2.3.1, released 2008-05-04
 
 * Fixed page numbers not showing with custom routes and implicit first page
