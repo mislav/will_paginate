@@ -4,7 +4,7 @@ require 'rubygems'
 # gem install redgreen for colored test output
 begin require 'redgreen'; rescue LoadError; end
 
-require 'boot' unless defined?(ActiveRecord)
+require 'boot' unless defined?(ActionView)
 
 class Test::Unit::TestCase
   protected
