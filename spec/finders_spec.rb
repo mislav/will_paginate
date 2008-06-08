@@ -9,6 +9,15 @@ describe WillPaginate::Finders::Base do
   it "should define default per_page of 30" do
     Model.per_page.should == 30
   end
+  
+  it "should allow to set custom per_page" do
+    begin
+      Model.per_page = 25
+      Model.per_page.should == 25
+    ensure
+      Model.per_page = 30
+    end
+  end
 
   it "should result with WillPaginate::Collection" do
     Model.expects(:wp_query)

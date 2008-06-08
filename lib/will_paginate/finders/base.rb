@@ -4,8 +4,13 @@ module WillPaginate
   module Finders
     # Database-agnostic finder logic
     module Base
-      # Default per-page limit
-      def per_page() 30 end
+      def per_page
+        @per_page ||= 30
+      end
+      
+      def per_page=(limit)
+        @per_page = limit.to_i
+      end
       
       # This is the main paginating finder.
       #
@@ -57,7 +62,6 @@ module WillPaginate
         
         def wp_parse_options(options) #:nodoc:
           raise ArgumentError, 'parameter hash expected' unless Hash === options
-          # options = options.symbolize_keys
           raise ArgumentError, ':page parameter required' unless options.key? :page
           
           if options[:count] and options[:total_entries]
