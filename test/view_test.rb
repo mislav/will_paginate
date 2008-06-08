@@ -111,26 +111,6 @@ class ViewTest < WillPaginate::ViewTestCase
     end
   end
 
-  def test_will_paginate_windows
-    paginate({ :page => 6, :per_page => 1 }, :inner_window => 1) do |pagination|
-      assert_select 'a[href]', 8 do |elements|
-        validate_page_numbers [5,1,2,5,7,10,11,7], elements
-        assert_select elements.first, 'a', '&laquo; Previous'
-        assert_select elements.last, 'a', 'Next &raquo;'
-      end
-      assert_select 'span.current', '6'
-      assert_equal '&laquo; Previous 1 2 &hellip; 5 6 7 &hellip; 10 11 Next &raquo;', pagination.first.inner_text
-    end
-  end
-
-  def test_will_paginate_eliminates_small_gaps
-    paginate({ :page => 6, :per_page => 1 }, :inner_window => 2) do
-      assert_select 'a[href]', 12 do |elements|
-        validate_page_numbers [5,1,2,3,4,5,7,8,9,10,11,7], elements
-      end
-    end
-  end
-  
   def test_container_id
     paginate do |div|
       assert_nil div.first['id']
@@ -245,19 +225,6 @@ class ViewTest < WillPaginate::ViewTestCase
 
   ## internal hardcore stuff ##
 
-  class LegacyCollection < WillPaginate::Collection
-    alias :page_count :total_pages
-    undef :total_pages
-  end
-
-  def test_deprecation_notices_with_page_count
-    collection = LegacyCollection.new(1, 1, 2)
-
-    assert_deprecated collection.class.name do
-      paginate collection
-    end
-  end
-  
   uses_mocha 'view internals' do
     def test_collection_name_can_be_guessed
       collection = mock
