@@ -181,7 +181,7 @@ describe WillPaginate::Finders::ActiveRecord do
         result.current_page.should == 1
         result.total_pages.should == 1
         result.size.should == 4
-      }.should run_queries
+      }.should run_queries(1)
     end
     
     it "should get second (inexistent) page of Topics, requiring 2 queries" do
@@ -309,18 +309,122 @@ describe WillPaginate::Finders::ActiveRecord do
 
       it "should paginate through association extension" do
         project = Project.find(:first)
+        expected = [replies(:brave)]
 
         lambda {
           result = project.replies.paginate_recent :page => 1
-          result.should == [replies(:brave)]
+          result.should == expected
+        }.should run_queries(1)
+      end
+    end
+    
+    it "should paginate with joins" do
+      result = nil
+      join_sql = 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id'
+
+      lambda {
+        result = Developer.paginate :page => 1, :joins => join_sql, :conditions => 'project_id = 1'
+        result.size.should == 2
+        developer_names = result.map(&:name)
+        developer_names.should include('David')
+        developer_names.should include('Jamis')
+      }.should run_queries(1)
+
+      lambda {
+        expected = result.to_a
+        result = Developer.paginate :page => 1, :joins => join_sql,
+                             :conditions => 'project_id = 1', :count => { :select => "users.id" }
+        result.should == expected
+        result.total_entries.should == 2
+      }.should run_queries(1)
+    end
+
+    it "should paginate with group" do
+      result = nil
+      lambda {
+        result = Developer.paginate :page => 1, :per_page => 10,
+                                    :group => 'salary', :select => 'salary', :order => 'salary'
+      }.should run_queries(1)
+
+      expected = users(:david, :jamis, :dev_10, :poor_jamis).map(&:salary).sort
+      result.map(&:salary).should == expected
+    end
+
+    it "should paginate with dynamic finder" do
+      expected = replies(:witty_retort, :spam)
+      Reply.paginate_by_topic_id(1, :page => 1).should == expected
+
+      result = Developer.paginate :conditions => { :salary => 100000 }, :page => 1, :per_page => 5
+      result.total_entries.should == 8
+      Developer.paginate_by_salary(100000, :page => 1, :per_page => 5).should == result
+    end
+
+    it "should paginate with dynamic finder and conditions" do
+      result = Developer.paginate_by_salary(100000, :page => 1, :conditions => ['id > ?', 6])
+      result.total_entries.should == 4
+      result.map(&:id).should == (7..10).to_a
+    end
+
+    it "should raise error when dynamic finder is not recognized" do
+      lambda {
+        Developer.paginate_by_inexistent_attribute 100000, :page => 1
+      }.should raise_error(NoMethodError)
+    end
+
+    it "should paginate with_scope" do
+      result = Developer.with_poor_ones { Developer.paginate :page => 1 }
+      result.size.should == 2
+      result.total_entries.should == 2
+    end
+
+    describe "named_scope" do
+      it "should paginate" do
+        result = Developer.poor.paginate :page => 1, :per_page => 1
+        result.size.should == 1
+        result.total_entries.should == 2
+      end
+
+      it "should paginate on habtm association" do
+        project = projects(:active_record)
+        lambda {
+          result = project.developers.poor.paginate :page => 1, :per_page => 1
+          result.size.should == 1
+          result.total_entries.should == 1
+        }.should run_queries(2)
+      end
+
+      it "should paginate on hmt association" do
+        project = projects(:active_record)
+        expected = [replies(:brave)]
+
+        lambda {
+          result = project.replies.recent.paginate :page => 1, :per_page => 1
+          result.should == expected
+          result.total_entries.should == 1
+        }.should run_queries(2)
+      end
+
+      it "should paginate on has_many association" do
+        project = projects(:active_record)
+        expected = [topics(:ar)]
+
+        lambda {
+          result = project.topics.mentions_activerecord.paginate :page => 1, :per_page => 1
+          result.should == expected
+          result.total_entries.should == 1
         }.should run_queries(2)
       end
     end
+
+    it "should paginate with :readonly option" do
+      lambda { Developer.paginate :readonly => true, :page => 1 }.should_not raise_error
+    end
+    
   end
   
   protected
   
-    def run_queries(num = 1)
+    def run_queries(num)
       QueryCountMatcher.new(num)
     end
 
