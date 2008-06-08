@@ -1,6 +1,6 @@
 require 'rubygems'
 begin
-  hanna_dir = '/home/mislav/projects/hanna/lib'
+  hanna_dir = '/Users/mislav/Projects/Hanna/lib'
   $:.unshift hanna_dir if File.exists? hanna_dir
   require 'hanna/rdoctask'
 rescue LoadError
@@ -18,6 +18,7 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('README.rdoc', 'LICENSE', 'CHANGELOG').
     include('lib/**/*.rb').
     exclude('lib/will_paginate/named_scope*').
+    exclude('lib/will_paginate/deprecation.rb').
     exclude('lib/will_paginate/version.rb')
   
   rdoc.main = "README.rdoc" # page to start on
