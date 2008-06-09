@@ -340,6 +340,12 @@ class FinderTest < ActiveRecordTestCase
       Developer.paginate :select => 'DISTINCT salary', :page => 2
     end
 
+    def test_count_with_scoped_select_when_distinct
+      Developer.stubs(:find).returns([])
+      Developer.expects(:count).with(:select => 'DISTINCT users.id').returns(0)
+      Developer.distinct.paginate :page => 2
+    end
+
     def test_should_use_scoped_finders_if_present
       # scope-out compatibility
       Topic.expects(:find_best).returns(Array.new(5))

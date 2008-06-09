@@ -181,7 +181,19 @@ module WillPaginate
       # in the database. It relies on the ActiveRecord +count+ method.
       def wp_count(options, args, finder)
         excludees = [:count, :order, :limit, :offset, :readonly]
-        unless options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
+
+        # we may be in a model or an association proxy
+        klass = (@owner and @reflection) ? @reflection.klass : self
+
+        # Use :select from scope if it isn't already present.
+        options[:select] = scope(:find, :select) unless options[:select]
+
+        if options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
+          # Remove quoting and check for table_name.*-like statement.
+          if options[:select].gsub('`', '') =~ /\w+\.\*/
+            options[:select] = "DISTINCT #{klass.table_name}.#{klass.primary_key}"
+          end
+        else
           excludees << :select # only exclude the select param if it doesn't begin with DISTINCT
         end
 
@@ -191,10 +203,7 @@ module WillPaginate
         # merge the hash found in :count
         # this allows you to specify :select, :order, or anything else just for the count query
         count_options.update options[:count] if options[:count]
-        
-        # we may be in a model or an association proxy
-        klass = (@owner and @reflection) ? @reflection.klass : self
-        
+
         # forget about includes if they are irrelevant (Rails 2.1)
         if count_options[:include] and
             klass.private_methods.include?('references_eager_loaded_tables?') and
