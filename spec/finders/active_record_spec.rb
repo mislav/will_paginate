@@ -6,6 +6,8 @@ class ArProject < ActiveRecord::Base
   def self.column_names
     ["id"]
   end
+  
+  named_scope :distinct, :select => "DISTINCT #{table_name}.*"
 end
 
 ActiverecordTestConnector.setup
@@ -72,6 +74,12 @@ describe WillPaginate::Finders::ActiveRecord do
     ArProject.stubs(:find).returns([])
     ArProject.expects(:count).with(:select => 'DISTINCT salary').returns(0)
     ArProject.paginate :select => 'DISTINCT salary', :page => 2
+  end
+  
+  it "should count with scoped select when :select => DISTINCT" do
+    ArProject.stubs(:find).returns([])
+    ArProject.expects(:count).with(:select => 'DISTINCT ar_projects.id').returns(0)
+    ArProject.distinct.paginate :page => 2
   end
 
   it "should use :with_foo for scope-out compatibility" do

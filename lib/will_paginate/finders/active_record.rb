@@ -148,10 +148,18 @@ module WillPaginate::Finders
     def wp_parse_count_options(options, klass)
       excludees = [:count, :order, :limit, :offset, :readonly]
       
-      unless options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
-        # only exclude the select param if it doesn't begin with DISTINCT
+      # Use :select from scope if it isn't already present.
+      options[:select] = scope(:find, :select) unless options[:select]
+      
+      if options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
+        # Remove quoting and check for table_name.*-like statement.
+        if options[:select].gsub('`', '') =~ /\w+\.\*/
+          options[:select] = "DISTINCT #{klass.table_name}.#{klass.primary_key}"
+        end
+      else
         excludees << :select
       end
+      
       # count expects (almost) the same options as find
       count_options = options.except *excludees
 
