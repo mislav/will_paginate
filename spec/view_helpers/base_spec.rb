@@ -43,13 +43,13 @@ describe WillPaginate::ViewHelpers::Base do
     end
 
     it "should display shortened end results" do
-      info(:page => 7, :per_page => 4).should include_words('strings 25 - 26')
+      info(:page => 7, :per_page => 4).should include_phrase('strings 25 - 26')
     end
 
     it "should handle longer class names" do
       collection = @array.paginate(:page => 2, :per_page => 5)
       collection.first.stubs(:class).returns(mock('Class', :name => 'ProjectType'))
-      info(collection).should include_words('project types')
+      info(collection).should include_phrase('project types')
     end
 
     it "should adjust output for single-page collections" do

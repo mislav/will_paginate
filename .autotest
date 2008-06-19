@@ -1,4 +1,5 @@
 Autotest.add_hook :initialize do |at|
+  
   at.libs = 'lib:spec'
   
   at.clear_mappings

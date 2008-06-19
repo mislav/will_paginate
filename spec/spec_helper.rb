@@ -4,8 +4,8 @@ require 'spec'
 
 module MyExtras
   protected
-  def include_words(string)
-    WordsInclusionMatcher.new(string)
+  def include_phrase(string)
+    PhraseMatcher.new(string)
   end
 
   def collection(params = {})
@@ -25,7 +25,7 @@ Spec::Runner.configure do |config|
   config.mock_with :mocha
 end
 
-class WordsInclusionMatcher
+class PhraseMatcher
   def initialize(string)
     @string = string
     @pattern = /\b#{string}\b/
@@ -37,10 +37,10 @@ class WordsInclusionMatcher
   end
 
   def failure_message
-    "expected #{@actual.inspect} to contain words #{@string.inspect}"
+    "expected #{@actual.inspect} to contain phrase #{@string.inspect}"
   end
 
   def negative_failure_message
-    "expected #{@actual.inspect} not to contain words #{@string.inspect}"
+    "expected #{@actual.inspect} not to contain phrase #{@string.inspect}"
   end
 end
