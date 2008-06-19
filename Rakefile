@@ -48,11 +48,11 @@ task :manifest do
     spec = File.read spec_file
     spec.gsub! /^(\s* s.(test_)?files \s* = \s* )( \[ [^\]]* \] | %w\( [^)]* \) )/mx do
       assignment = $1
-      bunch = $2 ? list.grep(/^test\//) : list
+      bunch = $2 ? list.grep(/^(test|spec)\//) : list
       '%s%%w(%s)' % [assignment, bunch.join(' ')]
     end
       
-    File.open(spec_file,   'w') {|f| f << spec }
+    File.open(spec_file, 'w') {|f| f << spec }
   end
   File.open('.manifest', 'w') {|f| f << list.join("\n") }
 end
