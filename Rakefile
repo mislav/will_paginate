@@ -1,6 +1,6 @@
 require 'rubygems'
 begin
-  hanna_dir = '/home/mislav/projects/hanna/lib'
+  hanna_dir = '/Users/mislav/Projects/Hanna/lib'
   $:.unshift hanna_dir if File.exists? hanna_dir
   require 'hanna/rdoctask'
 rescue LoadError
