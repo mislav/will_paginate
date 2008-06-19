@@ -91,34 +91,5 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
     def prepare(collection_options, options = {})
       @renderer.prepare(collection(collection_options), options)
     end
-    
-    def have_deprecation
-      DeprecationMatcher.new
-    end
   
-end
-
-class DeprecationMatcher
-  def initialize
-    @old_behavior = WillPaginate::Deprecation.behavior
-    @messages = []
-    WillPaginate::Deprecation.behavior = lambda { |message, callstack|
-      @messages << message
-    }
-  end
-
-  def matches?(block)
-    block.call
-    !@messages.empty?
-  ensure
-    WillPaginate::Deprecation.behavior = @old_behavior
-  end
-
-  def failure_message
-    "expected block to raise a deprecation warning"
-  end
-
-  def negative_failure_message
-    "expected block not to raise deprecation warnings, #{@messages.size} raised"
-  end
 end
