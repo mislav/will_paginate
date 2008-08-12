@@ -32,18 +32,21 @@ task :test_databases => %w(test_mysql test_sqlite3 test_postgres)
 desc %{Test everything on SQLite3, MySQL and PostgreSQL}
 task :test_full => %w(test test_mysql test_postgres)
 
-desc %{Test everything with Rails 1.2.x and 2.0.x gems}
+desc %{Test everything with Rails 2.1.x, 2.0.x & 1.2.x gems}
 task :test_all do
   all = Rake::Task['test_full']
-  ENV['RAILS_VERSION'] = '~>1.2.6'
-  all.invoke 
-  # reset the invoked flag
+  versions = %w(2.1.0 2.0.2 1.2.6)
+  versions.each do |version|
+    ENV['RAILS_VERSION'] = "~> #{version}"
+    all.invoke
+    reset_invoked unless version == versions.last
+  end
+end
+
+def reset_invoked
   %w( test_full test test_mysql test_postgres ).each do |name|
     Rake::Task[name].instance_variable_set '@already_invoked', false
   end
-  # do it again
-  ENV['RAILS_VERSION'] = '~>2.0.2'
-  all.invoke 
 end
 
 task :rcov do

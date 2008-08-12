@@ -9,8 +9,8 @@ sqlite2:
 
 mysql:
   adapter: mysql
-  username: rails
-  password: mislav
+  username: root
+  password: 
   encoding: utf8
   database: will_paginate_unittest
 
