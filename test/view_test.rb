@@ -36,7 +36,7 @@ class ViewTest < WillPaginate::ViewTestCase
 
   def test_will_paginate_with_options
     paginate({ :page => 2 },
-             :class => 'will_paginate', :prev_label => 'Prev', :next_label => 'Next') do
+             :class => 'will_paginate', :previous_label => 'Prev', :next_label => 'Next') do
       assert_select 'a[href]', 4 do |elements|
         validate_page_numbers [1,1,3,3], elements
         # test rel attribute values:
@@ -78,6 +78,14 @@ class ViewTest < WillPaginate::ViewTestCase
     paginate do |pagination|
       assert_select 'span.disabled.prev_page:first-child'
       assert_select 'a.next_page[href]:last-child'
+    end
+  end
+  
+  def test_prev_label_deprecated
+    assert_deprecated ':previous_label' do
+      paginate({ :page => 2 }, :prev_label => 'Deprecated') do
+        assert_select 'a[href]:first-child', 'Deprecated'
+      end
     end
   end
 

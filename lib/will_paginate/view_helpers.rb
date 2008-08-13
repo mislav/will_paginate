@@ -14,24 +14,24 @@ module WillPaginate
   # WillPaginate::ViewHelpers.pagination_options hash. You can write to this hash to
   # override default options on the global level:
   #
-  #   WillPaginate::ViewHelpers.pagination_options[:prev_label] = 'Previous page'
+  #   WillPaginate::ViewHelpers.pagination_options[:previous_label] = 'Previous page'
   #
   # By putting this into your environment.rb you can easily translate link texts to previous
   # and next pages, as well as override some other defaults to your liking.
   module ViewHelpers
     # default options that can be overridden on the global level
     @@pagination_options = {
-      :class        => 'pagination',
-      :prev_label   => '&laquo; Previous',
-      :next_label   => 'Next &raquo;',
-      :inner_window => 4, # links around the current page
-      :outer_window => 1, # links around beginning and end
-      :separator    => ' ', # single space is friendly to spiders and non-graphic browsers
-      :param_name   => :page,
-      :params       => nil,
-      :renderer     => 'WillPaginate::LinkRenderer',
-      :page_links   => true,
-      :container    => true
+      :class          => 'pagination',
+      :previous_label => '&laquo; Previous',
+      :next_label     => 'Next &raquo;',
+      :inner_window   => 4, # links around the current page
+      :outer_window   => 1, # links around beginning and end
+      :separator      => ' ', # single space is friendly to spiders and non-graphic browsers
+      :param_name     => :page,
+      :params         => nil,
+      :renderer       => 'WillPaginate::LinkRenderer',
+      :page_links     => true,
+      :container      => true
     }
     mattr_reader :pagination_options
 
@@ -41,7 +41,7 @@ module WillPaginate
     # 
     # ==== Options
     # * <tt>:class</tt> -- CSS class name for the generated DIV (default: "pagination")
-    # * <tt>:prev_label</tt> -- default: "« Previous"
+    # * <tt>:previous_label</tt> -- default: "« Previous"
     # * <tt>:next_label</tt> -- default: "Next »"
     # * <tt>:inner_window</tt> -- how many links are shown around the current page (default: 4)
     # * <tt>:outer_window</tt> -- how many links are around the first and the last page (default: 1)
@@ -92,6 +92,10 @@ module WillPaginate
       return nil unless WillPaginate::ViewHelpers.total_pages_for_collection(collection) > 1
       
       options = options.symbolize_keys.reverse_merge WillPaginate::ViewHelpers.pagination_options
+      if options[:prev_label]
+        WillPaginate::Deprecation::warn(":prev_label view parameter is now :previous_label; the old name has been deprecated.")
+        options[:previous_label] = options.delete(:prev_label)
+      end
       
       # get the renderer instance
       renderer = case options[:renderer]
@@ -214,7 +218,7 @@ module WillPaginate
     def to_html
       links = @options[:page_links] ? windowed_links : []
       # previous/next buttons
-      links.unshift page_link_or_span(@collection.previous_page, 'disabled prev_page', @options[:prev_label])
+      links.unshift page_link_or_span(@collection.previous_page, 'disabled prev_page', @options[:previous_label])
       links.push    page_link_or_span(@collection.next_page,     'disabled next_page', @options[:next_label])
       
       html = links.join(@options[:separator])
