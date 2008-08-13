@@ -33,12 +33,12 @@ module WillPaginate
   # 
   # If you are writing a library that provides a collection which you would like
   # to conform to this API, you don't have to copy these methods over; simply
-  # make your plugin/gem dependant on the "will_paginate" gem:
+  # make your plugin/gem dependant on the "mislav-will_paginate" gem:
   #
-  #   gem 'will_paginate'
+  #   gem 'mislav-will_paginate'
   #   require 'will_paginate/collection'
   #   
-  #   # now use WillPaginate::Collection directly or subclass it
+  #   # WillPaginate::Collection is now available for use
   class Collection < Array
     attr_reader :current_page, :per_page, :total_entries, :total_pages
 
@@ -98,7 +98,7 @@ module WillPaginate
     # Current offset of the paginated collection. If we're on the first page,
     # it is always 0. If we're on the 2nd page and there are 30 entries per page,
     # the offset is 30. This property is useful if you want to render ordinals
-    # besides your records: simply start with offset + 1.
+    # side by side with records in the view: simply start with offset + 1.
     def offset
       (current_page - 1) * per_page
     end
@@ -112,7 +112,8 @@ module WillPaginate
     def next_page
       current_page < total_pages ? (current_page + 1) : nil
     end
-
+    
+    # sets the <tt>total_entries</tt> property and calculates <tt>total_pages</tt>
     def total_entries=(number)
       @total_entries = number.to_i
       @total_pages   = (@total_entries / per_page.to_f).ceil

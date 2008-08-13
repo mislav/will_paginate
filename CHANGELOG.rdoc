@@ -1,5 +1,7 @@
 == master
 
+* Rename :prev_label to :previous_label for consistency. Old name still
+  functions, but it's deprecated
 * ActiveRecord 2.1: remove :include from count query when tables are not
   referenced in :conditions
 

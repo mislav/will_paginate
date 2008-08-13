@@ -11,32 +11,11 @@ can.
 
 Some resources to get you started:
 
+* {Installation instructions}[http://github.com/mislav/will_paginate/wikis/installation]
+  on {the wiki}[http://github.com/mislav/will_paginate/wikis]
 * Your mind reels with questions? Join our
   {Google group}[http://groups.google.com/group/will_paginate].
-* The will_paginate project page: http://github.com/mislav/will_paginate
-* How to report bugs: http://github.com/mislav/will_paginate/wikis/report-bugs
-* Ryan Bates made an awesome screencast[http://railscasts.com/episodes/51],
-  check it out.
-
-== Installation
-
-The recommended way is that you get the gem:
-
-  gem install mislav-will_paginate --source http://gems.github.com/
-
-After that you don't need the will_paginate <i>plugin</i> in your Rails
-application anymore. Just add a simple require to the end of
-"config/environment.rb":
-
-  gem 'mislav-will_paginate', '~> 2.2'
-  require 'will_paginate'
-
-That's it. Remember to install the gem on <b>all</b> machines that you are
-deploying to.
-
-<i>There are extensive
-{installation instructions}[http://github.com/mislav/will_paginate/wikis/installation]
-on {the wiki}[http://github.com/mislav/will_paginate/wikis].</i>
+* {How to report bugs}[http://github.com/mislav/will_paginate/wikis/report-bugs]
 
 
 == Example usage
@@ -54,8 +33,7 @@ pagination, just stick this in:
 
   <%= will_paginate @posts %>
 
-You're done. (Copy and paste the example fancy CSS styles from the bottom.) You
-can find the option list at WillPaginate::ViewHelpers.
+You're done. (You can find the option list at WillPaginate::ViewHelpers.)
 
 How does it know how much items to fetch per page? It asks your model by calling
 its <tt>per_page</tt> class method. You can define it like this:
@@ -115,16 +93,13 @@ Lourens Naudé, Rick Olson, Russell Norris, Piotr Usewicz, Chris Eppstein.
 == Usable pagination in the UI
 
 There are some CSS styles to get you started in the "examples/" directory. They
-are showcased in the <b>"examples/index.html"</b> file.
+are {showcased online here}[http://mislav.caboo.se/static/will_paginate/].
 
 More reading about pagination as design pattern:
 
-* Pagination 101:
-  http://kurafire.net/log/archive/2007/06/22/pagination-101
-* Pagination gallery:
-  http://www.smashingmagazine.com/2007/11/16/pagination-gallery-examples-and-good-practices/
-* Pagination on Yahoo Design Pattern Library:
-  http://developer.yahoo.com/ypatterns/parent.php?pattern=pagination
+* {Pagination 101}[http://kurafire.net/log/archive/2007/06/22/pagination-101]
+* {Pagination gallery}[http://www.smashingmagazine.com/2007/11/16/pagination-gallery-examples-and-good-practices/]
+* {Pagination on Yahoo Design Pattern Library}[http://developer.yahoo.com/ypatterns/parent.php?pattern=pagination]
 
 Want to discuss, request features, ask questions? Join the
 {Google group}[http://groups.google.com/group/will_paginate].
