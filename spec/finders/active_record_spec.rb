@@ -3,6 +3,9 @@ require 'will_paginate/finders/active_record'
 require File.dirname(__FILE__) + '/activerecord_test_connector'
 
 class ArProject < ActiveRecord::Base
+  def self.column_names
+    ["id"]
+  end
 end
 
 ActiverecordTestConnector.setup
