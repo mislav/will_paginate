@@ -186,8 +186,6 @@ returning([ a::AssociationCollection ]) { |classes|
     classes << a::HasManyThroughAssociation
   end
 }.each do |klass|
-  klass.class_eval do
-    include WillPaginate::Finders::ActiveRecord
-    alias_method_chain :method_missing, :paginate
-  end
+  klass.send :include, WillPaginate::Finders::ActiveRecord
+  klass.class_eval { alias_method_chain :method_missing, :paginate }
 end

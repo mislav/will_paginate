@@ -8,7 +8,6 @@ require 'will_paginate/deprecation'
 #
 # Happy paginating!
 module WillPaginate
-  # no-op
   def self.enable
     Deprecation.warn "WillPaginate::enable() doesn't do anything anymore"
   end
@@ -26,9 +25,7 @@ module WillPaginate
     require 'will_paginate/named_scope'
     require 'will_paginate/named_scope_patch' if patch
 
-    ActiveRecord::Base.class_eval do
-      include WillPaginate::NamedScope
-    end
+    ActiveRecord::Base.send :include, WillPaginate::NamedScope
   end
 end
 

@@ -52,7 +52,7 @@ module WillPaginate
   end
 end
 
-ActionView::Base.class_eval { include WillPaginate::ViewHelpers::ActionView }
+ActionView::Base.send :include, WillPaginate::ViewHelpers::ActionView
 
 if defined?(ActionController::Base) and ActionController::Base.respond_to? :rescue_responses
   ActionController::Base.rescue_responses['WillPaginate::InvalidPage'] = :not_found
