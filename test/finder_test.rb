@@ -397,6 +397,15 @@ class FinderTest < ActiveRecordTestCase
       Developer.paginate(options)
       assert_equal options, options_before
     end
+    
+    def test_paginate_by_sql_doesnt_change_original_query
+      query = 'SQL QUERY'
+      original_query = query.dup
+      Developer.expects(:find_by_sql).returns([])
+      
+      Developer.paginate_by_sql query, :page => 1
+      assert_equal original_query, query
+    end
 
     def test_paginated_each
       collection = stub('collection', :size => 5, :empty? => false, :per_page => 5)
