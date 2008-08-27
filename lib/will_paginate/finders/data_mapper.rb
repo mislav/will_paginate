@@ -1,5 +1,5 @@
 require 'will_paginate/finders/base'
-require 'data_mapper'
+require 'dm-core'
 
 module WillPaginate::Finders
   module DataMapper
@@ -13,16 +13,12 @@ module WillPaginate::Finders
       pager.replace all(find_options, &block)
       
       unless pager.total_entries
-        pager.total_entries = wp_count(options) 
+        pager.total_entries = wp_count(options)
       end
     end
 
-    # Does the not-so-trivial job of finding out the total number of entries
-    # in the database. It relies on the ActiveRecord +count+ method.
-    def wp_count(options, args, finder)
-      excludees = [:count, :order, :limit, :offset, :readonly]
-      count_options = options.except *excludees
-
+    def wp_count(options)
+      count_options = options.except(:count, :order)
       # merge the hash found in :count
       count_options.update options[:count] if options[:count]
 
@@ -31,6 +27,4 @@ module WillPaginate::Finders
   end
 end
 
-DataMapper::Base.class_eval do
-  include WillPaginate::Finders::DataMapper
-end
+DataMapper::Model.send(:include, WillPaginate::Finders::DataMapper)
