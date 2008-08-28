@@ -42,7 +42,7 @@ module WillPaginate
     # 
     # ==== Options
     # Display options:
-    # * <tt>:previous_label</tt> -- default: "« Previous"
+    # * <tt>:previous_label</tt> -- default: "« Previous" (this parameter is called <tt>:prev_label</tt> in versions <b>2.3.2</b> and older!)
     # * <tt>:next_label</tt> -- default: "Next »"
     # * <tt>:page_links</tt> -- when false, only previous/next links are rendered (default: true)
     # * <tt>:inner_window</tt> -- how many links are shown around the current page (default: 4)
