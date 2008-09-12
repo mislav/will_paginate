@@ -396,12 +396,11 @@ class FinderTest < ActiveRecordTestCase
 
     def test_paginating_finder_doesnt_mangle_options
       Developer.expects(:find).returns([])
-      options = { :page => 1 }
-      options.expects(:delete).never
+      options = { :page => 1, :per_page => 2, :foo => 'bar' }
       options_before = options.dup
       
       Developer.paginate(options)
-      assert_equal options, options_before
+      assert_equal options_before, options
     end
     
     def test_paginate_by_sql_doesnt_change_original_query
