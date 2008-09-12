@@ -13,6 +13,13 @@
 * created WP::Finders::Base abstract module that implements generic pagination logic
 * removed dependency to ActiveSupport
 
+=== TODO:
+
+* f54bc3 Ensure that paginate_by_sql doesn't change the original SQL query. Closes #235
+* 9a9372 rename :prev_label to :previous_label for consistency. old name still functions but is deprecated
+* 3c4725 Oops, I used return in an iterator block. I obviously write too much JavaScript
+* 537f22 ensure that 'href' values in pagination links are escaped URLs
+
 == 2.3.1, released 2008-05-04
 
 * Fixed page numbers not showing with custom routes and implicit first page
