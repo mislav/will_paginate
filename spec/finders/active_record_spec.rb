@@ -103,6 +103,15 @@ describe WillPaginate::Finders::ActiveRecord do
     
       ArProject.paginate_by_sql "sql\n ORDER\nby foo, bar, `baz` ASC", :page => 2
     end
+    
+    it "shouldn't change the original query string" do
+      query = 'SQL QUERY'
+      original_query = query.dup
+      ArProject.expects(:find_by_sql).returns([])
+      
+      ArProject.paginate_by_sql(query, :page => 1)
+      query.should == original_query
+    end
   end
 
   # TODO: counts would still be wrong!
