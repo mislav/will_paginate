@@ -87,7 +87,8 @@ contributions or just simply awesome ideas:
 Chris Wanstrath, Dr. Nic Williams, K. Adam Christensen, Mike Garey, Bence
 Golda, Matt Aimonetti, Charles Brian Quinn, Desi McAdam, James Coglan, Matijs
 van Zuijlen, Maria, Brendan Ribera, Todd Willey, Bryan Helmkamp, Jan Berkel,
-Lourens Naudé, Rick Olson, Russell Norris, Piotr Usewicz, Chris Eppstein.
+Lourens Naudé, Rick Olson, Russell Norris, Piotr Usewicz, Chris Eppstein,
+Denis Barushev, Ben Pickles.
 
 
 == Usable pagination in the UI

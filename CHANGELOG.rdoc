@@ -1,3 +1,9 @@
+== 2.3.4, released 2008-09-16
+
+* Removed gem dependency to Active Support (causes trouble with vendored rails).
+* Rails 2.1: fix a failing test and a deprecation warning.
+* Cope with scoped :select when counting.
+
 == 2.3.3, released 2008-08-29
 
 * Ensure that paginate_by_sql doesn't change the original SQL query.
