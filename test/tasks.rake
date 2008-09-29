@@ -35,7 +35,7 @@ task :test_full => %w(test test_mysql test_postgres)
 desc %{Test everything with Rails 2.1.x, 2.0.x & 1.2.x gems}
 task :test_all do
   all = Rake::Task['test_full']
-  versions = %w(2.1.0 2.0.2 1.2.6)
+  versions = %w(2.1.0 2.0.4 1.2.6)
   versions.each do |version|
     ENV['RAILS_VERSION'] = "~> #{version}"
     all.invoke
