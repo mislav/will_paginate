@@ -1,27 +1,22 @@
-## stolen from: http://dev.rubyonrails.org/browser/trunk/activerecord/lib/active_record/named_scope.rb?rev=9084
-
 module WillPaginate
   # This is a feature backported from Rails 2.1 because of its usefullness not only with will_paginate,
   # but in other aspects when managing complex conditions that you want to be reusable.
   module NamedScope
     # All subclasses of ActiveRecord::Base have two named_scopes:
     # * <tt>all</tt>, which is similar to a <tt>find(:all)</tt> query, and
-    # * <tt>scoped</tt>, which allows for the creation of anonymous scopes, on the fly:
-    #
-    #   Shirt.scoped(:conditions => {:color => 'red'}).scoped(:include => :washing_instructions)
+    # * <tt>scoped</tt>, which allows for the creation of anonymous scopes, on the fly: <tt>Shirt.scoped(:conditions => {:color => 'red'}).scoped(:include => :washing_instructions)</tt>
     #
     # These anonymous scopes tend to be useful when procedurally generating complex queries, where passing
     # intermediate values (scopes) around as first-class objects is convenient.
     def self.included(base)
       base.class_eval do
         extend ClassMethods
-        named_scope :all
         named_scope :scoped, lambda { |scope| scope }
       end
     end
 
     module ClassMethods
-      def scopes #:nodoc:
+      def scopes
         read_inheritable_attribute(:scopes) || write_inheritable_attribute(:scopes, {})
       end
 
@@ -46,7 +41,7 @@ module WillPaginate
       # Nested finds and calculations also work with these compositions: <tt>Shirt.red.dry_clean_only.count</tt> returns the number of garments
       # for which these criteria obtain. Similarly with <tt>Shirt.red.dry_clean_only.average(:thread_count)</tt>.
       #
-      # All scopes are available as class methods on the ActiveRecord descendent upon which the scopes were defined. But they are also available to
+      # All scopes are available as class methods on the ActiveRecord::Base descendent upon which the scopes were defined. But they are also available to
       # <tt>has_many</tt> associations. If,
       #
       #   class Person < ActiveRecord::Base
@@ -76,7 +71,20 @@ module WillPaginate
       #     end
       #   end
       #
+      #
+      # For testing complex named scopes, you can examine the scoping options using the
+      # <tt>proxy_options</tt> method on the proxy itself.
+      #
+      #   class Shirt < ActiveRecord::Base
+      #     named_scope :colored, lambda { |color|
+      #       { :conditions => { :color => color } }
+      #     }
+      #   end
+      #
+      #   expected_options = { :conditions => { :colored => 'red' } }
+      #   assert_equal expected_options, Shirt.colored('red').proxy_options
       def named_scope(name, options = {}, &block)
+        name = name.to_sym
         scopes[name] = lambda do |parent_scope, *args|
           Scope.new(parent_scope, case options
             when Hash
@@ -93,9 +101,15 @@ module WillPaginate
       end
     end
     
-    class Scope #:nodoc:
+    class Scope
       attr_reader :proxy_scope, :proxy_options
-      [].methods.each { |m| delegate m, :to => :proxy_found unless m =~ /(^__|^nil\?|^send|class|extend|find|count|sum|average|maximum|minimum|paginate)/ }
+
+      [].methods.each do |m|
+        unless m =~ /(^__|^nil\?|^send|^object_id$|class|extend|^find$|count|sum|average|maximum|minimum|paginate|first|last|empty\?|respond_to\?)/
+          delegate m, :to => :proxy_found
+        end
+      end
+
       delegate :scopes, :with_scope, :to => :proxy_scope
 
       def initialize(proxy_scope, options, &block)
@@ -106,6 +120,30 @@ module WillPaginate
 
       def reload
         load_found; self
+      end
+
+      def first(*args)
+        if args.first.kind_of?(Integer) || (@found && !args.first.kind_of?(Hash))
+          proxy_found.first(*args)
+        else
+          find(:first, *args)
+        end
+      end
+
+      def last(*args)
+        if args.first.kind_of?(Integer) || (@found && !args.first.kind_of?(Hash))
+          proxy_found.last(*args)
+        else
+          find(:last, *args)
+        end
+      end
+
+      def empty?
+        @found ? @found.empty? : count.zero?
+      end
+
+      def respond_to?(method, include_private = false)
+        super || @proxy_scope.respond_to?(method, include_private)
       end
 
       protected
