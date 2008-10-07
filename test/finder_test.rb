@@ -261,6 +261,12 @@ class FinderTest < ActiveRecordTestCase
       assert_equal 1, entries.total_entries, 'only one topic should be found'
     end
   end
+  
+  def test_named_scope_with_include
+    project = projects(:active_record)
+    entries = project.topics.with_replies_starting_with('AR ').paginate(:page => 1, :per_page => 1)
+    assert_equal 1, entries.size
+  end
 
   ## misc ##
 
