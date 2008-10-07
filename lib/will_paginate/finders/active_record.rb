@@ -148,6 +148,11 @@ module WillPaginate::Finders
     def wp_parse_count_options(options, klass)
       excludees = [:count, :order, :limit, :offset, :readonly]
       
+      unless ::ActiveRecord::Calculations::CALCULATIONS_OPTIONS.include?(:from)
+        # :from parameter wasn't supported in count() before this change
+        excludees << :from
+      end
+      
       # Use :select from scope if it isn't already present.
       options[:select] = scope(:find, :select) unless options[:select]
       

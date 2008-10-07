@@ -162,6 +162,21 @@ describe WillPaginate::Finders::ActiveRecord do
     options.should == options_before
   end
   
+  if ::ActiveRecord::Calculations::CALCULATIONS_OPTIONS.include?(:from)
+    # for ActiveRecord 2.1 and newer
+    it "keeps the :from parameter in count" do
+      ArProject.expects(:find).returns([1])
+      ArProject.expects(:count).with {|options| options.key?(:from) }.returns(0)
+      ArProject.paginate(:page => 2, :per_page => 1, :from => 'projects')
+    end
+  else
+    it "excludes :from parameter from count" do
+      ArProject.expects(:find).returns([1])
+      ArProject.expects(:count).with {|options| !options.key?(:from) }.returns(0)
+      ArProject.paginate(:page => 2, :per_page => 1, :from => 'projects')
+    end
+  end
+  
   if ActiverecordTestConnector.able_to_connect
     fixtures :topics, :replies, :users, :projects, :developers_projects
     
