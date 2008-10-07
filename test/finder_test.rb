@@ -427,6 +427,12 @@ class FinderTest < ActiveRecordTestCase
       assert_equal 14, Developer.paginated_each(:page => '2') { }
     end
 
+    def test_paginated_each_with_named_scope
+      assert_equal 2, Developer.poor.paginated_each(:per_page => 1) {
+        assert_equal 11, Developer.count
+      }
+    end
+
     # detect ActiveRecord 2.1
     if ActiveRecord::Base.private_methods.include?('references_eager_loaded_tables?')
       def test_removes_irrelevant_includes_in_count

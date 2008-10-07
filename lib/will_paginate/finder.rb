@@ -104,7 +104,10 @@ module WillPaginate
         
         begin 
           collection = paginate(options)
-          total += collection.each(&block).size
+          with_exclusive_scope(:find => {}) do
+            # using exclusive scope so that the block is yielded in scope-free context
+            total += collection.each(&block).size
+          end
           options[:page] += 1
         end until collection.size < collection.per_page
         
