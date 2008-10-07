@@ -1,3 +1,9 @@
+== 2.3.5, released 2008-10-07
+
+* update the backported named_scope implementation for Rails versions older than 2.1
+* break out of scope of paginated_each() yielded block when used on named scopes
+* fix paginate(:from)
+
 == 2.3.4, released 2008-09-16
 
 * Removed gem dependency to Active Support (causes trouble with vendored rails).
