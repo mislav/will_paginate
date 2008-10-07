@@ -444,5 +444,10 @@ class FinderTest < ActiveRecordTestCase
           :include => :projects, :conditions => 'projects.id > 2'
       end
     end
+    
+    def test_paginate_from
+      result = Developer.paginate(:from => 'users', :page => 1, :per_page => 1)
+      assert_equal 1, result.size
+    end
   end
 end
