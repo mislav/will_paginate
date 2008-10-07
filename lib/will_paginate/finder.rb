@@ -184,6 +184,7 @@ module WillPaginate
       # in the database. It relies on the ActiveRecord +count+ method.
       def wp_count(options, args, finder)
         excludees = [:count, :order, :limit, :offset, :readonly]
+        excludees << :from unless ActiveRecord::Calculations::CALCULATIONS_OPTIONS.include?(:from)
 
         # we may be in a model or an association proxy
         klass = (@owner and @reflection) ? @reflection.klass : self

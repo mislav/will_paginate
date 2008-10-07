@@ -17,6 +17,6 @@ mysql:
 postgres:
   adapter: postgresql
   username: mislav
-  password: mislav
+  password: 
   database: will_paginate_unittest
   min_messages: warning
