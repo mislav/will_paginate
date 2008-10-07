@@ -461,5 +461,16 @@ class FinderTest < ActiveRecordTestCase
       result = Developer.paginate(:from => 'users', :page => 1, :per_page => 1)
       assert_equal 1, result.size
     end
+    
+    def test_hmt_with_include
+      # ticket #220
+      reply = projects(:active_record).replies.find(:first, :order => 'replies.id')
+      assert_equal replies(:decisive), reply
+      
+      # ticket #223
+      Project.find(1, :include => :replies)
+      
+      # I cannot reproduce any of the failures from those reports :(
+    end
   end
 end
