@@ -22,8 +22,8 @@ module WillPaginate
   # your models, but not through associations.
   def self.enable_named_scope(patch = true)
     return if defined? ActiveRecord::NamedScope
-    require 'will_paginate/named_scope'
-    require 'will_paginate/named_scope_patch' if patch
+    require 'will_paginate/finders/active_record/named_scope'
+    require 'will_paginate/finders/active_record/named_scope_patch' if patch
 
     ActiveRecord::Base.send :include, WillPaginate::NamedScope
   end

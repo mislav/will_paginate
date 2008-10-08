@@ -2,6 +2,9 @@ require 'spec_helper'
 require 'will_paginate/finders/active_record'
 require File.dirname(__FILE__) + '/activerecord_test_connector'
 
+require 'will_paginate'
+WillPaginate::enable_named_scope
+
 class ArProject < ActiveRecord::Base
   def self.column_names
     ["id"]
