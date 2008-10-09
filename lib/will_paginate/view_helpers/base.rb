@@ -95,8 +95,8 @@ module WillPaginate
       # By default, this method produces HTML output. You can trigger plain
       # text output by passing <tt>:html => false</tt> in options.
       def page_entries_info(collection, options = {})
-        entry_name  = options[:entry_name] || (collection.empty?? 'entry' :
-                      collection.first.class.name.underscore.gsub('_', ' '))
+        entry_name = options[:entry_name] || (collection.empty?? 'entry' :
+                     collection.first.class.name.underscore.gsub('_', ' '))
         
         plural_name = if options[:plural_name]
           options[:plural_name]

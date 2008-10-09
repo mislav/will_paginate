@@ -11,13 +11,15 @@ module WillPaginate
       
       def will_paginate(collection = nil, options = {})
         options, collection = collection, nil if collection.is_a? Hash
-        unless collection or !controller
-          collection_name = "@#{controller.controller_name}"
-          collection = instance_variable_get(collection_name)
-          raise ArgumentError, "The #{collection_name} variable appears to be empty. Did you " +
-            "forget to pass the collection object for will_paginate?" unless collection
-        end
+        collection ||= infer_collection_from_controller
 
+        super(collection, options.symbolize_keys)
+      end
+      
+      def page_entries_info(collection = nil, options = {})
+        options, collection = collection, nil if collection.is_a? Hash
+        collection ||= infer_collection_from_controller
+        
         super(collection, options.symbolize_keys)
       end
       
@@ -47,6 +49,16 @@ module WillPaginate
         pagination = will_paginate(*args).to_s
         content = pagination + capture(&block) + pagination
         concat content, block.binding
+      end
+      
+    protected
+
+      def infer_collection_from_controller
+        collection_name = "@#{controller.controller_name}"
+        collection = instance_variable_get(collection_name)
+        raise ArgumentError, "The #{collection_name} variable appears to be empty. Did you " +
+          "forget to pass the collection object for will_paginate?" if collection.nil?
+        collection
       end
     end
   end
