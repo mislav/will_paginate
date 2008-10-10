@@ -22,6 +22,12 @@ describe WillPaginate::ViewHelpers::ActionView do
     @template = '<%= will_paginate collection, options %>'
   end
   
+  def render(locals)
+    @view.render(:inline => @template, :locals => locals)
+  end
+  
+  ## basic pagination ##
+  
   it "should render" do
     paginate do |pagination|
       assert_select 'a[href]', 3 do |elements|
@@ -34,9 +40,81 @@ describe WillPaginate::ViewHelpers::ActionView do
       pagination.first.inner_text.should == '&laquo; Previous 1 2 3 Next &raquo;'
     end
   end
-  
-  def render(locals)
-    @view.render(:inline => @template, :locals => locals)
+
+  it "should render nothing when there is only 1 page" do
+    paginate(:per_page => 30).should be_empty
+  end
+
+  it "should paginate with options" do
+    paginate({ :page => 2 }, :class => 'will_paginate', :prev_label => 'Prev', :next_label => 'Next') do
+      assert_select 'a[href]', 4 do |elements|
+        validate_page_numbers [1,1,3,3], elements
+        # test rel attribute values:
+        assert_select elements[1], 'a', '1' do |link|
+          link.first['rel'].should == 'prev start'
+        end
+        assert_select elements.first, 'a', "Prev" do |link|
+          link.first['rel'].should == 'prev start'
+        end
+        assert_select elements.last, 'a', "Next" do |link|
+          link.first['rel'].should == 'next'
+        end
+      end
+      assert_select 'span.current', '2'
+    end
+  end
+
+  it "should paginate using a custom renderer class" do
+    paginate({}, :renderer => AdditionalLinkAttributesRenderer) do
+      assert_select 'a[default=true]', 3
+    end
+  end
+
+  it "should paginate using a custom renderer instance" do
+    renderer = WillPaginate::ViewHelpers::LinkRenderer.new
+    renderer.gap_marker = '<span class="my-gap">~~</span>'
+    
+    paginate({ :per_page => 2 }, :inner_window => 0, :outer_window => 0, :renderer => renderer) do
+      assert_select 'span.my-gap', '~~'
+    end
+    
+    renderer = AdditionalLinkAttributesRenderer.new(:title => 'rendered')
+    paginate({}, :renderer => renderer) do
+      assert_select 'a[title=rendered]', 3
+    end
+  end
+
+  it "should have classnames on previous/next links" do
+    paginate do |pagination|
+      assert_select 'span.disabled.prev_page:first-child'
+      assert_select 'a.next_page[href]:last-child'
+    end
+  end
+
+  it "should match expected markup" do
+    paginate
+    expected = <<-HTML
+      <div class="pagination"><span class="disabled prev_page">&laquo; Previous</span>
+      <span class="current">1</span>
+      <a href="/foo/bar?page=2" rel="next">2</a>
+      <a href="/foo/bar?page=3">3</a>
+      <a href="/foo/bar?page=2" class="next_page" rel="next">Next &raquo;</a></div>
+    HTML
+    expected.strip!.gsub!(/\s{2,}/, ' ')
+    expected_dom = HTML::Document.new(expected).root
+    
+    html_document.root.should == expected_dom
+  end
+end
+
+class AdditionalLinkAttributesRenderer < WillPaginate::ViewHelpers::LinkRenderer
+  def initialize(link_attributes = nil)
+    super()
+    @additional_link_attributes = link_attributes || { :default => 'true' }
+  end
+
+  def page_link(page, text, attributes = {})
+    @template.link_to text, url_for(page), attributes.merge(@additional_link_attributes)
   end
 end
 

@@ -25,11 +25,14 @@ class ViewExampleGroup < Spec::Example::ExampleGroup
     locals = { :collection => collection, :options => options }
 
     @render_output = render(locals)
+    @html_document = nil
     
     if block_given?
       classname = options[:class] || WillPaginate::ViewHelpers.pagination_options[:class]
       assert_select("div.#{classname}", 1, 'no main DIV', &block)
     end
+    
+    @render_output
   end
   
   def html_document

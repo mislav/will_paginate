@@ -1,87 +1,8 @@
 require 'helper'
 require 'lib/view_test_process'
 
-class AdditionalLinkAttributesRenderer < WillPaginate::ViewHelpers::LinkRenderer
-  def initialize(link_attributes = nil)
-    super()
-    @additional_link_attributes = link_attributes || { :default => 'true' }
-  end
-
-  def page_link(page, text, attributes = {})
-    @template.link_to text, url_for(page), attributes.merge(@additional_link_attributes)
-  end
-end
-
 class ViewTest < WillPaginate::ViewTestCase
   
-  ## basic pagination ##
-
-  def test_no_pagination_when_page_count_is_one
-    paginate :per_page => 30
-    assert_equal '', @html_result
-  end
-
-  def test_will_paginate_with_options
-    paginate({ :page => 2 },
-             :class => 'will_paginate', :prev_label => 'Prev', :next_label => 'Next') do
-      assert_select 'a[href]', 4 do |elements|
-        validate_page_numbers [1,1,3,3], elements
-        # test rel attribute values:
-        assert_select elements[1], 'a', '1' do |link|
-          assert_equal 'prev start', link.first['rel']
-        end
-        assert_select elements.first, 'a', "Prev" do |link|
-          assert_equal 'prev start', link.first['rel']
-        end
-        assert_select elements.last, 'a', "Next" do |link|
-          assert_equal 'next', link.first['rel']
-        end
-      end
-      assert_select 'span.current', '2'
-    end
-  end
-
-  def test_will_paginate_using_renderer_class
-    paginate({}, :renderer => AdditionalLinkAttributesRenderer) do
-      assert_select 'a[default=true]', 3
-    end
-  end
-
-  def test_will_paginate_using_renderer_instance
-    renderer = WillPaginate::ViewHelpers::LinkRenderer.new
-    renderer.gap_marker = '<span class="my-gap">~~</span>'
-    
-    paginate({ :per_page => 2 }, :inner_window => 0, :outer_window => 0, :renderer => renderer) do
-      assert_select 'span.my-gap', '~~'
-    end
-    
-    renderer = AdditionalLinkAttributesRenderer.new(:title => 'rendered')
-    paginate({}, :renderer => renderer) do
-      assert_select 'a[title=rendered]', 3
-    end
-  end
-
-  def test_prev_next_links_have_classnames
-    paginate do |pagination|
-      assert_select 'span.disabled.prev_page:first-child'
-      assert_select 'a.next_page[href]:last-child'
-    end
-  end
-
-  def test_full_output
-    paginate
-    expected = <<-HTML
-      <div class="pagination"><span class="disabled prev_page">&laquo; Previous</span>
-      <span class="current">1</span>
-      <a href="/foo/bar?page=2" rel="next">2</a>
-      <a href="/foo/bar?page=3">3</a>
-      <a href="/foo/bar?page=2" class="next_page" rel="next">Next &raquo;</a></div>
-    HTML
-    expected.strip!.gsub!(/\s{2,}/, ' ')
-    
-    assert_dom_equal expected, @html_result
-  end
-
   ## advanced options for pagination ##
 
   def test_will_paginate_without_container
