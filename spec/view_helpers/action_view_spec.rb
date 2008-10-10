@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'action_controller'
-require 'action_controller/assertions/selector_assertions'
+require 'view_helpers/view_example_group'
 require 'will_paginate/view_helpers/action_view'
 require 'will_paginate/collection'
 
@@ -22,8 +22,6 @@ describe WillPaginate::ViewHelpers::ActionView do
     @template = '<%= will_paginate collection, options %>'
   end
   
-  include ActionController::Assertions::SelectorAssertions
-  
   it "should render" do
     paginate do |pagination|
       assert_select 'a[href]', 3 do |elements|
@@ -37,67 +35,8 @@ describe WillPaginate::ViewHelpers::ActionView do
     end
   end
   
-  def assert(value, message)
-    raise message unless value
-  end
-  
-  def paginate(collection = {}, options = {}, &block)
-    if collection.instance_of? Hash
-      page_options = { :page => 1, :total_entries => 11, :per_page => 4 }.merge(collection)
-      collection = [1].paginate(page_options)
-    end
-
-    locals = { :collection => collection, :options => options }
-
-    @render_output = @view.render(:inline => @template, :locals => locals)
-    
-    if block_given?
-      classname = options[:class] || WillPaginate::ViewHelpers.pagination_options[:class]
-      assert_select("div.#{classname}", 1, 'no main DIV', &block)
-    end
-  end
-  
-  def html_document
-    @html_document ||= HTML::Document.new(@render_output, true, false)
-  end
-  
-  def response_from_page_or_rjs
-    html_document.root
-  end
-  
-  def validate_page_numbers(expected, links, param_name = :page)
-    param_pattern = /\W#{CGI.escape(param_name.to_s)}=([^&]*)/
-    
-    links.map { |e|
-      e['href'] =~ param_pattern
-      $1 ? $1.to_i : $1
-    }.should == expected
-  end
-
-  def assert_links_match(pattern, links = nil, numbers = nil)
-    links ||= assert_select 'div.pagination a[href]' do |elements|
-      elements
-    end
-
-    pages = [] if numbers
-    
-    links.each do |el|
-      el['href'].should =~ pattern
-      if numbers
-        el['href'] =~ pattern
-        pages << ($1.nil?? nil : $1.to_i)
-      end
-    end
-
-    pages.should == numbers if numbers
-  end
-
-  def assert_no_links_match(pattern)
-    assert_select 'div.pagination a[href]' do |elements|
-      elements.each do |el|
-        el['href'] !~ pattern
-      end
-    end
+  def render(locals)
+    @view.render(:inline => @template, :locals => locals)
   end
 end
 
@@ -143,25 +82,5 @@ class DummyRequest
   def params(more = nil)
     @params.update(more) if more
     @params
-  end
-end
-
-module HTML
-  Node.class_eval do
-    def inner_text
-      children.map(&:inner_text).join('')
-    end
-  end
-  
-  Text.class_eval do
-    def inner_text
-      self.to_s
-    end
-  end
-
-  Tag.class_eval do
-    def inner_text
-      childless?? '' : super
-    end
   end
 end
