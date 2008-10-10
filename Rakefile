@@ -7,11 +7,10 @@ rescue LoadError
   require 'rake'
   require 'rake/rdoctask'
 end
-load 'test/tasks.rake'
 load 'spec/tasks.rake'
 
-desc 'Default: run unit tests.'
-task :default => :test
+desc 'Default: run specs.'
+task :default => :spec
 
 desc 'Generate RDoc documentation for the will_paginate plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
