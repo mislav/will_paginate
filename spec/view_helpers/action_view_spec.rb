@@ -105,6 +105,52 @@ describe WillPaginate::ViewHelpers::ActionView do
     
     html_document.root.should == expected_dom
   end
+  
+  ## advanced options for pagination ##
+
+  it "should be able to render without container" do
+    paginate({}, :container => false)
+    assert_select 'div.pagination', 0, 'main DIV present when it shouldn\'t'
+    assert_select 'a[href]', 3
+  end
+
+  it "should be able to render without page links" do
+    paginate({ :page => 2 }, :page_links => false) do
+      assert_select 'a[href]', 2 do |elements|
+        validate_page_numbers [1,3], elements
+      end
+    end
+  end
+
+  it "should have magic HTML ID for the container" do
+    paginate do |div|
+      div.first['id'].should be_nil
+    end
+    
+    # magic ID
+    paginate({}, :id => true) do |div|
+      div.first['id'].should == 'fixnums_pagination'
+    end
+    
+    # explicit ID
+    paginate({}, :id => 'custom_id') do |div|
+      div.first['id'].should == 'custom_id'
+    end
+  end
+
+  ## other helpers ##
+  
+  it "should render a paginated section" do
+    @template = <<-ERB
+      <% paginated_section collection, options do %>
+        <%= content_tag :div, '', :id => "developers" %>
+      <% end %>
+    ERB
+    
+    paginate
+    assert_select 'div.pagination', 2
+    assert_select 'div.pagination + div#developers', 1
+  end
 end
 
 class AdditionalLinkAttributesRenderer < WillPaginate::ViewHelpers::LinkRenderer

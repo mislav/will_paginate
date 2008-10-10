@@ -3,52 +3,6 @@ require 'lib/view_test_process'
 
 class ViewTest < WillPaginate::ViewTestCase
   
-  ## advanced options for pagination ##
-
-  def test_will_paginate_without_container
-    paginate({}, :container => false)
-    assert_select 'div.pagination', 0, 'main DIV present when it shouldn\'t'
-    assert_select 'a[href]', 3
-  end
-
-  def test_will_paginate_without_page_links
-    paginate({ :page => 2 }, :page_links => false) do
-      assert_select 'a[href]', 2 do |elements|
-        validate_page_numbers [1,3], elements
-      end
-    end
-  end
-
-  def test_container_id
-    paginate do |div|
-      assert_nil div.first['id']
-    end
-    
-    # magic ID
-    paginate({}, :id => true) do |div|
-      assert_equal 'fixnums_pagination', div.first['id']
-    end
-    
-    # explicit ID
-    paginate({}, :id => 'custom_id') do |div|
-      assert_equal 'custom_id', div.first['id']
-    end
-  end
-
-  ## other helpers ##
-  
-  def test_paginated_section
-    @template = <<-ERB
-      <% paginated_section collection, options do %>
-        <%= content_tag :div, '', :id => "developers" %>
-      <% end %>
-    ERB
-    
-    paginate
-    assert_select 'div.pagination', 2
-    assert_select 'div.pagination + div#developers', 1
-  end
-  
   ## parameter handling in page links ##
   
   def test_will_paginate_preserves_parameters_on_get
