@@ -16,19 +16,6 @@ class ViewTest < WillPaginate::ViewTestCase
   
   ## basic pagination ##
 
-  def test_will_paginate
-    paginate do |pagination|
-      assert_select 'a[href]', 3 do |elements|
-        validate_page_numbers [2,3,2], elements
-        assert_select elements.last, ':last-child', "Next &raquo;"
-      end
-      assert_select 'span', 2
-      assert_select 'span.disabled:first-child', '&laquo; Previous'
-      assert_select 'span.current', '1'
-      assert_equal '&laquo; Previous 1 2 3 Next &raquo;', pagination.first.inner_text
-    end
-  end
-
   def test_no_pagination_when_page_count_is_one
     paginate :per_page => 30
     assert_equal '', @html_result
