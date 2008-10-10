@@ -22,6 +22,10 @@ describe WillPaginate::ViewHelpers::ActionView do
     @template = '<%= will_paginate collection, options %>'
   end
   
+  def request
+    @view.request
+  end
+  
   def render(locals)
     @view.render(:inline => @template, :locals => locals)
   end
@@ -150,6 +154,117 @@ describe WillPaginate::ViewHelpers::ActionView do
     paginate
     assert_select 'div.pagination', 2
     assert_select 'div.pagination + div#developers', 1
+  end
+  
+  ## parameter handling in page links ##
+  
+  it "should preserve parameters on GET" do
+    request.params :foo => { :bar => 'baz' }
+    paginate
+    assert_links_match /foo%5Bbar%5D=baz/
+  end
+  
+  it "should not preserve parameters on POST" do
+    request.post
+    request.params :foo => 'bar'
+    paginate
+    assert_no_links_match /foo=bar/
+  end
+  
+  it "should add additional parameters to links" do
+    paginate({}, :params => { :foo => 'bar' })
+    assert_links_match /foo=bar/
+  end
+  
+  it "should add anchor parameter" do
+    paginate({}, :params => { :anchor => 'anchor' })
+    assert_links_match /#anchor$/
+  end
+  
+  it "should remove arbitrary parameters" do
+    request.params :foo => 'bar'
+    paginate({}, :params => { :foo => nil })
+    assert_no_links_match /foo=bar/
+  end
+    
+  it "should override default route parameters" do
+    paginate({}, :params => { :controller => 'baz', :action => 'list' })
+    assert_links_match %r{\Wbaz/list\W}
+  end
+  
+  it "should paginate with custom page parameter" do
+    paginate({ :page => 2 }, :param_name => :developers_page) do
+      assert_select 'a[href]', 4 do |elements|
+        validate_page_numbers [1,1,3,3], elements, :developers_page
+      end
+    end    
+  end
+  
+  it "should paginate with complex custom page parameter" do
+    request.params :developers => { :page => 2 }
+    
+    paginate({ :page => 2 }, :param_name => 'developers[page]') do
+      assert_select 'a[href]', 4 do |links|
+        assert_links_match /\?developers%5Bpage%5D=\d+$/, links
+        validate_page_numbers [1,1,3,3], links, 'developers[page]'
+      end
+    end
+  end
+
+  it "should paginate with custom route page parameter" do
+    request.symbolized_path_parameters.update :controller => 'dummy', :action => nil
+    paginate :per_page => 2 do
+      assert_select 'a[href]', 6 do |links|
+        assert_links_match %r{/page/(\d+)$}, links, [2, 3, 4, 5, 6, 2]
+      end
+    end
+  end
+
+  it "should paginate with custom route with dot separator page parameter" do
+    request.symbolized_path_parameters.update :controller => 'dummy', :action => 'dots'
+    paginate :per_page => 2 do
+      assert_select 'a[href]', 6 do |links|
+        assert_links_match %r{/page\.(\d+)$}, links, [2, 3, 4, 5, 6, 2]
+      end
+    end
+  end
+
+  it "should paginate with custom route and first page number implicit" do
+    request.symbolized_path_parameters.update :controller => 'ibocorp', :action => nil
+    paginate :page => 2, :per_page => 2 do
+      assert_select 'a[href]', 7 do |links|
+        assert_links_match %r{/ibocorp(?:/(\d+))?$}, links, [nil, nil, 3, 4, 5, 6, 3]
+      end
+    end
+  end
+
+  ## internal hardcore stuff ##
+
+  it "should be able to guess the collection name" do
+    collection = mock
+    collection.expects(:total_pages).returns(1)
+    
+    @template = '<%= will_paginate options %>'
+    @view.controller.controller_name = 'developers'
+    @view.assigns['developers'] = collection
+    
+    paginate(nil)
+  end
+  
+  it "should fail if the inferred collection is nil" do
+    @template = '<%= will_paginate options %>'
+    @view.controller.controller_name = 'developers'
+    
+    lambda {
+      paginate(nil)
+    }.should raise_error(ArgumentError, /@developers/)
+  end
+
+  if ActionController::Base.respond_to? :rescue_responses
+    # only on Rails 2
+    it "should set rescue response hook" do
+      ActionController::Base.rescue_responses['WillPaginate::InvalidPage'].should == :not_found
+    end
   end
 end
 
