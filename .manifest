@@ -1,4 +1,4 @@
-CHANGELOG
+CHANGELOG.rdoc
 LICENSE
 README.rdoc
 Rakefile
@@ -18,12 +18,13 @@ lib/will_paginate/core_ext.rb
 lib/will_paginate/deprecation.rb
 lib/will_paginate/finders
 lib/will_paginate/finders.rb
+lib/will_paginate/finders/active_record
 lib/will_paginate/finders/active_record.rb
+lib/will_paginate/finders/active_record/named_scope.rb
+lib/will_paginate/finders/active_record/named_scope_patch.rb
 lib/will_paginate/finders/active_resource.rb
 lib/will_paginate/finders/base.rb
 lib/will_paginate/finders/data_mapper.rb
-lib/will_paginate/named_scope.rb
-lib/will_paginate/named_scope_patch.rb
 lib/will_paginate/version.rb
 lib/will_paginate/view_helpers
 lib/will_paginate/view_helpers.rb
@@ -59,12 +60,7 @@ spec/spec.opts
 spec/spec_helper.rb
 spec/tasks.rake
 spec/view_helpers
+spec/view_helpers/action_view_spec.rb
 spec/view_helpers/base_spec.rb
 spec/view_helpers/link_renderer_base_spec.rb
-test
-test/boot.rb
-test/helper.rb
-test/lib
-test/lib/view_test_process.rb
-test/tasks.rake
-test/view_test.rb
+spec/view_helpers/view_example_group.rb
