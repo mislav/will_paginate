@@ -16,9 +16,7 @@
 === TODO:
 
 * Make a concrete implementation of LinkRendererBase that will generate HTML for both ActionView and Merb
-* Finish transition from view tests -> specs
 * ActionView and Merb integration tests for view helpers
-* 9a9372 rename :prev_label to :previous_label for consistency. old name still functions but is deprecated
 * 3c4725 Oops, I used return in an iterator block. I obviously write too much JavaScript
 * 537f22 ensure that 'href' values in pagination links are escaped URLs
 

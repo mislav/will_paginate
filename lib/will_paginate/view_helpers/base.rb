@@ -9,7 +9,7 @@ module WillPaginate
       # 
       # ==== Options
       # * <tt>:class</tt> -- CSS class name for the generated DIV (default: "pagination")
-      # * <tt>:prev_label</tt> -- default: "« Previous"
+      # * <tt>:previous_label</tt> -- default: "« Previous"
       # * <tt>:next_label</tt> -- default: "Next »"
       # * <tt>:inner_window</tt> -- how many links are shown around the current page (default: 4)
       # * <tt>:outer_window</tt> -- how many links are around the first and the last page (default: 1)
@@ -53,6 +53,11 @@ module WillPaginate
         return nil unless WillPaginate::ViewHelpers.total_pages_for_collection(collection) > 1
         
         options = WillPaginate::ViewHelpers.pagination_options.merge(options)
+        
+        if options[:prev_label]
+          WillPaginate::Deprecation::warn(":prev_label view parameter is now :previous_label; the old name has been deprecated.")
+          options[:previous_label] = options.delete(:prev_label)
+        end
         
         # get the renderer instance
         renderer = case options[:renderer]

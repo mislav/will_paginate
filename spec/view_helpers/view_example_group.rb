@@ -78,6 +78,14 @@ class ViewExampleGroup < Spec::Example::ExampleGroup
     end
   end
   
+  def build_message(message, pattern, *args)
+    built_message = pattern.dup
+    for value in args
+      built_message.sub! '?', value.inspect
+    end
+    built_message
+  end
+  
 end
 
 Spec::Example::ExampleGroupFactory.register(:view_helpers, ViewExampleGroup)

@@ -14,7 +14,7 @@ module WillPaginate
   # WillPaginate::ViewHelpers.pagination_options hash. You can write to this hash to
   # override default options on the global level:
   #
-  #   WillPaginate::ViewHelpers.pagination_options[:prev_label] = 'Previous page'
+  #   WillPaginate::ViewHelpers.pagination_options[:previous_label] = 'Previous page'
   #
   # By putting this into your environment.rb you can easily translate link texts to previous
   # and next pages, as well as override some other defaults to your liking.
@@ -22,19 +22,18 @@ module WillPaginate
     def self.pagination_options() @pagination_options; end
     def self.pagination_options=(value) @pagination_options = value; end
     
-    # default options that can be overridden on the global level
     self.pagination_options = {
-      :class        => 'pagination',
-      :prev_label   => '&laquo; Previous',
-      :next_label   => 'Next &raquo;',
-      :inner_window => 4, # links around the current page
-      :outer_window => 1, # links around beginning and end
-      :separator    => ' ', # single space is friendly to spiders and non-graphic browsers
-      :param_name   => :page,
-      :params       => nil,
-      :renderer     => 'WillPaginate::ViewHelpers::LinkRenderer',
-      :page_links   => true,
-      :container    => true
+      :class          => 'pagination',
+      :previous_label => '&laquo; Previous',
+      :next_label     => 'Next &raquo;',
+      :inner_window   => 4, # links around the current page
+      :outer_window   => 1, # links around beginning and end
+      :separator      => ' ', # single space is friendly to spiders and non-graphic browsers
+      :param_name     => :page,
+      :params         => nil,
+      :renderer       => 'WillPaginate::ViewHelpers::LinkRenderer',
+      :page_links     => true,
+      :container      => true
     }
 
     def self.total_pages_for_collection(collection) #:nodoc:

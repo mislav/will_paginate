@@ -50,7 +50,7 @@ describe WillPaginate::ViewHelpers::ActionView do
   end
 
   it "should paginate with options" do
-    paginate({ :page => 2 }, :class => 'will_paginate', :prev_label => 'Prev', :next_label => 'Next') do
+    paginate({ :page => 2 }, :class => 'will_paginate', :previous_label => 'Prev', :next_label => 'Next') do
       assert_select 'a[href]', 4 do |elements|
         validate_page_numbers [1,1,3,3], elements
         # test rel attribute values:
@@ -93,6 +93,14 @@ describe WillPaginate::ViewHelpers::ActionView do
       assert_select 'span.disabled.prev_page:first-child'
       assert_select 'a.next_page[href]:last-child'
     end
+  end
+  
+  it "should warn about :prev_label being deprecated" do
+    lambda {
+      paginate({ :page => 2 }, :prev_label => 'Deprecated') do
+        assert_select 'a[href]:first-child', 'Deprecated'
+      end
+    }.should have_deprecation
   end
 
   it "should match expected markup" do
