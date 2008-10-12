@@ -68,3 +68,15 @@ ActionView::Base.send :include, WillPaginate::ViewHelpers::ActionView
 if defined?(ActionController::Base) and ActionController::Base.respond_to? :rescue_responses
   ActionController::Base.rescue_responses['WillPaginate::InvalidPage'] = :not_found
 end
+
+WillPaginate::ViewHelpers::LinkRenderer.class_eval do
+  protected
+  
+  def default_url_params
+    { :escape => false }
+  end
+  
+  def generate_url(params)
+    @template.url_for(params)
+  end
+end

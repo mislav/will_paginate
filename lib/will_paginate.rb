@@ -33,3 +33,11 @@ if defined?(Rails)
   require 'will_paginate/view_helpers/action_view' if defined?(ActionController)
   require 'will_paginate/finders/active_record'    if defined?(ActiveRecord)
 end
+
+if defined?(Merb::Plugins)
+  require 'will_paginate/collection'
+  require 'will_paginate/view_helpers/base'
+  require 'will_paginate/view_helpers/link_renderer'
+  # this only includes will_paginate view stuff in Merb (not finder adapters)
+  Merb::AbstractController.send(:include, WillPaginate::ViewHelpers::Base)
+end
