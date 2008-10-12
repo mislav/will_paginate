@@ -2,11 +2,6 @@ require 'spec_helper'
 require 'will_paginate/view_helpers/link_renderer_base'
 require 'will_paginate/collection'
 
-class LegacyCollection < WillPaginate::Collection
-  alias :page_count :total_pages
-  undef :total_pages
-end
-
 describe WillPaginate::ViewHelpers::LinkRendererBase do
   
   before do
@@ -30,13 +25,6 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
     lambda {
       @renderer.send(:total_pages).should == 42
     }.should_not have_deprecation
-  end
-  
-  it "should log deprecation warnings for legacy collections" do
-    @renderer.prepare(LegacyCollection.new(1, 1, 2), {})
-    lambda {
-      @renderer.send(:total_pages).should == 2
-    }.should have_deprecation
   end
   
   it "should clear old cached values when prepared" do

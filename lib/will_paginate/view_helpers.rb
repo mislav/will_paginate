@@ -35,20 +35,5 @@ module WillPaginate
       :page_links     => true,
       :container      => true
     }
-
-    def self.total_pages_for_collection(collection) #:nodoc:
-      if collection.respond_to?('page_count') and !collection.respond_to?('total_pages')
-        WillPaginate::Deprecation.warn <<-MSG
-          You are using a paginated collection of class #{collection.class.name}
-          which conforms to the old API of WillPaginate::Collection by using
-          `page_count`, while the current method name is `total_pages`. Please
-          upgrade yours or 3rd-party code that provides the paginated collection.
-        MSG
-        class << collection
-          def total_pages; page_count; end
-        end
-      end
-      collection.total_pages
-    end
   end
 end

@@ -65,7 +65,7 @@ module WillPaginate
       end
 
       def total_pages
-        @total_pages ||= WillPaginate::ViewHelpers.total_pages_for_collection(@collection)
+        @collection.total_pages
       end
 
       def param_name
