@@ -49,19 +49,6 @@ module WillPaginate
       
     protected
 
-      # Collects link items for visible page numbers.
-      def windowed_links
-        prev = nil
-
-        visible_page_numbers.inject [] do |links, n|
-          # detect gaps:
-          links << gap_marker if prev and n > prev + 1
-          links << page_link_or_span(n, 'current')
-          prev = n
-          links
-        end
-      end
-
       def page_link_or_span(page, span_class, text = nil)
         text ||= page.to_s
         

@@ -13,10 +13,6 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
     @renderer = WillPaginate::ViewHelpers::LinkRendererBase.new
   end
   
-  it "should have '...' as default gap marker" do
-    @renderer.gap_marker.should == '...'
-  end
-  
   it "should raise error when unprepared" do
     lambda {
       @renderer.send :param_name
@@ -53,10 +49,15 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
     @renderer.send(:param_name).should == 'bar'
   end
   
+  it "should have pagination definition" do
+    prepare :total_pages => 1
+    @renderer.pagination.should == [:previous_page, 1, :next_page]
+  end
+  
   describe "visible page numbers" do
     it "should calculate windowed visible links" do
       prepare({ :page => 6, :total_pages => 11 }, :inner_window => 1, :outer_window => 1)
-      showing_pages 1, 2, 5, 6, 7, 10, 11
+      showing_pages 1, 2, :gap, 5, 6, 7, :gap, 10, 11
     end
   
     it "should eliminate small gaps" do
@@ -67,22 +68,22 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
     
     it "should support having no windows at all" do
       prepare({ :page => 4, :total_pages => 7 }, :inner_window => 0, :outer_window => 0)
-      showing_pages 1, 4, 7
+      showing_pages 1, :gap, 4, :gap, 7
     end
     
     it "should adjust upper limit if lower is out of bounds" do
       prepare({ :page => 1, :total_pages => 10 }, :inner_window => 2, :outer_window => 1)
-      showing_pages 1, 2, 3, 4, 5, 9, 10
+      showing_pages 1, 2, 3, 4, 5, :gap, 9, 10
     end
     
     it "should adjust lower limit if upper is out of bounds" do
       prepare({ :page => 10, :total_pages => 10 }, :inner_window => 2, :outer_window => 1)
-      showing_pages 1, 2, 6, 7, 8, 9, 10
+      showing_pages 1, 2, :gap, 6, 7, 8, 9, 10
     end
     
     def showing_pages(*pages)
       pages = pages.first.to_a if Array === pages.first or Range === pages.first
-      @renderer.send(:visible_page_numbers).should == pages
+      @renderer.send(:windowed_page_numbers).should == pages
     end
   end
   
