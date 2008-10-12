@@ -76,7 +76,7 @@ describe WillPaginate::ViewHelpers::ActionView do
 
   it "should paginate using a custom renderer instance" do
     renderer = WillPaginate::ViewHelpers::LinkRenderer.new
-    renderer.gap_marker = '<span class="my-gap">~~</span>'
+    def renderer.gap() '<span class="my-gap">~~</span>' end
     
     paginate({ :per_page => 2 }, :inner_window => 0, :outer_window => 0, :renderer => renderer) do
       assert_select 'span.my-gap', '~~'
@@ -106,7 +106,7 @@ describe WillPaginate::ViewHelpers::ActionView do
   it "should match expected markup" do
     paginate
     expected = <<-HTML
-      <div class="pagination"><span class="disabled prev_page">&laquo; Previous</span>
+      <div class="pagination"><span class="prev_page disabled">&laquo; Previous</span>
       <span class="current">1</span>
       <a href="/foo/bar?page=2" rel="next">2</a>
       <a href="/foo/bar?page=3">3</a>
@@ -292,8 +292,8 @@ class AdditionalLinkAttributesRenderer < WillPaginate::ViewHelpers::LinkRenderer
     @additional_link_attributes = link_attributes || { :default => 'true' }
   end
 
-  def page_link(page, text, attributes = {})
-    @template.link_to text, url_for(page), attributes.merge(@additional_link_attributes)
+  def link(text, target, attributes = {})
+    super(text, target, attributes.merge(@additional_link_attributes))
   end
 end
 

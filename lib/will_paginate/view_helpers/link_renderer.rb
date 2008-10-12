@@ -7,10 +7,6 @@ module WillPaginate
     # links. It is used by +will_paginate+ helper internally.
     class LinkRenderer < LinkRendererBase
       
-      def initialize
-        @gap_marker = '<span class="gap">&hellip;</span>'
-      end
-      
       # * +collection+ is a WillPaginate::Collection instance or any other object
       #   that conforms to that API
       # * +options+ are forwarded from +will_paginate+ view helper
@@ -18,21 +14,18 @@ module WillPaginate
       def prepare(collection, options, template)
         super(collection, options)
         @template = template
-        # reset values in case we're re-using this instance
-        @url_string = nil
       end
 
       # Process it! This method returns the complete HTML string which contains
       # pagination links. Feel free to subclass LinkRenderer and change this
       # method as you see fit.
       def to_html
-        links = @options[:page_links] ? windowed_links : []
-        # previous/next buttons
-        links.unshift page_link_or_span(@collection.previous_page, 'disabled prev_page', @options[:previous_label])
-        links.push    page_link_or_span(@collection.next_page,     'disabled next_page', @options[:next_label])
+        links = pagination.map do |item|
+          item.is_a?(Fixnum) ? page_number(item) : send(item)
+        end
         
         html = links.join(@options[:separator])
-        @options[:container] ? @template.content_tag(:div, html, html_attributes) : html
+        @options[:container] ? tag(:div, html, html_attributes) : html
       end
 
       # Returns the subset of +options+ this instance was initialized with that
@@ -48,30 +41,58 @@ module WillPaginate
       end
       
     protected
-
-      def page_link_or_span(page, span_class, text = nil)
-        text ||= page.to_s
-        
-        if page and page != current_page
-          classnames = span_class && span_class.index(' ') && span_class.split(' ', 2).last
-          page_link page, text, :rel => rel_value(page), :class => classnames
+    
+      def page_number(page)
+        unless page == current_page
+          link page, page, :rel => rel_value(page)
         else
-          page_span page, text, :class => span_class
+          tag :span, page, :class => 'current'
         end
       end
-
-      def page_link(page, text, attributes = {})
-        @template.link_to text, url_for(page), attributes
+      
+      def gap
+        '<span class="gap">&hellip;</span>'
       end
-
-      def page_span(page, text, attributes = {})
-        @template.content_tag :span, text, attributes
+      
+      def previous_page
+        previous_or_next_page(@collection.previous_page, @options[:previous_label], 'prev_page')
+      end
+      
+      def next_page
+        previous_or_next_page(@collection.next_page, @options[:next_label], 'next_page')
+      end
+      
+      def previous_or_next_page(page, text, classname)
+        if page
+          link text, page, :class => classname
+        else
+          tag :span, text, :class => classname + ' disabled'
+        end
+      end
+      
+      def link(text, target, attributes = {})
+        if target.is_a? Fixnum
+          attributes[:rel] = rel_value(target)
+          target = url(target)
+        end
+        attributes[:href] = target
+        tag(:a, text, attributes)
+      end
+      
+      def tag(name, value, attributes = {})
+        string_attributes = attributes.inject('') do |str, pair|
+          unless pair.last.nil?
+            str << %( #{pair.first}="#{CGI::escapeHTML(pair.last.to_s)}")
+          end
+          str
+        end
+        "<#{name}#{string_attributes}>#{value}</#{name}>"
       end
 
       # Returns URL params for +page_link_or_span+, taking the current GET params
       # and <tt>:params</tt> option into account.
-      def url_for(page)
-        url_params = { }
+      def url(page)
+        url_params = { :escape => false }
         # page links should preserve GET parameters
         stringified_merge url_params, @template.params if @template.request.get?
         stringified_merge url_params, @options[:params] if @options[:params]
