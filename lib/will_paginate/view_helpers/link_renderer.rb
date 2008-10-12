@@ -48,7 +48,7 @@ module WillPaginate
         unless page == current_page
           link page, page, :rel => rel_value(page)
         else
-          tag :span, page, :class => 'current'
+          tag :em, page
         end
       end
       
@@ -57,7 +57,7 @@ module WillPaginate
       end
       
       def previous_page
-        previous_or_next_page(@collection.previous_page, @options[:previous_label], 'prev_page')
+        previous_or_next_page(@collection.previous_page, @options[:previous_label], 'previous_page')
       end
       
       def next_page

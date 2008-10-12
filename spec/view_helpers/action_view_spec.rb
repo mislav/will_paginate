@@ -38,9 +38,9 @@ describe WillPaginate::ViewHelpers::ActionView do
         validate_page_numbers [2,3,2], elements
         assert_select elements.last, ':last-child', "Next &raquo;"
       end
-      assert_select 'span', 2
+      assert_select 'span', 1
       assert_select 'span.disabled:first-child', '&laquo; Previous'
-      assert_select 'span.current', '1'
+      assert_select 'em', '1'
       pagination.first.inner_text.should == '&laquo; Previous 1 2 3 Next &raquo;'
     end
   end
@@ -64,7 +64,7 @@ describe WillPaginate::ViewHelpers::ActionView do
           link.first['rel'].should == 'next'
         end
       end
-      assert_select 'span.current', '2'
+      assert_select 'em', '2'
     end
   end
 
@@ -90,7 +90,7 @@ describe WillPaginate::ViewHelpers::ActionView do
 
   it "should have classnames on previous/next links" do
     paginate do |pagination|
-      assert_select 'span.disabled.prev_page:first-child'
+      assert_select 'span.disabled.previous_page:first-child'
       assert_select 'a.next_page[href]:last-child'
     end
   end
@@ -106,8 +106,8 @@ describe WillPaginate::ViewHelpers::ActionView do
   it "should match expected markup" do
     paginate
     expected = <<-HTML
-      <div class="pagination"><span class="prev_page disabled">&laquo; Previous</span>
-      <span class="current">1</span>
+      <div class="pagination"><span class="previous_page disabled">&laquo; Previous</span>
+      <em>1</em>
       <a href="/foo/bar?page=2" rel="next">2</a>
       <a href="/foo/bar?page=3">3</a>
       <a href="/foo/bar?page=2" class="next_page" rel="next">Next &raquo;</a></div>
