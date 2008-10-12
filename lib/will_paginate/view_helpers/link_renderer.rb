@@ -14,6 +14,7 @@ module WillPaginate
       def prepare(collection, options, template)
         super(collection, options)
         @template = template
+        @html_attributes = nil
       end
 
       # Process it! This method returns the complete HTML string which contains
@@ -31,13 +32,14 @@ module WillPaginate
       # Returns the subset of +options+ this instance was initialized with that
       # represent HTML attributes for the container element of pagination links.
       def html_attributes
-        return @html_attributes if @html_attributes
-        @html_attributes = @options.except *(WillPaginate::ViewHelpers.pagination_options.keys - [:class])
-        # pagination of Post models will have the ID of "posts_pagination"
-        if @options[:container] and @options[:id] === true
-          @html_attributes[:id] = @collection.first.class.name.underscore.pluralize + '_pagination'
+        @html_attributes ||= begin
+          attributes = @options.except *(WillPaginate::ViewHelpers.pagination_options.keys - [:class])
+          # pagination of Post models will have the ID of "posts_pagination"
+          if @options[:container] and @options[:id] === true
+            attributes[:id] = @collection.first.class.name.underscore.pluralize + '_pagination'
+          end
+          attributes
         end
-        @html_attributes
       end
       
     protected
