@@ -14,7 +14,7 @@ module WillPaginate
       def prepare(collection, options, template)
         super(collection, options)
         @template = template
-        @container_attributes = nil
+        @container_attributes = @base_url_params = nil
       end
 
       # Process it! This method returns the complete HTML string which contains
@@ -77,6 +77,47 @@ module WillPaginate
         tag(:div, html, container_attributes)
       end
       
+      # Returns URL params for +page_link_or_span+, taking the current GET params
+      # and <tt>:params</tt> option into account.
+      def url(page)
+        @base_url_params ||= begin
+          url_params = default_url_params
+          merge_optional_params(url_params)
+          url_params
+        end
+        
+        url_params = @base_url_params.dup
+        add_current_page_param(url_params, page)
+        
+        @template.url_for(url_params)
+      end
+      
+      def default_url_params
+        url_params = { :escape => false }
+        if @template.request.get?
+          # page links should preserve GET parameters
+          stringified_merge(url_params, @template.params)
+        end
+        url_params
+      end
+      
+      def add_current_page_param(url_params, page)
+        unless param_name.index(/[^\w-]/)
+          url_params[param_name] = page
+        else
+          page_param = (defined?(CGIMethods) ? CGIMethods : ActionController::AbstractRequest).
+            parse_query_parameters(param_name + '=' + page.to_s)
+          
+          stringified_merge(url_params, page_param)
+        end
+      end
+      
+      def merge_optional_params(url_params)
+        stringified_merge(url_params, @options[:params]) if @options[:params]
+      end
+
+    private
+
       def link(text, target, attributes = {})
         if target.is_a? Fixnum
           attributes[:rel] = rel_value(target)
@@ -95,28 +136,6 @@ module WillPaginate
         end
         "<#{name}#{string_attributes}>#{value}</#{name}>"
       end
-
-      # Returns URL params for +page_link_or_span+, taking the current GET params
-      # and <tt>:params</tt> option into account.
-      def url(page)
-        url_params = { :escape => false }
-        # page links should preserve GET parameters
-        stringified_merge url_params, @template.params if @template.request.get?
-        stringified_merge url_params, @options[:params] if @options[:params]
-        
-        if complex = param_name.index(/[^\w-]/)
-          page_param = (defined?(CGIMethods) ? CGIMethods : ActionController::AbstractRequest).
-            parse_query_parameters("#{param_name}=#{page}")
-          
-          stringified_merge url_params, page_param
-        else
-          url_params[param_name] = page
-        end
-
-        @template.url_for url_params
-      end
-
-    private
 
       def rel_value(page)
         case page
