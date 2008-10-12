@@ -50,7 +50,7 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
   end
   
   it "should have pagination definition" do
-    prepare :total_pages => 1
+    prepare({ :total_pages => 1 }, :page_links => true)
     @renderer.pagination.should == [:previous_page, 1, :next_page]
   end
   
