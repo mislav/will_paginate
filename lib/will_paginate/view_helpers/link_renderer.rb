@@ -1,3 +1,4 @@
+require 'cgi'
 require 'will_paginate/core_ext'
 require 'will_paginate/view_helpers/link_renderer_base'
 
@@ -96,7 +97,7 @@ module WillPaginate
         url_params = { :escape => false }
         if @template.request.get?
           # page links should preserve GET parameters
-          stringified_merge(url_params, @template.params)
+          symbolized_update(url_params, @template.params)
         end
         url_params
       end
@@ -108,12 +109,12 @@ module WillPaginate
           page_param = (defined?(CGIMethods) ? CGIMethods : ActionController::AbstractRequest).
             parse_query_parameters(param_name + '=' + page.to_s)
           
-          stringified_merge(url_params, page_param)
+          symbolized_update(url_params, page_param)
         end
       end
       
       def merge_optional_params(url_params)
-        stringified_merge(url_params, @options[:params]) if @options[:params]
+        symbolized_update(url_params, @options[:params]) if @options[:params]
       end
 
     private
@@ -145,15 +146,15 @@ module WillPaginate
         end
       end
 
-      def stringified_merge(target, other)
+      def symbolized_update(target, other)
         other.each do |key, value|
-          key = key.to_s
+          key = key.to_sym
           existing = target[key]
 
           if value.is_a?(Hash)
             target[key] = existing = {} if existing.nil?
             if existing.is_a?(Hash)
-              stringified_merge(existing, value)
+              symbolized_update(existing, value)
               return
             end
           end
