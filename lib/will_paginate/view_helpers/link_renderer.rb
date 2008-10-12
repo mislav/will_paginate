@@ -14,25 +14,26 @@ module WillPaginate
       def prepare(collection, options, template)
         super(collection, options)
         @template = template
-        @html_attributes = nil
+        @container_attributes = nil
       end
 
       # Process it! This method returns the complete HTML string which contains
       # pagination links. Feel free to subclass LinkRenderer and change this
       # method as you see fit.
       def to_html
-        links = pagination.map do |item|
-          item.is_a?(Fixnum) ? page_number(item) : send(item)
-        end
+        html = pagination.map do |item|
+          item.is_a?(Fixnum) ?
+            page_number(item) :
+            send(item)
+        end.join(@options[:separator])
         
-        html = links.join(@options[:separator])
-        @options[:container] ? tag(:div, html, html_attributes) : html
+        @options[:container] ? html_container(html) : html
       end
 
       # Returns the subset of +options+ this instance was initialized with that
       # represent HTML attributes for the container element of pagination links.
-      def html_attributes
-        @html_attributes ||= begin
+      def container_attributes
+        @container_attributes ||= begin
           attributes = @options.except *(WillPaginate::ViewHelpers.pagination_options.keys - [:class])
           # pagination of Post models will have the ID of "posts_pagination"
           if @options[:container] and @options[:id] === true
@@ -46,9 +47,9 @@ module WillPaginate
     
       def page_number(page)
         unless page == current_page
-          link page, page, :rel => rel_value(page)
+          link(page, page, :rel => rel_value(page))
         else
-          tag :em, page
+          tag(:em, page)
         end
       end
       
@@ -66,10 +67,14 @@ module WillPaginate
       
       def previous_or_next_page(page, text, classname)
         if page
-          link text, page, :class => classname
+          link(text, page, :class => classname)
         else
-          tag :span, text, :class => classname + ' disabled'
+          tag(:span, text, :class => classname + ' disabled')
         end
+      end
+      
+      def html_container(html)
+        tag(:div, html, container_attributes)
       end
       
       def link(text, target, attributes = {})
@@ -82,11 +87,11 @@ module WillPaginate
       end
       
       def tag(name, value, attributes = {})
-        string_attributes = attributes.inject('') do |str, pair|
+        string_attributes = attributes.inject('') do |attrs, pair|
           unless pair.last.nil?
-            str << %( #{pair.first}="#{CGI::escapeHTML(pair.last.to_s)}")
+            attrs << %( #{pair.first}="#{CGI::escapeHTML(pair.last.to_s)}")
           end
-          str
+          attrs
         end
         "<#{name}#{string_attributes}>#{value}</#{name}>"
       end
