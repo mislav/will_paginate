@@ -1,3 +1,7 @@
+== 2.3.6, released 2008-10-26
+
+* Rails 2.2 fix: stop using `extract_attribute_names_from_match` inernal AR method, it no longer exists
+
 == 2.3.5, released 2008-10-07
 
 * update the backported named_scope implementation for Rails versions older than 2.1
