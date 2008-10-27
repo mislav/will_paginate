@@ -90,7 +90,7 @@ module WillPaginate
         url_params = @base_url_params.dup
         add_current_page_param(url_params, page)
         
-        generate_url(url_params)
+        generate_url(url_params, page)
       end
       
       def default_url_params
@@ -123,7 +123,9 @@ module WillPaginate
         @template.request.get?
       end
       
-      def generate_url(params)
+      # Url generation method
+      # it's being overwritten by merb_renderer_ext
+      def generate_url(params, page)
         @template.url(params)
       end
 

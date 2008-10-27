@@ -42,4 +42,5 @@ if defined?(Merb::Plugins)
   Merb::AbstractController.send(:include, WillPaginate::ViewHelpers::Base)
   adapter = { :datamapper => 'data_mapper', :activerecord => 'active_record' }[Merb.orm]
   require "will_paginate/finders/#{adapter}"
+  require 'will_paginate/view_helpers/merb_renderer_ext'
 end
