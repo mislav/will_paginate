@@ -81,54 +81,9 @@ module WillPaginate
       # Returns URL params for +page_link_or_span+, taking the current GET params
       # and <tt>:params</tt> option into account.
       def url(page)
-        @base_url_params ||= begin
-          url_params = base_url_params
-          merge_optional_params(url_params)
-          url_params
-        end
-        
-        url_params = @base_url_params.dup
-        add_current_page_param(url_params, page)
-        
-        generate_url(url_params, page)
+        raise NotImplementedError
       end
       
-      def default_url_params
-        { }
-      end
-      
-      def base_url_params
-        url_params = default_url_params
-        # page links should preserve GET parameters
-        symbolized_update(url_params, @template.params) if get_request?
-        url_params
-      end
-      
-      def merge_optional_params(url_params)
-        symbolized_update(url_params, @options[:params]) if @options[:params]
-      end
-      
-      def add_current_page_param(url_params, page)
-        unless param_name.index(/[^\w-]/)
-          url_params[param_name.to_sym] = page
-        else
-          page_param = (defined?(CGIMethods) ? CGIMethods : ActionController::AbstractRequest).
-            parse_query_parameters(param_name + '=' + page.to_s)
-          
-          symbolized_update(url_params, page_param)
-        end
-      end
-      
-      def get_request?
-        @template.request.get?
-      end
-      
-      # Url generation method
-      # it's being overwritten by merb_renderer_ext
-      def generate_url(params, page)
-        @template.url(params)
-      end
-
     private
 
       def link(text, target, attributes = {})

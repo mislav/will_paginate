@@ -35,12 +35,8 @@ if defined?(Rails)
 end
 
 if defined?(Merb::Plugins)
-  require 'will_paginate/collection'
-  require 'will_paginate/view_helpers/base'
-  require 'will_paginate/view_helpers/link_renderer'
-  # this only includes will_paginate view stuff in Merb (not finder adapters)
-  Merb::AbstractController.send(:include, WillPaginate::ViewHelpers::Base)
-  adapter = { :datamapper => 'data_mapper', :activerecord => 'active_record' }[Merb.orm]
-  require "will_paginate/finders/#{adapter}"
-  require 'will_paginate/view_helpers/merb_renderer_ext'
+  require 'will_paginate/view_helpers/merb'
+  if adapter = { :datamapper => 'data_mapper', :activerecord => 'active_record' }[Merb.orm]
+    require "will_paginate/finders/#{adapter}"
+  end
 end

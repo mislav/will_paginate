@@ -30,7 +30,6 @@ describe WillPaginate::Finders::DataMapper do
     filtered_result.first.should == Animal.first(:name => 'Dog')
   end
   
-  
   it "should leave extra parameters intact" do
     Animal.expects(:all).with(:name => 'Dog', :limit => 4, :offset => 0 ).returns(Array.new(5))
     Animal.expects(:count).with({:name => 'Dog'}).returns(1)
@@ -60,5 +59,4 @@ describe WillPaginate::Finders::DataMapper do
     end
   end
   
-
 end
