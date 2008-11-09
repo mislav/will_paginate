@@ -18,8 +18,6 @@ module WillPaginate
       # * <tt>:param_name</tt> -- parameter name for page number in URLs (default: <tt>:page</tt>)
       # * <tt>:params</tt> -- additional parameters when generating pagination links
       #   (eg. <tt>:controller => "foo", :action => nil</tt>)
-      # * <tt>:base_url</tt> -- specify the action url, the helper will only add the page # attribute
-      #    to the url
       # * <tt>:renderer</tt> -- class name, class or instance of a link renderer (default:
       #   <tt>WillPaginate::LinkRenderer</tt>)
       # * <tt>:page_links</tt> -- when false, only previous/next links are rendered (default: true)
