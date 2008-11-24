@@ -13,6 +13,7 @@ class ArProject < ActiveRecord::Base
   named_scope :distinct, :select => "DISTINCT #{table_name}.*"
 end
 
+gem 'sqlite3-ruby'
 ActiverecordTestConnector.setup
 
 describe WillPaginate::Finders::ActiveRecord do
