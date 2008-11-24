@@ -14,7 +14,7 @@ task :default => :spec
 
 desc 'Generate RDoc documentation for the will_paginate plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_files.include('README.rdoc', 'LICENSE', 'CHANGELOG').
+  rdoc.rdoc_files.include('README.rdoc', 'LICENSE', 'CHANGELOG.rdoc').
     include('lib/**/*.rb').
     exclude('lib/will_paginate/named_scope*').
     exclude('lib/will_paginate/deprecation.rb').

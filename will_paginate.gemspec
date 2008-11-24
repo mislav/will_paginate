@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name    = 'will_paginate'
-  s.version = '2.5.0'
-  # s.date    = '2008-10-27'
+  s.version = '3.0.0'
+  s.date    = '2008-11-23'
   
   s.summary = "Most awesome pagination solution for every web app"
   s.description = "The will_paginate library provides a simple, yet powerful and extensible API for pagination and rendering of page links in templates."
