@@ -1,5 +1,6 @@
 require 'will_paginate/view_helpers/base'
 require 'action_view'
+require 'action_pack/version'
 require 'will_paginate/view_helpers/link_renderer'
 
 module WillPaginate
@@ -46,8 +47,15 @@ module WillPaginate
       # blocks of pagination links sharing the same ID (which is invalid HTML).
       def paginated_section(*args, &block)
         pagination = will_paginate(*args).to_s
-        content = pagination + capture(&block) + pagination
-        concat content, block.binding
+        
+        if ::ActionPack::VERSION::STRING.to_f >= 2.2
+          concat pagination
+          yield
+          concat pagination
+        else
+          content = pagination + capture(&block) + pagination
+          concat(content, block.binding)
+        end
       end
       
     protected
