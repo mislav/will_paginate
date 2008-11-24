@@ -43,19 +43,26 @@ module WillPaginate
           window_to = total_pages if window_to > total_pages
         end
         
-        visible   = (1..total_pages).to_a
-        left_gap  = (2 + outer_window)...window_from
-        right_gap = (window_to + 1)...(total_pages - outer_window)
-        
-        # replace page numbers that shouldn't be visible with `:gap`
-        [right_gap, left_gap].each do |gap|
-          if (gap.last - gap.first) > 1
-            visible -= gap.to_a
-            visible.insert(gap.first - 1, :gap)
-          end
+        # these are always visible
+        middle = window_from..window_to
+
+        # left window
+        if outer_window + 3 < middle.first # there's a gap
+          left = (1..(outer_window + 1)).to_a
+          left << :gap
+        else # runs into visible pages
+          left = 1...middle.first
+        end
+
+        # right window
+        if total_pages - outer_window - 2 > middle.last # again, gap
+          right = ((total_pages - outer_window)..total_pages).to_a
+          right.unshift :gap
+        else # runs into visible pages
+          right = (middle.last + 1)..total_pages
         end
         
-        visible
+        left.to_a + middle.to_a + right.to_a
       end
 
     private
