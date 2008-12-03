@@ -41,6 +41,8 @@ class ActiveRecordTestConnector
     ActiveRecord::Base.logger = Logger.new(STDOUT) if $0 == 'irb'
     puts "using #{configuration['adapter']} adapter" unless ENV['DB'].blank?
     
+    gem 'sqlite3-ruby' if 'sqlite3' == db
+    
     ActiveRecord::Base.establish_connection(configuration)
     ActiveRecord::Base.configurations = { db => configuration }
     prepare ActiveRecord::Base.connection
