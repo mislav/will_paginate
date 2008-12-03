@@ -141,8 +141,15 @@ module WillPaginate
     # blocks of pagination links sharing the same ID (which is invalid HTML).
     def paginated_section(*args, &block)
       pagination = will_paginate(*args).to_s
-      content = pagination + capture(&block) + pagination
-      concat content, block.binding
+      
+      unless ActionView::Base.respond_to? :erb_variable
+        concat pagination
+        yield
+        concat pagination
+      else
+        content = pagination + capture(&block) + pagination
+        concat(content, block.binding)
+      end
     end
 
     # Renders a helpful message with numbers of displayed vs. total entries.
