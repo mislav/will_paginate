@@ -48,7 +48,7 @@ module WillPaginate
       def paginated_section(*args, &block)
         pagination = will_paginate(*args).to_s
         
-        if ::ActionPack::VERSION::STRING.to_f >= 2.2
+        unless ::ActionView::Base.respond_to? :erb_variable
           concat pagination
           yield
           concat pagination
