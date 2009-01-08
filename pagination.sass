@@ -1,0 +1,91 @@
+.digg_pagination
+  :background white
+  a, span
+    :padding .2em .5em
+    :display block
+    :float left
+    :margin-right 1px
+  span.disabled
+    :color #999
+    :border 1px solid #DDD
+  span.current
+    :font-weight bold
+    :background #2E6AB1
+    :color white
+    :border 1px solid #2E6AB1
+  a
+    :text-decoration none
+    :color #105CB6
+    :border 1px solid #9AAFE5
+    &:hover, &:focus
+      :color #003
+      :border-color #003
+  .page_info
+    :background #2E6AB1
+    :color white
+    :padding .4em .6em
+    :width 22em
+    :margin-bottom .3em
+    :text-align center
+    b
+      :color #003
+      :background = #2E6AB1 + 60
+      :padding .1em .25em
+    
+  /* self-clearing method:
+  &:after
+    :content "."
+    :display block
+    :height 0
+    :clear both
+    :visibility hidden
+  * html &
+    :height 1%
+  *:first-child+html &
+    :overflow hidden
+
+.apple_pagination
+  :background #F1F1F1
+  :border 1px solid #E5E5E5
+  :text-align center
+  :padding 1em
+  a, span
+    :padding .2em .3em
+  span.disabled
+    :color #AAA
+  span.current
+    :font-weight bold
+    :background transparent url(apple-circle.gif) no-repeat 50% 50%
+  a
+    :text-decoration none
+    :color black
+    &:hover, &:focus
+      :text-decoration underline
+
+.flickr_pagination
+  :text-align center
+  :padding .3em
+  a, span
+    :padding .2em .5em
+  span.disabled
+    :color #AAA
+  span.current
+    :font-weight bold
+    :color #FF0084
+  a
+    :border 1px solid #DDDDDD
+    :color #0063DC
+    :text-decoration none
+    &:hover, &:focus
+      :border-color #003366
+      :background #0063DC
+      :color white
+  .page_info
+    :color #aaa
+    :padding-top .8em
+  .prev_page, .next_page
+    :border-width 2px
+  .prev_page
+    :margin-right 1em
+  .next_page
+    :margin-left 1em
