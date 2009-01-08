@@ -2,12 +2,6 @@ CHANGELOG.rdoc
 LICENSE
 README.rdoc
 Rakefile
-examples
-examples/apple-circle.gif
-examples/index.haml
-examples/index.html
-examples/pagination.css
-examples/pagination.sass
 init.rb
 lib
 lib/will_paginate

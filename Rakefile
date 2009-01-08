@@ -36,7 +36,10 @@ task :manifest do
   spec_file = Dir['*.gemspec'].first
   list -= [spec_file] if spec_file
   
-  File.read('.gitignore').each_line do |glob|
+  ignores = File.read('.gitignore').to_a
+  ignores << 'website'
+  
+  ignores.each do |glob|
     glob = glob.chomp.sub(/^\//, '')
     list -= Dir[glob]
     list -= Dir["#{glob}/**/*"] if File.directory?(glob) and !File.symlink?(glob)
