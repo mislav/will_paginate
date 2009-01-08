@@ -56,7 +56,9 @@ task :manifest do
   File.open('.manifest', 'w') {|f| f << list.join("\n") }
 end
 
-task :examples do
-  %x(haml examples/index.haml examples/index.html)
-  %x(sass examples/pagination.sass examples/pagination.css)
+task :website do
+  Dir.chdir('website') do
+    %x(haml index.haml index.html)
+    %x(sass pagination.sass pagination.css)
+  end
 end
