@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
 require 'will_paginate/finders/data_mapper'
 require File.dirname(__FILE__) + '/data_mapper_test_connector'
 
