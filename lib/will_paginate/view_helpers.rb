@@ -99,7 +99,7 @@ module WillPaginate
       
       options = options.symbolize_keys.reverse_merge WillPaginate::ViewHelpers.pagination_options
       if options[:prev_label]
-        WillPaginate::Deprecation::warn(":prev_label view parameter is now :previous_label; the old name has been deprecated.")
+        WillPaginate::Deprecation::warn(":prev_label view parameter is now :previous_label; the old name has been deprecated", caller)
         options[:previous_label] = options.delete(:prev_label)
       end
       
@@ -185,12 +185,11 @@ module WillPaginate
 
     def self.total_pages_for_collection(collection) #:nodoc:
       if collection.respond_to?('page_count') and !collection.respond_to?('total_pages')
-        WillPaginate::Deprecation.warn <<-MSG
+        WillPaginate::Deprecation.warn %{
           You are using a paginated collection of class #{collection.class.name}
           which conforms to the old API of WillPaginate::Collection by using
           `page_count`, while the current method name is `total_pages`. Please
-          upgrade yours or 3rd-party code that provides the paginated collection.
-        MSG
+          upgrade yours or 3rd-party code that provides the paginated collection}, caller
         class << collection
           def total_pages; page_count; end
         end
