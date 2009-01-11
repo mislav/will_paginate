@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'active_support/rescuable' # needed for Ruby 1.9.1
 require 'action_controller'
 require 'view_helpers/view_example_group'
 require 'will_paginate/view_helpers/action_view'
