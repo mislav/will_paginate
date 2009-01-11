@@ -142,19 +142,6 @@ describe WillPaginate::Finders::ActiveRecord do
     
     ArProject.paginate_by_id(ids, :per_page => 3, :page => 2, :order => 'id')
   end
-  
-  # Is this Rails 2.0? Find out by testing find_all which was removed in [6998]
-  unless ActiveRecord::Base.respond_to? :find_all
-    it "should paginate array of IDs" do
-      # AR finders also accept arrays of IDs
-      # (this was broken in Rails before [6912])
-      lambda {
-        result = Developer.paginate((1..8).to_a, :per_page => 3, :page => 2, :order => 'id')
-        result.map(&:id).should == (4..6).to_a
-        result.total_entries.should == 8
-      }.should run_queries(1)
-    end
-  end
 
   it "doesn't mangle options" do
     ArProject.expects(:find).returns([])
@@ -427,6 +414,19 @@ describe WillPaginate::Finders::ActiveRecord do
 
     it "should paginate with :readonly option" do
       lambda { Developer.paginate :readonly => true, :page => 1 }.should_not raise_error
+    end
+    
+    # detect ActiveRecord 2.0
+    unless ActiveRecord::Base.respond_to? :find_all
+      it "should paginate array of IDs" do
+        # AR finders also accept arrays of IDs
+        # (this was broken in Rails before [6912])
+        lambda {
+          result = Developer.paginate((1..8).to_a, :per_page => 3, :page => 2, :order => 'id')
+          result.map(&:id).should == (4..6).to_a
+          result.total_entries.should == 8
+        }.should run_queries(1)
+      end
     end
     
   end
