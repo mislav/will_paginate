@@ -117,16 +117,12 @@ module WillPaginate
         other.each do |key, value|
           key = key.to_sym
           existing = target[key]
-
-          if value.is_a?(Hash)
-            target[key] = existing = {} if existing.nil?
-            if existing.is_a?(Hash)
-              symbolized_update(existing, value)
-              return
-            end
-          end
           
-          target[key] = value
+          if value.is_a?(Hash) and (existing.is_a?(Hash) or existing.nil?)
+            symbolized_update(existing || (target[key] = {}), value)
+          else
+            target[key] = value
+          end
         end
       end
     end
