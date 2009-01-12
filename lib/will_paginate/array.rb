@@ -2,7 +2,7 @@ require 'will_paginate/collection'
 
 class Array
   # Paginates a static array (extracting a subset of it). The result is a
-  # WillPaginate::Collection instance, which is an array with few more
+  # WillPaginate::Collection instance, which is an array with a few more
   # properties about its paginated state.
   #
   # Parameters:

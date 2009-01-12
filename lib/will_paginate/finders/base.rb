@@ -2,7 +2,18 @@ require 'will_paginate/core_ext'
 
 module WillPaginate
   module Finders
-    # Database-agnostic finder logic
+    # = Database-agnostic finder module
+    # 
+    # Out of the box, will_paginate supports hooking in several ORMs to provide paginating
+    # finders based on their API. As of this writing, the supported libraries are:
+    #
+    # * ActiveRecord
+    # * DataMapper
+    # * Sequel
+    #
+    # It's easy to write your own adapter for anything that can load data with explicit
+    # limit and offset settings. DataMapper adapter is a nice and compact example of
+    # writing an adapter to bring the +paginate+ method to DataMapper models.
     module Base
       def per_page
         @per_page ||= 30

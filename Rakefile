@@ -16,8 +16,11 @@ desc 'Generate RDoc documentation for the will_paginate plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('README.rdoc', 'LICENSE', 'CHANGELOG.rdoc').
     include('lib/**/*.rb').
-    exclude('lib/will_paginate/named_scope*').
+    exclude('lib/will_paginate/finders/active_record/named_scope*').
+    exclude('lib/will_paginate/finders/sequel.rb').
+    exclude('lib/will_paginate/view_helpers/merb.rb').
     exclude('lib/will_paginate/deprecation.rb').
+    exclude('lib/will_paginate/core_ext.rb').
     exclude('lib/will_paginate/version.rb')
   
   rdoc.main = "README.rdoc" # page to start on

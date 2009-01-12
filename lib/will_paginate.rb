@@ -2,12 +2,14 @@ require 'will_paginate/deprecation'
 
 # = You *will* paginate!
 #
-# First read about WillPaginate::Finder::ClassMethods, then see
+# First read about WillPaginate::Finders::Base, then see
 # WillPaginate::ViewHelpers. The magical array you're handling in-between is
 # WillPaginate::Collection.
 #
 # Happy paginating!
 module WillPaginate
+  # This method used to hook in ActiveRecord and ActionView at load time,
+  # but now doesn't do anything anymore and will be removed in future releases.
   def self.enable
     Deprecation.warn "WillPaginate::enable() doesn't do anything anymore"
   end

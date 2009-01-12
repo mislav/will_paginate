@@ -3,10 +3,12 @@ require 'will_paginate/view_helpers'
 
 module WillPaginate
   module ViewHelpers
+    # = The main view helpers module
+    #
+    # This is the base module which provides the +will_paginate+ view helper.
     module Base
-      # Renders Digg/Flickr-style pagination for a WillPaginate::Collection
-      # object. Nil is returned if there is only one page in total; no point in
-      # rendering the pagination in that case...
+      # Renders Digg/Flickr-style pagination for a WillPaginate::Collection object. Nil is
+      # returned if there is only one page in total; pagination links aren't needed in that case.
       # 
       # ==== Options
       # * <tt>:class</tt> -- CSS class name for the generated DIV (default: "pagination")
@@ -35,19 +37,6 @@ module WillPaginate
       # ... will result in:
       #
       #   <div class="pagination" id="wp_posts"> ... </div>
-      #
-      # ==== Using the helper without arguments
-      # If the helper is called without passing in the collection object, it will
-      # try to read from the instance variable inferred by the controller name.
-      # For example, calling +will_paginate+ while the current controller is
-      # PostsController will result in trying to read from the <tt>@posts</tt>
-      # variable. Example:
-      #
-      #   <%= will_paginate :id => true %>
-      #
-      # ... will result in <tt>@post</tt> collection getting paginated:
-      #
-      #   <div class="pagination" id="posts_pagination"> ... </div>
       #
       def will_paginate(collection, options = {})
         # early exit if there is nothing to render

@@ -99,7 +99,7 @@ module WillPaginate::Finders
       paginate(*args, &block)
     end
 
-    def wp_query(options, pager, args, &block)
+    def wp_query(options, pager, args, &block) #:nodoc:
       finder = (options.delete(:finder) || 'find').to_s
       find_options = options.except(:count).update(:offset => pager.offset, :limit => pager.per_page) 
 
@@ -121,7 +121,7 @@ module WillPaginate::Finders
 
     # Does the not-so-trivial job of finding out the total number of entries
     # in the database. It relies on the ActiveRecord +count+ method.
-    def wp_count(options, args, finder)
+    def wp_count(options, args, finder) #:nodoc:
       # find out if we are in a model or an association proxy
       klass = (@owner and @reflection) ? @reflection.klass : self
       count_options = wp_parse_count_options(options, klass)
@@ -145,7 +145,7 @@ module WillPaginate::Finders
       count.respond_to?(:length) ? count.length : count
     end
     
-    def wp_parse_count_options(options, klass)
+    def wp_parse_count_options(options, klass) #:nodoc:
       excludees = [:count, :order, :limit, :offset, :readonly]
       
       unless ::ActiveRecord::Calculations::CALCULATIONS_OPTIONS.include?(:from)

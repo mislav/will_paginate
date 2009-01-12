@@ -1,5 +1,13 @@
 == "agnostic" branch
 
+* added Sequel support
+* added an initialization hook for Merb
+* refactored URL generation
+* BACKWARDS INCOMPATIBLE: refactored LinkRenderer; also markup changes
+    <span class="current">1</span> is now <em>1</em>
+    a.prev_page -> a.previous_page (for consistency)
+* "prev_label" -> "previous_label"
+* ported view tests to specs
 * setup Autotest
 * added per_page=(limit) attribute writer to set default per_page
 * Remove :include option from count_all query when possible (Rails 2.1)
@@ -7,18 +15,11 @@
 * specs for ViewHelpers::Base and LinkRendererBase
 * created LinkRendererBase that implements windowed visible page numbers logic
 * created WP::ViewHelpers::Base abstract module that implements generic view helpers
-* converted finder tests to specs
+* ported finder tests to specs
 * added WP::Finders::DataMapper
 * added WP::Finders::ActiveRecord mixin for ActiveRecord::Base
 * created WP::Finders::Base abstract module that implements generic pagination logic
 * removed dependency to ActiveSupport
-
-=== TODO:
-
-* Make a concrete implementation of LinkRendererBase that will generate HTML for both ActionView and Merb
-* ActionView and Merb integration tests for view helpers
-* 3c4725 Oops, I used return in an iterator block. I obviously write too much JavaScript
-* 537f22 ensure that 'href' values in pagination links are escaped URLs
 
 == 2.3.1, released 2008-05-04
 
@@ -49,14 +50,14 @@
     gem install mislav-will_paginate
     
 * extract reusable pagination testing stuff into WillPaginate::View
-* rethink the page URL construction mechanizm to be more bulletproof when
+* rethink the page URL construction mechanism to be more bulletproof when
   combined with custom routing for page parameter
 * test that anchor parameter can be used in pagination links
 
 == 2.2.2, released 2008-04-21
 
 * Add support for page parameter in custom routes like "/foo/page/2"
-* Change output of "page_entries_info" on single-page collection and erraneous
+* Change output of "page_entries_info" on single-page collection and erroneous
   output with empty collection as reported by Tim Chater
   
 == 2.2.1, released 2008-04-08

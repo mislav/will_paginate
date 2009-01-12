@@ -5,18 +5,35 @@ require 'will_paginate/view_helpers/link_renderer'
 
 module WillPaginate
   module ViewHelpers
-    # ActionView helpers for Rails integration
+    # = ActionView helpers
+    # 
+    # This module serves for availability in ActionView templates. It also adds a new
+    # view helper: +paginated_section+.
+    # 
+    # == Using the helper without arguments
+    # If the helper is called without passing in the collection object, it will
+    # try to read from the instance variable inferred by the controller name.
+    # For example, calling +will_paginate+ while the current controller is
+    # PostsController will result in trying to read from the <tt>@posts</tt>
+    # variable. Example:
+    #
+    #   <%= will_paginate :id => true %>
+    #
+    # ... will result in <tt>@post</tt> collection getting paginated:
+    #
+    #   <div class="pagination" id="posts_pagination"> ... </div>
+    #
     module ActionView
       include WillPaginate::ViewHelpers::Base
       
-      def will_paginate(collection = nil, options = {})
+      def will_paginate(collection = nil, options = {}) #:nodoc:
         options, collection = collection, nil if collection.is_a? Hash
         collection ||= infer_collection_from_controller
 
         super(collection, options.symbolize_keys)
       end
       
-      def page_entries_info(collection = nil, options = {})
+      def page_entries_info(collection = nil, options = {}) #:nodoc:
         options, collection = collection, nil if collection.is_a? Hash
         collection ||= infer_collection_from_controller
         
@@ -72,7 +89,7 @@ module WillPaginate
 end
 
 ActionView::Base.send :include, WillPaginate::ViewHelpers::ActionView
-
+# :stopdoc:
 if defined?(ActionController::Base) and ActionController::Base.respond_to? :rescue_responses
   ActionController::Base.rescue_responses['WillPaginate::InvalidPage'] = :not_found
 end
