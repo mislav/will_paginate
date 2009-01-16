@@ -4,16 +4,37 @@ module WillPaginate
   module Finders
     # = Database-agnostic finder module
     # 
-    # Out of the box, will_paginate supports hooking in several ORMs to provide paginating
-    # finders based on their API. As of this writing, the supported libraries are:
+    # Out of the box, will_paginate supports hooking in several ORMs to
+    # provide paginating finders based on their API. As of this writing, the
+    # supported libraries are:
     #
     # * ActiveRecord
     # * DataMapper
     # * Sequel
     #
-    # It's easy to write your own adapter for anything that can load data with explicit
-    # limit and offset settings. DataMapper adapter is a nice and compact example of
-    # writing an adapter to bring the +paginate+ method to DataMapper models.
+    # It's easy to write your own adapter for anything that can load data with
+    # explicit limit and offset settings. DataMapper adapter is a nice and
+    # compact example of writing an adapter to bring the +paginate+ method to
+    # DataMapper models.
+    #
+    # == The importance of SQL's <tt>ORDER BY</tt>
+    #
+    # In most ORMs, <tt>:order</tt> parameter specifies columns for the
+    # <tt>ORDER BY</tt> clause in SQL. It is important to have it, since
+    # pagination only makes sense with ordered sets. Without the order clause,
+    # databases aren't required to do consistent ordering when performing
+    # <tt>SELECT</tt> queries.
+    # 
+    # Ordering by a field for which many records share the same value (e.g.
+    # "status") can still result in incorrect ordering with some databases (MS
+    # SQL and Postgres for instance). With these databases it's recommend that
+    # you order by primary key as well. That is, instead of ordering by
+    # "status DESC", use the alternative "status DESC, id DESC" and this will
+    # yield consistent results.
+    #
+    # Therefore, make sure you are doing ordering on a column that makes the
+    # most sense in the current context. Make that obvious to the user, also.
+    # For perfomance reasons you will also want to add an index to that column.
     module Base
       def per_page
         @per_page ||= 30
