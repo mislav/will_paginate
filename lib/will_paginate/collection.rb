@@ -82,7 +82,7 @@ module WillPaginate
     #
     # The Array#paginate API has since then changed, but this still serves as a
     # fine example of WillPaginate::Collection usage.
-    def self.create(page, per_page, total = nil, &block)
+    def self.create(page, per_page, total = nil)
       pager = new(page, per_page, total)
       yield pager
       pager

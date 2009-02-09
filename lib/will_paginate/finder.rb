@@ -61,7 +61,7 @@ module WillPaginate
       #
       # All other options (+conditions+, +order+, ...) are forwarded to +find+
       # and +count+ calls.
-      def paginate(*args, &block)
+      def paginate(*args)
         options = args.pop
         page, per_page, total_entries = wp_parse_options(options)
         finder = (options[:finder] || 'find').to_s
@@ -79,7 +79,7 @@ module WillPaginate
           
           args << find_options
           # @options_from_last_find = nil
-          pager.replace send(finder, *args, &block)
+          pager.replace(send(finder, *args) { |*a| yield(*a) if block_given? })
           
           # magic counting for user convenience:
           pager.total_entries = wp_count(count_options, args, finder) unless pager.total_entries
@@ -96,7 +96,7 @@ module WillPaginate
       #
       # See {Faking Cursors in ActiveRecord}[http://weblog.jamisbuck.org/2007/4/6/faking-cursors-in-activerecord]
       # where Jamis Buck describes this and a more efficient way for MySQL.
-      def paginated_each(options = {}, &block)
+      def paginated_each(options = {})
         options = { :order => 'id', :page => 1 }.merge options
         options[:page] = options[:page].to_i
         options[:total_entries] = 0 # skip the individual count queries
@@ -106,7 +106,7 @@ module WillPaginate
           collection = paginate(options)
           with_exclusive_scope(:find => {}) do
             # using exclusive scope so that the block is yielded in scope-free context
-            total += collection.each(&block).size
+            total += collection.each { |item| yield item }.size
           end
           options[:page] += 1
         end until collection.size < collection.per_page
@@ -161,10 +161,14 @@ module WillPaginate
 
     protected
       
-      def method_missing_with_paginate(method, *args, &block) #:nodoc:
+      def method_missing_with_paginate(method, *args) #:nodoc:
         # did somebody tried to paginate? if not, let them be
         unless method.to_s.index('paginate') == 0
-          return method_missing_without_paginate(method, *args, &block) 
+          if block_given?
+            return method_missing_without_paginate(method, *args) { |*a| yield(*a) }
+          else
+            return method_missing_without_paginate(method, *args) 
+          end
         end
         
         # paginate finders are really just find_* with limit and offset
@@ -177,7 +181,7 @@ module WillPaginate
         options[:finder] = finder
         args << options
         
-        paginate(*args, &block)
+        paginate(*args) { |*a| yield(*a) if block_given? }
       end
 
       # Does the not-so-trivial job of finding out the total number of entries

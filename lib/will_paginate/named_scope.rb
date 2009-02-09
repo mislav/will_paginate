@@ -83,7 +83,7 @@ module WillPaginate
       #
       #   expected_options = { :conditions => { :colored => 'red' } }
       #   assert_equal expected_options, Shirt.colored('red').proxy_options
-      def named_scope(name, options = {}, &block)
+      def named_scope(name, options = {})
         name = name.to_sym
         scopes[name] = lambda do |parent_scope, *args|
           Scope.new(parent_scope, case options
@@ -91,7 +91,7 @@ module WillPaginate
               options
             when Proc
               options.call(*args)
-          end, &block)
+          end) { |*a| yield(*a) if block_given? }
         end
         (class << self; self end).instance_eval do
           define_method name do |*args|
@@ -112,9 +112,9 @@ module WillPaginate
 
       delegate :scopes, :with_scope, :to => :proxy_scope
 
-      def initialize(proxy_scope, options, &block)
+      def initialize(proxy_scope, options)
         [options[:extend]].flatten.each { |extension| extend extension } if options[:extend]
-        extend Module.new(&block) if block_given?
+        extend Module.new { |*args| yield(*args) } if block_given?
         @proxy_scope, @proxy_options = proxy_scope, options.except(:extend)
       end
 
@@ -152,12 +152,12 @@ module WillPaginate
       end
 
       private
-      def method_missing(method, *args, &block)
+      def method_missing(method, *args)
         if scopes.include?(method)
           scopes[method].call(self, *args)
         else
           with_scope :find => proxy_options do
-            proxy_scope.send(method, *args, &block)
+            proxy_scope.send(method, *args) { |*a| yield(*a) if block_given? }
           end
         end
       end

@@ -1,7 +1,7 @@
 ActiveRecord::Associations::AssociationProxy.class_eval do
   protected
-  def with_scope(*args, &block)
-    @reflection.klass.send :with_scope, *args, &block
+  def with_scope(*args)
+    @reflection.klass.send(:with_scope, *args) { |*a| yield(*a) if block_given? }
   end
 end
 
@@ -10,11 +10,11 @@ end
   klass.class_eval do
     protected
     alias :method_missing_without_scopes :method_missing_without_paginate
-    def method_missing_without_paginate(method, *args, &block)
+    def method_missing_without_paginate(method, *args)
       if @reflection.klass.scopes.include?(method)
-        @reflection.klass.scopes[method].call(self, *args, &block)
+        @reflection.klass.scopes[method].call(self, *args) { |*a| yield(*a) if block_given? }
       else
-        method_missing_without_scopes(method, *args, &block)
+        method_missing_without_scopes(method, *args) { |*a| yield(*a) if block_given? }
       end
     end
   end
@@ -23,14 +23,14 @@ end
 # Rails 1.2.6
 ActiveRecord::Associations::HasAndBelongsToManyAssociation.class_eval do
   protected
-  def method_missing(method, *args, &block)
+  def method_missing(method, *args)
     if @target.respond_to?(method) || (!@reflection.klass.respond_to?(method) && Class.respond_to?(method))
       super
     elsif @reflection.klass.scopes.include?(method)
       @reflection.klass.scopes[method].call(self, *args)
     else
       @reflection.klass.with_scope(:find => { :conditions => @finder_sql, :joins => @join_sql, :readonly => false }) do
-        @reflection.klass.send(method, *args, &block)
+        @reflection.klass.send(method, *args) { |*a| yield(*a) if block_given? }
       end
     end
   end
