@@ -2,15 +2,12 @@ CHANGELOG.rdoc
 LICENSE
 README.rdoc
 Rakefile
-examples
 examples/apple-circle.gif
 examples/index.haml
 examples/index.html
 examples/pagination.css
 examples/pagination.sass
 init.rb
-lib
-lib/will_paginate
 lib/will_paginate.rb
 lib/will_paginate/array.rb
 lib/will_paginate/collection.rb
@@ -20,13 +17,11 @@ lib/will_paginate/named_scope.rb
 lib/will_paginate/named_scope_patch.rb
 lib/will_paginate/version.rb
 lib/will_paginate/view_helpers.rb
-test
 test/boot.rb
 test/collection_test.rb
 test/console
 test/database.yml
 test/finder_test.rb
-test/fixtures
 test/fixtures/admin.rb
 test/fixtures/developer.rb
 test/fixtures/developers_projects.yml
@@ -40,7 +35,6 @@ test/fixtures/topics.yml
 test/fixtures/user.rb
 test/fixtures/users.yml
 test/helper.rb
-test/lib
 test/lib/activerecord_test_case.rb
 test/lib/activerecord_test_connector.rb
 test/lib/load_fixtures.rb
