@@ -129,14 +129,30 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
     unless param_name.index(/[^\w-]/)
       url_params[param_name.to_sym] = page
     else
-      page_param = (defined?(CGIMethods) ? CGIMethods : ActionController::AbstractRequest).
-        parse_query_parameters(param_name + '=' + page.to_s)
-      
+      page_param = parse_query_parameters("#{param_name}=#{page}")
       symbolized_update(url_params, page_param)
     end
   end
   
   def get_request?
     @template.request.get?
+  end
+  
+  private
+  
+  def parse_query_parameters(params)
+    if defined? Rack::Utils
+      # For Rails > 2.3
+      Rack::Utils.parse_nested_query(params)
+    elsif defined?(ActionController::AbstractRequest)
+      ActionController::AbstractRequest.parse_query_parameters(params)
+    elsif defined?(ActionController::UrlEncodedPairParser)
+      # For Rails > 2.2
+      ActionController::UrlEncodedPairParser.parse_query_parameters(params)
+    elsif defined?(CGIMethods)
+      CGIMethods.parse_query_parameters(params)
+    else
+      raise "unsupported ActionPack version"
+    end
   end
 end
