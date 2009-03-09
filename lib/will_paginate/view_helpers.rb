@@ -321,8 +321,7 @@ module WillPaginate
         stringified_merge @url_params, @options[:params] if @options[:params]
         
         if complex = param_name.index(/[^\w-]/)
-          page_param = (defined?(CGIMethods) ? CGIMethods : ActionController::AbstractRequest).
-            parse_query_parameters("#{param_name}=#{page}")
+          page_param = parse_query_parameters("#{param_name}=#{page}")
           
           stringified_merge @url_params, page_param
         else
@@ -383,6 +382,20 @@ module WillPaginate
         else
           target[key] = value
         end
+      end
+    end
+
+    def parse_query_parameters(params)
+      if defined?(CGIMethods)
+        CGIMethods.parse_query_parameters(params)
+      elsif defined?(ActionController::AbstractRequest)
+        ActionController::AbstractRequest.parse_query_parameters(params)
+      elsif defined?(ActionController::UrlEncodedPairParser)
+        # For Rails > 2.2
+        ActionController::UrlEncodedPairParser.parse_query_parameters(params)
+      else
+        # For Rails > 2.3
+        Rack::Utils.parse_nested_query(params)
       end
     end
   end
