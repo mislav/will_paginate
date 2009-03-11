@@ -37,12 +37,12 @@ describe WillPaginate::ViewHelpers::ActionView do
     paginate do |pagination|
       assert_select 'a[href]', 3 do |elements|
         validate_page_numbers [2,3,2], elements
-        assert_select elements.last, ':last-child', "Next &raquo;"
+        assert_select elements.last, ':last-child', "Next &#8594;"
       end
       assert_select 'span', 1
-      assert_select 'span.disabled:first-child', '&laquo; Previous'
+      assert_select 'span.disabled:first-child', '&#8592; Previous'
       assert_select 'em', '1'
-      pagination.first.inner_text.should == '&laquo; Previous 1 2 3 Next &raquo;'
+      pagination.first.inner_text.should == '&#8592; Previous 1 2 3 Next &#8594;'
     end
   end
 
@@ -107,11 +107,11 @@ describe WillPaginate::ViewHelpers::ActionView do
   it "should match expected markup" do
     paginate
     expected = <<-HTML
-      <div class="pagination"><span class="previous_page disabled">&laquo; Previous</span>
+      <div class="pagination"><span class="previous_page disabled">&#8592; Previous</span>
       <em>1</em>
       <a href="/foo/bar?page=2" rel="next">2</a>
       <a href="/foo/bar?page=3">3</a>
-      <a href="/foo/bar?page=2" class="next_page" rel="next">Next &raquo;</a></div>
+      <a href="/foo/bar?page=2" class="next_page" rel="next">Next &#8594;</a></div>
     HTML
     expected.strip!.gsub!(/\s{2,}/, ' ')
     expected_dom = HTML::Document.new(expected).root
