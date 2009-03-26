@@ -98,8 +98,8 @@ also need that collection object to be able to render pagination:
 
 == Authors and credits
 
-The original author of will_paginate is PJ Hyett, who later handed over development to Mislav
-Marohnić. The library was almost completely rewritten twice since then.
+The original author of will_paginate was PJ Hyett, who later handed over development to Mislav
+Marohnić. (The library was completely rewritten since then.)
 
 All these people helped making will_paginate what it is now with their code contributions or just
 simply awesome ideas:
