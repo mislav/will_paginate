@@ -73,6 +73,7 @@ module WillPaginate
   end
 end
 
-if defined?(Rails) and defined?(ActiveRecord) and defined?(ActionController)
-  WillPaginate.enable
+if defined? Rails
+  WillPaginate.enable_activerecord if defined? ActiveRecord
+  WillPaginate.enable_actionpack if defined? ActionController
 end
