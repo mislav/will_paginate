@@ -5,7 +5,7 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
   protected
 
   def url(page)
-    params = @template.request.params.except(:action, :controller).merge('page' => page)
+    params = @template.request.params.except(:action, :controller).merge(param_name => page)
     @template.url(:this, params)
   end
 end
