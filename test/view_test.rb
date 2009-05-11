@@ -277,6 +277,14 @@ class ViewTest < WillPaginate::ViewTestCase
       end
     end    
   end
+
+  def test_will_paginate_with_atmark_url
+    @request.symbolized_path_parameters[:action] = "@tag"
+    renderer = WillPaginate::LinkRenderer.new
+    
+    paginate({ :page => 1 }, :renderer=>renderer)
+    assert_links_match %r[/foo/@tag\?page=\d]
+  end
   
   def test_complex_custom_page_param
     @request.params :developers => { :page => 2 }
