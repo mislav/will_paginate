@@ -44,6 +44,16 @@ module WillPaginate
         klass.send :include, Finder::ClassMethods
         klass.class_eval { alias_method_chain :method_missing, :paginate }
       end
+      
+      # monkeypatch Rails ticket #2189: "count breaks has_many :through"
+      ActiveRecord::Base.class_eval do
+        protected
+        def self.construct_count_options_from_args(*args)
+          result = super
+          result[0] = '*' if result[0].is_a?(String) and result[0] =~ /\.\*$/
+          result
+        end
+      end
     end
 
     # Enable named_scope, a feature of Rails 2.1, even if you have older Rails
