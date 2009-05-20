@@ -284,11 +284,11 @@ class FinderTest < ActiveRecordTestCase
   # this functionality is temporarily removed
   def xtest_pagination_defines_method
     pager = "paginate_by_created_at"
-    assert !User.methods.include?(pager), "User methods should not include `#{pager}` method"
+    assert !User.methods.include_method?(pager), "User methods should not include `#{pager}` method"
     # paginate!
     assert 0, User.send(pager, nil, :page => 1).total_entries
     # the paging finder should now be defined
-    assert User.methods.include?(pager), "`#{pager}` method should be defined on User"
+    assert User.methods.include_method?(pager), "`#{pager}` method should be defined on User"
   end
 
   # Is this Rails 2.0? Find out by testing find_all which was removed in [6998]
@@ -440,7 +440,7 @@ class FinderTest < ActiveRecordTestCase
     end
 
     # detect ActiveRecord 2.1
-    if ActiveRecord::Base.private_methods.include?('references_eager_loaded_tables?')
+    if ActiveRecord::Base.private_methods.include_method?(:references_eager_loaded_tables?)
       def test_removes_irrelevant_includes_in_count
         Developer.expects(:find).returns([1])
         Developer.expects(:count).with({}).returns(0)

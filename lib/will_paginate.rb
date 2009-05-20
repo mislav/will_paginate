@@ -17,7 +17,7 @@ module WillPaginate
     
     # hooks WillPaginate::ViewHelpers into ActionView::Base
     def enable_actionpack
-      return if ActionView::Base.instance_methods.include? 'will_paginate'
+      return if ActionView::Base.instance_methods.include_method? :will_paginate
       require 'will_paginate/view_helpers'
       ActionView::Base.send :include, ViewHelpers
 
