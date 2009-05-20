@@ -236,7 +236,7 @@ describe WillPaginate::Finders::ActiveRecord do
     end
     
     # detect ActiveRecord 2.1
-    if ActiveRecord::Base.private_methods.include?('references_eager_loaded_tables?')
+    if ActiveRecord::Base.private_methods.include_method?(:references_eager_loaded_tables?)
       it "should remove :include for count" do
         Developer.expects(:find).returns([1])
         Developer.expects(:count).with({}).returns(0)

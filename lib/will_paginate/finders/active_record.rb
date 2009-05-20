@@ -162,7 +162,7 @@ module WillPaginate::Finders
       
       # forget about includes if they are irrelevant (Rails 2.1)
       if count_options[:include] and
-          klass.private_methods.include?('references_eager_loaded_tables?') and
+          klass.private_methods.include_method?(:references_eager_loaded_tables?) and
           !klass.send(:references_eager_loaded_tables?, count_options)
         count_options.delete :include
       end
