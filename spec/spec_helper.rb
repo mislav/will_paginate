@@ -1,5 +1,4 @@
 require 'rubygems'
-gem 'dchelimsky-rspec', '~> 1.1.11'
 require 'spec'
 
 module MyExtras
