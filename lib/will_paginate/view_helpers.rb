@@ -386,16 +386,18 @@ module WillPaginate
     end
 
     def parse_query_parameters(params)
-      if defined?(CGIMethods)
-        CGIMethods.parse_query_parameters(params)
+      if defined? Rack::Utils
+        # For Rails > 2.3
+        Rack::Utils.parse_nested_query(params)
       elsif defined?(ActionController::AbstractRequest)
         ActionController::AbstractRequest.parse_query_parameters(params)
       elsif defined?(ActionController::UrlEncodedPairParser)
         # For Rails > 2.2
         ActionController::UrlEncodedPairParser.parse_query_parameters(params)
+      elsif defined?(CGIMethods)
+        CGIMethods.parse_query_parameters(params)
       else
-        # For Rails > 2.3
-        Rack::Utils.parse_nested_query(params)
+        raise "unsupported ActionPack version"
       end
     end
   end
