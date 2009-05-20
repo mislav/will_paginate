@@ -1,4 +1,5 @@
 require 'sequel'
+require 'sequel/extensions/pagination'
 
 existing_methods = Sequel::Dataset::Pagination.instance_methods
 
