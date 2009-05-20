@@ -140,10 +140,6 @@ module WillPaginate
           unless pager.total_entries
             count_query = original_query.sub /\bORDER\s+BY\s+[\w`,\s]+$/mi, ''
             count_query = "SELECT COUNT(*) FROM (#{count_query})"
-            
-            unless ['oracle', 'oci'].include?(self.connection.adapter_name.downcase)
-              count_query << ' AS count_table'
-            end
             # perform the count query
             pager.total_entries = count_by_sql(count_query)
           end
