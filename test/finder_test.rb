@@ -363,7 +363,7 @@ class FinderTest < ActiveRecordTestCase
     def test_paginate_by_sql
       assert_respond_to Developer, :paginate_by_sql
       Developer.expects(:find_by_sql).with(regexp_matches(/sql LIMIT 3(,| OFFSET) 3/)).returns([])
-      Developer.expects(:count_by_sql).with('SELECT COUNT(*) FROM (sql)').returns(0)
+      Developer.expects(:count_by_sql).with('SELECT COUNT(*) FROM (sql) AS count_table').returns(0)
       
       entries = Developer.paginate_by_sql 'sql', :page => 2, :per_page => 3
     end
@@ -378,7 +378,7 @@ class FinderTest < ActiveRecordTestCase
 
     def test_paginate_by_sql_strips_order_by_when_counting
       Developer.expects(:find_by_sql).returns([])
-      Developer.expects(:count_by_sql).with("SELECT COUNT(*) FROM (sql\n )").returns(0)
+      Developer.expects(:count_by_sql).with("SELECT COUNT(*) FROM (sql\n ) AS count_table").returns(0)
       
       Developer.paginate_by_sql "sql\n ORDER\nby foo, bar, `baz` ASC", :page => 2
     end
