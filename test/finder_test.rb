@@ -361,18 +361,15 @@ class FinderTest < ActiveRecordTestCase
     end
 
     def test_paginate_by_sql
-      assert_respond_to Developer, :paginate_by_sql
-      Developer.expects(:find_by_sql).with(regexp_matches(/sql LIMIT 3(,| OFFSET) 3/)).returns([])
-      Developer.expects(:count_by_sql).with('SELECT COUNT(*) FROM (sql) AS count_table').returns(0)
-      
-      entries = Developer.paginate_by_sql 'sql', :page => 2, :per_page => 3
+      sql = "SELECT * FROM users WHERE type = 'Developer' ORDER BY id"
+      entries = Developer.paginate_by_sql(sql, :page => 2, :per_page => 3)
+      assert_equal 11, entries.total_entries
+      assert_equal [users(:dev_4), users(:dev_5), users(:dev_6)], entries
     end
 
     def test_paginate_by_sql_respects_total_entries_setting
-      Developer.expects(:find_by_sql).returns([])
-      Developer.expects(:count_by_sql).never
-      
-      entries = Developer.paginate_by_sql 'sql', :page => 1, :total_entries => 999
+      sql = "SELECT * FROM users"
+      entries = Developer.paginate_by_sql(sql, :page => 1, :total_entries => 999)
       assert_equal 999, entries.total_entries
     end
 
