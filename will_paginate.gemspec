@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name    = 'will_paginate'
-  s.version = '2.3.9'
-  s.date    = '2009-05-20'
+  s.version = '2.3.10'
+  s.date    = '2009-05-21'
   
   s.summary = "Most awesome pagination solution for Rails"
   s.description = "The will_paginate library provides a simple, yet powerful and extensible API for ActiveRecord pagination and rendering of pagination links in ActionView templates."
