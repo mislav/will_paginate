@@ -141,7 +141,7 @@ module WillPaginate
             count_query = original_query.sub /\bORDER\s+BY\s+[\w`,\s]+$/mi, ''
             count_query = "SELECT COUNT(*) FROM (#{count_query})"
             
-            unless ['oracle', 'oci'].include?(self.connection.adapter_name.downcase)
+            unless self.connection.adapter_name =~ /^(oracle|oci$)/i
               count_query << ' AS count_table'
             end
             # perform the count query
