@@ -1,4 +1,5 @@
 require 'active_support'
+require 'will_paginate/core_ext'
 
 # = You *will* paginate!
 #
