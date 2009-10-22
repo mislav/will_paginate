@@ -235,7 +235,7 @@ module WillPaginate
                   counter.call
                 end
 
-        count.respond_to?(:length) ? count.length : count
+        (!count.is_a?(Integer) && count.respond_to?(:length)) ? count.length : count
       end
 
       def wp_parse_options(options) #:nodoc:

@@ -39,6 +39,22 @@ class FinderTest < ActiveRecordTestCase
     assert_nothing_raised { Topic.paginate :page => 1, :count => nil }
   end
   
+  def test_counting_when_integer_has_length_method
+    Integer.module_eval { def length; to_s.length; end }
+    begin
+      assert_equal 2, 11.length
+      entries = Developer.paginate :page => 1, :per_page => 5
+      assert_equal 11, entries.total_entries
+      assert_equal 5, entries.size
+      assert_equal 3, entries.total_pages
+    ensure
+      begin
+        Integer.module_eval { remove_method :length }
+      rescue
+      end
+    end
+  end
+  
   def test_paginate_with_per_page
     entries = Topic.paginate :page => 1, :per_page => 1
     assert_equal 1, entries.size
