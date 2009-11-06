@@ -1,12 +1,5 @@
-require 'rubygems'
-begin
-  hanna_dir = '/Users/mislav/Projects/Hanna/lib'
-  $:.unshift hanna_dir if File.exists? hanna_dir
-  require 'hanna/rdoctask'
-rescue LoadError
-  require 'rake'
-  require 'rake/rdoctask'
-end
+require 'rake/rdoctask'
+
 load 'spec/tasks.rake'
 
 desc 'Default: run specs.'
