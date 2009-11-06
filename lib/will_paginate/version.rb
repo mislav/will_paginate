@@ -1,8 +1,8 @@
 module WillPaginate #:nodoc:
   module VERSION #:nodoc:
-    MAJOR = 2
-    MINOR = 5
-    TINY  = 0
+    MAJOR = 3
+    MINOR = 0
+    TINY  = 'pre'
 
     STRING = [MAJOR, MINOR, TINY].join('.')
   end
