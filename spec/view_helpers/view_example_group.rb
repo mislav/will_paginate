@@ -1,8 +1,8 @@
-require 'action_controller/assertions/selector_assertions'
+require 'action_dispatch/testing/assertions'
 
 class ViewExampleGroup < Spec::Example::ExampleGroup
   
-  include ActionController::Assertions::SelectorAssertions
+  include ActionDispatch::Assertions::SelectorAssertions
   
   def assert(value, message)
     raise message unless value
