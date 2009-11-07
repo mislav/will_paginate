@@ -276,7 +276,7 @@ describe WillPaginate::ViewHelpers::ActionView do
     
     lambda {
       paginate(nil)
-    }.should raise_error(ArgumentError, /@developers/)
+    }.should raise_error(ActionView::TemplateError, /@developers/)
   end
 
   if ActionController::Base.respond_to? :rescue_responses
