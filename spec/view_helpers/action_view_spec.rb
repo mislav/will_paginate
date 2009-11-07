@@ -17,17 +17,17 @@ end
 
 describe WillPaginate::ViewHelpers::ActionView do
   before(:each) do
-    @view = ActionView::Base.new
-    @view.controller = DummyController.new
-    @view.request = @view.controller.request
+    @assigns = {}
+    @controller = DummyController.new
+    @request = @controller.request
     @template = '<%= will_paginate collection, options %>'
   end
   
-  def request
-    @view.request
-  end
+  attr_reader :assigns, :controller, :request
   
   def render(locals)
+    @view = ActionView::Base.new([], @assigns, @controller)
+    @view.request = @request
     @view.render(:inline => @template, :locals => locals)
   end
   
@@ -264,15 +264,15 @@ describe WillPaginate::ViewHelpers::ActionView do
     collection.expects(:total_pages).returns(1)
     
     @template = '<%= will_paginate options %>'
-    @view.controller.controller_name = 'developers'
-    @view.assigns['developers'] = collection
+    controller.controller_name = 'developers'
+    assigns['developers'] = collection
     
     paginate(nil)
   end
   
   it "should fail if the inferred collection is nil" do
     @template = '<%= will_paginate options %>'
-    @view.controller.controller_name = 'developers'
+    controller.controller_name = 'developers'
     
     lambda {
       paginate(nil)
