@@ -45,7 +45,7 @@ module WillPaginate::Finders
         query = sanitize_sql(sql.dup)
         original_query = query.dup
         # add limit, offset
-        add_limit! query, :offset => pager.offset, :limit => pager.per_page
+        query << " LIMIT #{pager.per_page} OFFSET #{pager.offset}"
         # perfom the find
         pager.replace find_by_sql(query)
         
