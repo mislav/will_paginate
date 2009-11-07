@@ -181,7 +181,7 @@ end
 
 # support pagination on associations
 a = ActiveRecord::Associations
-returning([ a::AssociationCollection ]) { |classes|
+[a::AssociationCollection].tap { |classes|
   # detect http://dev.rubyonrails.org/changeset/9230
   unless a::HasManyThroughAssociation.superclass == a::HasManyAssociation
     classes << a::HasManyThroughAssociation
