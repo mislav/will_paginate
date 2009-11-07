@@ -1,11 +1,3 @@
-unless $:.find { |p| p =~ %r{/html-scanner$} }
-  unless actionpack_path = $:.find { |p| p =~ %r{/actionpack(-[\d.]+)?/lib$} }
-    raise "cannot find ActionPack in load paths"
-  end
-  html_scanner_path = "#{actionpack_path}/action_controller/vendor/html-scanner"
-  $:.unshift(html_scanner_path)
-end
-
 require 'action_controller/assertions/selector_assertions'
 
 class ViewExampleGroup < Spec::Example::ExampleGroup
