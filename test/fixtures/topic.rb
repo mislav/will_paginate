@@ -7,4 +7,6 @@ class Topic < ActiveRecord::Base
   named_scope :with_replies_starting_with, lambda { |text|
     { :conditions => "replies.content LIKE '#{text}%' ", :include  => :replies }
   }
+
+  def self.paginate_by_definition_in_class; end
 end

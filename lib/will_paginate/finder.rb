@@ -155,7 +155,7 @@ module WillPaginate
         when :paginate, :paginate_by_sql
           true
         else
-          super(method.to_s.sub(/^paginate/, 'find'), include_priv)
+          super || super(method.to_s.sub(/^paginate/, 'find'), include_priv)
         end
       end
 

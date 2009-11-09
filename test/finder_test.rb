@@ -9,7 +9,7 @@ class FinderTest < ActiveRecordTestCase
   fixtures :topics, :replies, :users, :projects, :developers_projects
 
   def test_new_methods_presence
-    assert_respond_to_all Topic, %w(per_page paginate paginate_by_sql)
+    assert_respond_to_all Topic, %w(per_page paginate paginate_by_sql paginate_by_definition_in_class)
   end
   
   def test_simple_paginate
