@@ -5,6 +5,8 @@ require 'view_helpers/view_example_group'
 require 'will_paginate/view_helpers/action_view'
 require 'will_paginate/collection'
 
+ActionController::Routing.use_controllers!(%w(foo baz))
+
 ActionController::Routing::Routes.draw do |map|
   map.connect 'dummy/page/:page', :controller => 'dummy'
   map.connect 'dummy/dots/page.:page', :controller => 'dummy', :action => 'dots'
