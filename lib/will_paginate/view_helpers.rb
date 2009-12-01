@@ -182,7 +182,11 @@ module WillPaginate
         ]
       end
     end
-
+    
+    if respond_to? :safe_helper
+      safe_helper :will_paginate, :paginated_section, :page_entries_info
+    end
+    
     def self.total_pages_for_collection(collection) #:nodoc:
       if collection.respond_to?('page_count') and !collection.respond_to?('total_pages')
         WillPaginate::Deprecation.warn %{
