@@ -1,3 +1,32 @@
+= 2.3.12, released 2009-12-01
+
+* make view helpers "HTML safe" for Rails 2.3.5 with rails_xss plugin
+
+= 2.3.11, released 2009-06-02
+
+* fix `enable_actionpack`
+
+= 2.3.10, released 2009-05-21
+
+* count_by_sql: don't use table alias with any adapters starting with "oracle"
+* Add back "AS count_table" alias to `paginate_by_sql` counter SQL
+
+= 2.3.9, released 2009-05-29
+
+* remove "AS count_table" alias from `paginate_by_sql` counter SQL
+* Rails 2.3.2 compat: monkeypatch Rails issue #2189 (count breaks has_many :through)
+* fix generation of page URLs that contain the "@" character
+* check for method existance in a ruby 1.8- and 1.9-compatible way
+* load will_paginate view helpers even if ActiveRecord is not loaded
+
+== 2.3.8, released 2009-03-09
+
+* Rails 2.3 compat: query parameter parsing with Rack
+
+== 2.3.7, released 2009-02-09
+
+* Removed all unnecessary &block variables since they cause serious memory damage and lots of subsequent gc runs.
+
 == 2.3.6, released 2008-10-26
 
 * Rails 2.2 fix: stop using `extract_attribute_names_from_match` inernal AR method, it no longer exists
