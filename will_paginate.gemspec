@@ -1,6 +1,8 @@
+require File.expand_path('../lib/will_paginate/version', __FILE__)
+
 Gem::Specification.new do |gem|
   gem.name    = 'will_paginate'
-  gem.version = '2.3.12'
+  gem.version = WillPaginate::VERSION::STRING
   gem.date    = Date.today.to_s
   
   gem.summary = "Pagination for Rails"
