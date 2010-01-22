@@ -33,11 +33,9 @@ module WillPaginate
   # 
   # If you are writing a library that provides a collection which you would like
   # to conform to this API, you don't have to copy these methods over; simply
-  # make your plugin/gem dependant on the "mislav-will_paginate" gem:
+  # make your plugin/gem dependant on this library and do:
   #
-  #   gem 'mislav-will_paginate'
   #   require 'will_paginate/collection'
-  #   
   #   # WillPaginate::Collection is now available for use
   class Collection < Array
     attr_reader :current_page, :per_page, :total_entries, :total_pages
