@@ -46,7 +46,7 @@
 == 2.3.3, released 2008-08-29
 
 * Ensure that paginate_by_sql doesn't change the original SQL query.
-* RDoc love (now live at http://mislav.caboo.se/static/will_paginate/doc/)
+* RDoc love (now live at http://gitrdoc.com/mislav/will_paginate/tree/master)
 * Rename :prev_label to :previous_label for consistency. old name still functions but is deprecated
 * ActiveRecord 2.1: Remove :include option from count_all query when it's possible.
 
