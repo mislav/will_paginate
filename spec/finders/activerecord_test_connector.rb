@@ -3,6 +3,8 @@ require 'active_record/version'
 require 'active_record/fixtures'
 require 'active_support/multibyte' # needed for Ruby 1.9.1
 
+$query_count = $query_sql = nil
+
 class ActiverecordTestConnector
   cattr_accessor :able_to_connect
   cattr_accessor :connected
@@ -40,15 +42,11 @@ class ActiverecordTestConnector
     configuration = configurations[db]
     
     ActiveRecord::Base.logger = Logger.new(STDOUT) if $0 == 'irb'
-    puts "using #{configuration['adapter']} adapter" unless ENV['DB'].blank?
+    puts "using #{configuration['adapter']} adapter"
     
-    ActiveRecord::Base.establish_connection(configuration)
     ActiveRecord::Base.configurations = { db => configuration }
+    ActiveRecord::Base.establish_connection(db)
     prepare ActiveRecord::Base.connection
-
-    unless Object.const_defined?(:QUOTED_TYPE)
-      Object.send :const_set, :QUOTED_TYPE, ActiveRecord::Base.connection.quote_column_name('type')
-    end
   end
 
   def self.load_schema
@@ -60,15 +58,23 @@ class ActiverecordTestConnector
 
   def self.prepare(conn)
     class << conn
-      IGNORED_SQL = [/^PRAGMA/, /^SELECT currval/, /^SELECT CAST/, /^SELECT @@IDENTITY/, /^SELECT @@ROWCOUNT/, /^SHOW FIELDS /]
+      IGNORED_SQL = /^(?:PRAGMA|SELECT (?:currval|CAST|@@IDENTITY|@@ROWCOUNT)|SHOW FIELDS)\b/
 
       def execute_with_counting(sql, name = nil, &block)
-        $query_count ||= 0
-        $query_count  += 1 unless IGNORED_SQL.any? { |r| sql =~ r }
+        if $query_count and IGNORED_SQL !~ sql
+          $query_count += 1
+          $query_sql << sql
+        end
         execute_without_counting(sql, name, &block)
       end
 
       alias_method_chain :execute, :counting
+    end
+  end
+  
+  def self.show_sql
+    ActiveSupport::Notifications.subscribe('active_record.sql') do |*args|
+      puts args.last[:sql]
     end
   end
   

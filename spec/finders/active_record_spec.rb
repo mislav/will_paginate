@@ -428,21 +428,23 @@ end
 
 class QueryCountMatcher
   def initialize(num)
-    @queries = num
-    @old_query_count = $query_count
+    @expected_count = num
   end
 
   def matches?(block)
+    $query_count = 0
+    $query_sql = []
     block.call
-    @queries_run = $query_count - @old_query_count
-    @queries == @queries_run
+    @queries = $query_sql
+    @count = $query_count
+    @count == @expected_count
   end
 
   def failure_message
-    "expected #{@queries} queries, got #{@queries_run}"
+    "expected #{@expected_count} queries, got #{@count}\n#{@queries.join("\n")}"
   end
 
   def negative_failure_message
-    "expected query count not to be #{$queries}"
+    "expected query count not to be #{$expected_count}"
   end
 end
