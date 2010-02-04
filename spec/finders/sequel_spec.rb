@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'will_paginate/finders/sequel'
-require File.dirname(__FILE__) + '/sequel_test_connector'
+require File.expand_path('../sequel_test_connector', __FILE__)
 
 describe Sequel::Dataset::Pagination, 'extension' do
   

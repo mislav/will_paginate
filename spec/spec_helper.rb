@@ -1,4 +1,4 @@
-require 'spec'
+require 'spec/autorun'
 
 module MyExtras
   protected

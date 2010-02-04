@@ -1,9 +1,9 @@
 require 'spec_helper'
 require 'will_paginate/finders/active_record'
-require File.dirname(__FILE__) + '/activerecord_test_connector'
 
 require 'will_paginate'
 WillPaginate::enable_named_scope
+require File.expand_path('../activerecord_test_connector', __FILE__)
 
 class ArProject < ActiveRecord::Base
   def self.column_names
@@ -13,7 +13,6 @@ class ArProject < ActiveRecord::Base
   named_scope :distinct, :select => "DISTINCT #{table_name}.*"
 end
 
-gem 'sqlite3-ruby'
 ActiverecordTestConnector.setup
 
 describe WillPaginate::Finders::ActiveRecord do

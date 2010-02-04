@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'will_paginate/finders/data_mapper'
-require File.dirname(__FILE__) + '/data_mapper_test_connector'
+require File.expand_path('../data_mapper_test_connector', __FILE__)
 
 require 'will_paginate'
 

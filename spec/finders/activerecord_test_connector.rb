@@ -7,7 +7,7 @@ class ActiverecordTestConnector
   cattr_accessor :able_to_connect
   cattr_accessor :connected
 
-  FIXTURES_PATH = File.join(File.dirname(__FILE__), '..', 'fixtures')
+  FIXTURES_PATH = File.expand_path('../../fixtures', __FILE__)
 
   # Set our defaults
   self.connected = false
@@ -35,7 +35,7 @@ class ActiverecordTestConnector
   def self.setup_connection
     db = ENV['DB'].blank?? 'sqlite3' : ENV['DB']
     
-    configurations = YAML.load_file(File.join(File.dirname(__FILE__), '..', 'database.yml'))
+    configurations = YAML.load_file(File.expand_path('../../database.yml', __FILE__))
     raise "no configuration for '#{db}'" unless configurations.key? db
     configuration = configurations[db]
     
