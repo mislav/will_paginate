@@ -3,4 +3,4 @@ active_record:
   name: Active Record
 action_controller:
   id: 2
-  name: Active Controller
+  name: Action Controller
