@@ -30,14 +30,14 @@ module WillPaginate
         options, collection = collection, nil if collection.is_a? Hash
         collection ||= infer_collection_from_controller
 
-        super(collection, options.symbolize_keys).tap { |output| output.html_safe! if output }
+        super(collection, options.symbolize_keys).try(:html_safe)
       end
       
       def page_entries_info(collection = nil, options = {}) #:nodoc:
         options, collection = collection, nil if collection.is_a? Hash
         collection ||= infer_collection_from_controller
         
-        super(collection, options.symbolize_keys).tap { |output| output.html_safe! if output }
+        super(collection, options.symbolize_keys).try(:html_safe)
       end
       
       # Wrapper for rendering pagination links at both top and bottom of a block

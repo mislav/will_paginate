@@ -5,8 +5,6 @@ require 'view_helpers/view_example_group'
 require 'will_paginate/view_helpers/action_view'
 require 'will_paginate/collection'
 
-ActionController::Routing.use_controllers!(%w(foo baz))
-
 ActionController::Routing::Routes.draw do |map|
   map.connect 'dummy/page/:page', :controller => 'dummy'
   map.connect 'dummy/dots/page.:page', :controller => 'dummy', :action => 'dots'
@@ -182,7 +180,7 @@ describe WillPaginate::ViewHelpers::ActionView do
   it "should preserve parameters on GET" do
     request.params :foo => { :bar => 'baz' }
     paginate
-    assert_links_match /foo%5Bbar%5D=baz/
+    assert_links_match /foo\[bar\]=baz/
   end
   
   it "should not preserve parameters on POST" do
@@ -226,7 +224,7 @@ describe WillPaginate::ViewHelpers::ActionView do
     
     paginate({ :page => 2 }, :param_name => 'developers[page]') do
       assert_select 'a[href]', 4 do |links|
-        assert_links_match /\?developers%5Bpage%5D=\d+$/, links
+        assert_links_match /\?developers\[page\]=\d+$/, links
         validate_page_numbers [1,1,3,3], links, 'developers[page]'
       end
     end
@@ -342,5 +340,13 @@ class DummyRequest
   def params(more = nil)
     @params.update(more) if more
     @params
+  end
+  
+  def host_with_port
+    'example.com'
+  end
+  
+  def protocol
+    'http:'
   end
 end

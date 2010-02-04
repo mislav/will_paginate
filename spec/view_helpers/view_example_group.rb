@@ -36,7 +36,7 @@ class ViewExampleGroup < Spec::Example::ExampleGroup
   end
   
   def validate_page_numbers(expected, links, param_name = :page)
-    param_pattern = /\W#{CGI.escape(param_name.to_s)}=([^&]*)/
+    param_pattern = /\W#{Regexp.escape(param_name.to_s)}=([^&]*)/
     
     links.map { |e|
       e['href'] =~ param_pattern
