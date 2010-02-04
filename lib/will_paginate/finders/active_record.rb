@@ -62,30 +62,7 @@ module WillPaginate::Finders
       end
     end
 
-    def respond_to?(method, include_priv = false) #:nodoc:
-      super(method.to_s.sub(/^paginate/, 'find'), include_priv)
-    end
-
   protected
-    
-    def method_missing_with_paginate(method, *args, &block) #:nodoc:
-      # did somebody tried to paginate? if not, let them be
-      unless method.to_s.index('paginate') == 0
-        return method_missing_without_paginate(method, *args, &block) 
-      end
-      
-      # paginate finders are really just find_* with limit and offset
-      finder = method.to_s.sub('paginate', 'find')
-      finder.sub!('find', 'find_all') if finder.index('find_by_') == 0
-      
-      options = args.pop
-      raise ArgumentError, 'parameter hash expected' unless options.respond_to? :symbolize_keys
-      options = options.dup
-      options[:finder] = finder
-      args << options
-      
-      paginate(*args, &block)
-    end
 
     def wp_query(options, pager, args, &block) #:nodoc:
       finder = (options.delete(:finder) || 'find').to_s
@@ -170,9 +147,6 @@ end
 
 ActiveRecord::Base.class_eval do
   extend WillPaginate::Finders::ActiveRecord
-  class << self
-    alias_method_chain :method_missing, :paginate
-  end
 end
 
 # support pagination on associations
@@ -184,5 +158,4 @@ a = ActiveRecord::Associations
   end
 }.each do |klass|
   klass.send :include, WillPaginate::Finders::ActiveRecord
-  klass.class_eval { alias_method_chain :method_missing, :paginate }
 end

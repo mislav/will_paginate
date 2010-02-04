@@ -240,7 +240,7 @@ describe WillPaginate::Finders::ActiveRecord do
       expected = [replies(:brave)]
 
       lambda {
-        result = project.replies.paginate_recent :page => 1
+        result = project.replies.only_recent.paginate(:page => 1)
         result.should == expected
       }.should run_queries(1)
     end
@@ -278,24 +278,9 @@ describe WillPaginate::Finders::ActiveRecord do
     result.map(&:salary).should == expected
   end
 
-  it "should paginate with dynamic finder" do
-    expected = replies(:witty_retort, :spam)
-    Reply.paginate_by_topic_id(1, :page => 1).should == expected
-
-    result = Developer.paginate :conditions => { :salary => 100000 }, :page => 1, :per_page => 5
-    result.total_entries.should == 8
-    Developer.paginate_by_salary(100000, :page => 1, :per_page => 5).should == result
-  end
-
-  it "should paginate with dynamic finder and conditions" do
-    result = Developer.paginate_by_salary(100000, :page => 1, :conditions => ['id > ?', 6])
-    result.total_entries.should == 4
-    result.map(&:id).should == (7..10).to_a
-  end
-
-  it "should raise error when dynamic finder is not recognized" do
+  it "should not paginate with dynamic finder" do
     lambda {
-      Developer.paginate_by_inexistent_attribute 100000, :page => 1
+      Developer.paginate_by_salary(100000, :page => 1, :per_page => 5)
     }.should raise_error(NoMethodError)
   end
 

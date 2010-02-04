@@ -6,10 +6,8 @@ class Project < ActiveRecord::Base
     # :counter_sql => 'SELECT COUNT(*) FROM topics WHERE (topics.project_id = #{id})'
   
   has_many :replies, :through => :topics do
-    def find_recent(params = {})
-      with_scope :find => { :conditions => ['replies.created_at > ?', 15.minutes.ago] } do
-        find :all, params
-      end
+    def only_recent(params = {})
+      scoped.where(['replies.created_at > ?', 15.minutes.ago])
     end
   end
 end
