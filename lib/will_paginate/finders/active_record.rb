@@ -137,7 +137,10 @@ module WillPaginate::Finders
       excludees = [:count, :order, :limit, :offset, :readonly]
       
       # Use :select from scope if it isn't already present.
-      options[:select] = scope(:find, :select) unless options[:select]
+      # FIXME: this triggers extra queries when going through associations
+      # if options[:select].blank? && current_scoped_methods && current_scoped_methods.select_values.present?
+      #   options[:select] = current_scoped_methods.select_values.join(", ")
+      # end
       
       if options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
         # Remove quoting and check for table_name.*-like statement.
