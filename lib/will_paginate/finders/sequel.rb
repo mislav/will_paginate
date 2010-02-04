@@ -1,3 +1,4 @@
+require 'will_paginate/core_ext'
 require 'sequel'
 require 'sequel/extensions/pagination'
 
