@@ -158,10 +158,8 @@ module WillPaginate::Finders
       # this allows you to specify :select, :order, or anything else just for the count query
       count_options.update options[:count] if options[:count]
       
-      # forget about includes if they are irrelevant (Rails 2.1)
-      if count_options[:include] and
-          klass.private_methods.include_method?(:references_eager_loaded_tables?) and
-          !klass.send(:references_eager_loaded_tables?, count_options)
+      # forget about includes if they are irrelevant when counting
+      if count_options[:include] and count_options[:conditions].blank? and count_options[:group].blank?
         count_options.delete :include
       end
       
