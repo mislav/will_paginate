@@ -1,8 +1,5 @@
 require 'spec_helper'
 require 'will_paginate/finders/active_record'
-
-require 'will_paginate'
-WillPaginate::enable_named_scope
 require File.expand_path('../activerecord_test_connector', __FILE__)
 
 class ArProject < ActiveRecord::Base
@@ -10,7 +7,7 @@ class ArProject < ActiveRecord::Base
     ["id"]
   end
   
-  named_scope :distinct, :select => "DISTINCT #{table_name}.*"
+  scope :distinct, :select => "DISTINCT #{table_name}.*"
 end
 
 ActiverecordTestConnector.setup
@@ -363,7 +360,7 @@ describe WillPaginate::Finders::ActiveRecord do
       result.total_entries.should == 2
     end
 
-    describe "named_scope" do
+    describe "scopes" do
       it "should paginate" do
         result = Developer.poor.paginate :page => 1, :per_page => 1
         result.size.should == 1
