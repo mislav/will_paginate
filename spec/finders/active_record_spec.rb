@@ -3,6 +3,8 @@ require 'will_paginate/finders/active_record'
 require File.expand_path('../activerecord_test_connector', __FILE__)
 ActiverecordTestConnector.setup
 
+WillPaginate::Finders::ActiveRecord.enable!
+
 describe WillPaginate::Finders::ActiveRecord do
   
   extend ActiverecordTestConnector::FixtureSetup
