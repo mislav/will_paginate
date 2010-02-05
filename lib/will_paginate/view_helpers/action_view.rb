@@ -88,11 +88,7 @@ module WillPaginate
   end
 end
 
-ActionView::Base.send :include, WillPaginate::ViewHelpers::ActionView
 # :stopdoc:
-if defined?(ActionController::Base) and ActionController::Base.respond_to? :rescue_responses
-  ActionController::Base.rescue_responses['WillPaginate::InvalidPage'] = :not_found
-end
 
 WillPaginate::ViewHelpers::LinkRenderer.class_eval do
   protected
@@ -141,18 +137,6 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
   private
   
   def parse_query_parameters(params)
-    if defined? Rack::Utils
-      # For Rails > 2.3
-      Rack::Utils.parse_nested_query(params)
-    elsif defined?(ActionController::AbstractRequest)
-      ActionController::AbstractRequest.parse_query_parameters(params)
-    elsif defined?(ActionController::UrlEncodedPairParser)
-      # For Rails > 2.2
-      ActionController::UrlEncodedPairParser.parse_query_parameters(params)
-    elsif defined?(CGIMethods)
-      CGIMethods.parse_query_parameters(params)
-    else
-      raise "unsupported ActionPack version"
-    end
+    Rack::Utils.parse_nested_query(params)
   end
 end

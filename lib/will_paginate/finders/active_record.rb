@@ -26,6 +26,18 @@ module WillPaginate::Finders
   module ActiveRecord
     include WillPaginate::Finders::Base
     
+    # In Rails, this is automatically called to mix-in pagination functionality to ActiveRecord.
+    def self.enable!
+      ActiveRecord::Base.class_eval do
+        extend self
+      end
+
+      # support pagination on associations and scopes
+      [ActiveRecord::Relation, ActiveRecord::Associations::AssociationCollection].each do |klass|
+        klass.send(:include, self)
+      end
+    end
+    
     # Wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
     # based on the params otherwise used by paginating finds: +page+ and
     # +per_page+.
@@ -143,19 +155,4 @@ module WillPaginate::Finders
       count_options
     end
   end
-end
-
-ActiveRecord::Base.class_eval do
-  extend WillPaginate::Finders::ActiveRecord
-end
-
-# support pagination on associations
-a = ActiveRecord::Associations
-[ActiveRecord::Relation, a::AssociationCollection].tap { |classes|
-  # detect http://dev.rubyonrails.org/changeset/9230
-  unless a::HasManyThroughAssociation.superclass == a::HasManyAssociation
-    classes << a::HasManyThroughAssociation
-  end
-}.each do |klass|
-  klass.send :include, WillPaginate::Finders::ActiveRecord
 end

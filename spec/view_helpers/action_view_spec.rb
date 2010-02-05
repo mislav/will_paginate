@@ -278,13 +278,6 @@ describe WillPaginate::ViewHelpers::ActionView do
       paginate(nil)
     }.should raise_error(ActionView::TemplateError, /@developers/)
   end
-
-  if ActionController::Base.respond_to? :rescue_responses
-    # only on Rails 2
-    it "should set rescue response hook" do
-      ActionController::Base.rescue_responses['WillPaginate::InvalidPage'].should == :not_found
-    end
-  end
 end
 
 class AdditionalLinkAttributesRenderer < WillPaginate::ViewHelpers::LinkRenderer
