@@ -5,7 +5,7 @@ module WillPaginate
     def self.debug=(value) @debug = value; end
     self.debug = false
 
-    # Choose the default warn behavior according to RAILS_ENV.
+    # Choose the default warn behavior according to Rails.env.
     # Ignore deprecation warnings in production.
     BEHAVIORS = {
       'test'        => Proc.new { |message, callstack|
@@ -27,8 +27,8 @@ module WillPaginate
     end
 
     def self.default_behavior
-      if defined?(RAILS_ENV)
-        BEHAVIORS[RAILS_ENV.to_s]
+      if defined?(::Rails)
+        BEHAVIORS[::Rails.env.to_s]
       else
         BEHAVIORS['test']
       end
