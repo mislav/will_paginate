@@ -94,7 +94,7 @@ Denis Barushev, Ben Pickles.
 == Usable pagination in the UI
 
 There are some CSS styles to get you started in the "examples/" directory. They
-are {showcased online here}[http://mislav.caboo.se/static/will_paginate/].
+are {showcased online here}[http://mislav.uniqpath.com/will_paginate/].
 
 More reading about pagination as design pattern:
 
