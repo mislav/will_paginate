@@ -168,7 +168,7 @@ describe WillPaginate::ViewHelpers::ActionView do
   
   it "should render a paginated section" do
     @template = <<-ERB
-      <% paginated_section collection, options do %>
+      <%= paginated_section collection, options do %>
         <%= content_tag :div, '', :id => "developers" %>
       <% end %>
     ERB
