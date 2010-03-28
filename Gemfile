@@ -1,14 +1,9 @@
-rails_dir = '/Users/mislav/.coral/rails-rails'
-if File.directory? rails_dir
-  path rails_dir
-else
-  git 'git://github.com/rails/rails.git'
-end
+git 'git://github.com/rails/rails.git'
 source :gemcutter
 
-gem 'activerecord', '~> 3.0.pre'
-gem 'activeresource', '~> 3.0.pre'
-gem 'actionpack', '~> 3.0.pre'
+gem 'activerecord', '~> 3.0.0.beta1'
+gem 'activeresource', '~> 3.0.0.beta1'
+gem 'actionpack', '~> 3.0.0.beta1'
 gem 'sequel', '~> 3.8.0'
 gem 'rspec', '~> 1.3.0'
 gem 'mocha', '~> 0.9.8'

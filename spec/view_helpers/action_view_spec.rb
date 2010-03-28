@@ -5,14 +5,17 @@ require 'view_helpers/view_example_group'
 require 'will_paginate/view_helpers/action_view'
 require 'will_paginate/collection'
 
-ActionController::Routing::Routes.draw do |map|
-  map.connect 'dummy/page/:page', :controller => 'dummy'
-  map.connect 'dummy/dots/page.:page', :controller => 'dummy', :action => 'dots'
-  map.connect 'ibocorp/:page', :controller => 'ibocorp',
-                               :requirements => { :page => /\d+/ },
-                               :defaults => { :page => 1 }
-                               
-  map.connect ':controller/:action/:id'
+ActionView::Base.send(:include, WillPaginate::ViewHelpers::ActionView)
+
+Routes = ActionDispatch::Routing::RouteSet.new
+
+Routes.draw do
+  match 'dummy/page/:page' => 'dummy#index'
+  match 'dummy/dots/page.:page' => 'dummy#dots'
+  match 'ibocorp(/:page)' => 'ibocorp#index',
+        :requirements => { :page => /\d+/ }, :defaults => { :page => 1 }
+
+  match ':controller(/:action(/:id(.:format)))'
 end
 
 describe WillPaginate::ViewHelpers::ActionView do
@@ -295,17 +298,15 @@ class DummyController
   attr_reader :request
   attr_accessor :controller_name
   
+  include ActionController::UrlFor
+  include Routes.url_helpers
+  
   def initialize
     @request = DummyRequest.new
-    @url = ActionController::UrlRewriter.new(@request, @request.params)
   end
 
   def params
     @request.params
-  end
-  
-  def url_for(params)
-    @url.rewrite(params)
   end
 end
 
@@ -327,6 +328,10 @@ class DummyRequest
   end
 
   def relative_url_root
+    ''
+  end
+  
+  def script_name
     ''
   end
 
