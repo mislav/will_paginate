@@ -13,7 +13,7 @@ Routes.draw do
   match 'dummy/page/:page' => 'dummy#index'
   match 'dummy/dots/page.:page' => 'dummy#dots'
   match 'ibocorp(/:page)' => 'ibocorp#index',
-        :requirements => { :page => /\d+/ }, :defaults => { :page => 1 }
+        :constraints => { :page => /\d+/ }, :defaults => { :page => 1 }
 
   match ':controller(/:action(/:id(.:format)))'
 end
@@ -259,6 +259,8 @@ describe WillPaginate::ViewHelpers::ActionView do
         assert_links_match %r{/ibocorp(?:/(\d+))?$}, links, [nil, nil, 3, 4, 5, 6, 3]
       end
     end
+    # Routes.recognize_path('/ibocorp/2').should == {:page=>'2', :action=>'index', :controller=>'ibocorp'}
+    # Routes.recognize_path('/ibocorp/foo').should == {:action=>'foo', :controller=>'ibocorp'}
   end
 
   ## internal hardcore stuff ##
@@ -309,6 +311,9 @@ class DummyController
   def params
     @request.params
   end
+end
+
+class IbocorpController < DummyController
 end
 
 class DummyRequest
