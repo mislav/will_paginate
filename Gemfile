@@ -1,9 +1,9 @@
 git 'git://github.com/rails/rails.git'
 source :gemcutter
 
-gem 'activerecord', '~> 3.0.0.beta1'
-gem 'activeresource', '~> 3.0.0.beta1'
-gem 'actionpack', '~> 3.0.0.beta1'
+gem 'activerecord', '~> 3.0.0.beta3'
+gem 'activeresource', '~> 3.0.0.beta3'
+gem 'actionpack', '~> 3.0.0.beta3'
 gem 'sequel', '~> 3.8.0'
 gem 'rspec', '~> 1.3.0'
 gem 'mocha', '~> 0.9.8'
