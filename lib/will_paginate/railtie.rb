@@ -3,8 +3,6 @@ require 'will_paginate/collection'
 
 module WillPaginate
   class Railtie < Rails::Railtie
-    railtie_name :will_paginate
-    
     initializer "will_paginate.active_record" do |app|
       if defined? ::ActiveRecord
         require 'will_paginate/finders/active_record'
