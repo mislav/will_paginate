@@ -3,7 +3,7 @@ require File.expand_path('../lib/will_paginate/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.name    = 'will_paginate'
   gem.version = WillPaginate::VERSION::STRING
-  gem.date    = Date.today.to_s
+  gem.date    = Time.now.strftime('%Y-%m-%d')
   
   gem.summary = "Pagination for Rails"
   gem.description = "The will_paginate library provides a simple, yet powerful and extensible API for ActiveRecord pagination and rendering of pagination links in ActionView templates."
