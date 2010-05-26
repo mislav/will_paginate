@@ -298,6 +298,7 @@ module WillPaginate
     
     def page_link_or_span(page, span_class, text = nil)
       text ||= page.to_s
+      text.html_safe! if text.respond_to? :html_safe!
       
       if page and page != current_page
         classnames = span_class && span_class.index(' ') && span_class.split(' ', 2).last
