@@ -238,6 +238,7 @@ module WillPaginate
       links.push    page_link_or_span(@collection.next_page,     'disabled next_page', @options[:next_label])
       
       html = links.join(@options[:separator])
+      html.html_safe! if html.respond_to? :html_safe!
       @options[:container] ? @template.content_tag(:div, html, html_attributes) : html
     end
 
