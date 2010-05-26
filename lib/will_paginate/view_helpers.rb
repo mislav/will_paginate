@@ -238,7 +238,7 @@ module WillPaginate
       links.push    page_link_or_span(@collection.next_page,     'disabled next_page', @options[:next_label])
       
       html = links.join(@options[:separator])
-      html.html_safe! if html.respond_to? :html_safe!
+      html = html.html_safe if html.respond_to? :html_safe
       @options[:container] ? @template.content_tag(:div, html, html_attributes) : html
     end
 
@@ -298,7 +298,7 @@ module WillPaginate
     
     def page_link_or_span(page, span_class, text = nil)
       text ||= page.to_s
-      text.html_safe! if text.respond_to? :html_safe!
+      text = text.html_safe if text.respond_to? :html_safe
       
       if page and page != current_page
         classnames = span_class && span_class.index(' ') && span_class.split(' ', 2).last
