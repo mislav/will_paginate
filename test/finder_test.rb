@@ -197,7 +197,7 @@ class FinderTest < ActiveRecordTestCase
 
   def test_paginate_with_dynamic_finder
     expected = [replies(:witty_retort), replies(:spam)]
-    assert_equal expected, Reply.paginate_by_topic_id(1, :page => 1)
+    assert_equal expected, Reply.paginate_by_topic_id(1, :page => 1, :order => :created_at)
 
     entries = Developer.paginate :conditions => { :salary => 100000 }, :page => 1, :per_page => 5
     assert_equal 8, entries.total_entries
