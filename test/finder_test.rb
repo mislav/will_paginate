@@ -469,5 +469,12 @@ class FinderTest < ActiveRecordTestCase
       
       # I cannot reproduce any of the failures from those reports :(
     end
+
+    def test_hmt_with_uniq
+      project = Project.find(1)
+      result = project.unique_replies.paginate :page => 1, :per_page => 1,
+        :order => 'replies.id'
+      assert_equal replies(:decisive), result.first
+    end
   end
 end

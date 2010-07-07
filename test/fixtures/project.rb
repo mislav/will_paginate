@@ -12,4 +12,6 @@ class Project < ActiveRecord::Base
       end
     end
   end
+
+  has_many :unique_replies, :through => :topics, :source => :replies, :uniq => true
 end

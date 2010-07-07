@@ -198,7 +198,7 @@ module WillPaginate
 
         if options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
           # Remove quoting and check for table_name.*-like statement.
-          if options[:select].gsub('`', '') =~ /\w+\.\*/
+          if options[:select].gsub(/[`"]/, '') =~ /\w+\.\*/
             options[:select] = "DISTINCT #{klass.table_name}.#{klass.primary_key}"
           end
         else
