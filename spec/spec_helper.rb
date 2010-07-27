@@ -1,3 +1,5 @@
+require 'rubygems'
+require 'bundler'
 require 'spec/autorun'
 
 module MyExtras

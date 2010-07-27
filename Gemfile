@@ -1,9 +1,11 @@
-git 'git://github.com/rails/rails.git'
-source :gemcutter
+source :rubygems
 
-gem 'activerecord', '~> 3.0.0.beta3'
-gem 'activeresource', '~> 3.0.0.beta3'
-gem 'actionpack', '~> 3.0.0.beta3'
+# path '/Users/mislav/.coral/rails-rails'
+# git 'git://github.com/rails/rails.git'
+
+gem 'activerecord', '~> 3.0.0.rc'
+gem 'activeresource', '~> 3.0.0.rc'
+gem 'actionpack', '~> 3.0.0.rc'
 gem 'sequel', '~> 3.8.0'
 gem 'rspec', '~> 1.3.0'
 gem 'mocha', '~> 0.9.8'

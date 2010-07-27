@@ -31,7 +31,7 @@ class ActiverecordTestConnector
   
   def self.add_load_path(path)
     dep = defined?(ActiveSupport::Dependencies) ? ActiveSupport::Dependencies : ::Dependencies
-    dep.load_paths.unshift path
+    dep.autoload_paths.unshift path
   end
 
   def self.setup_connection

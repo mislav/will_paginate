@@ -31,7 +31,7 @@ describe WillPaginate::ViewHelpers::ActionView do
   def render(locals)
     @view = ActionView::Base.new([], @assigns, @controller)
     @view.request = @request
-    @view.singleton_class.send(:include, @controller._router.url_helpers)
+    @view.singleton_class.send(:include, @controller._routes.url_helpers)
     @view.render(:inline => @template, :locals => locals)
   end
   
