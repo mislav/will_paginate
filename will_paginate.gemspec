@@ -17,5 +17,6 @@ Gem::Specification.new do |s|
   s.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
   s.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
   
-  s.files = Dir['Rakefile', '{bin,lib,test,spec}/**/*', 'README*', 'LICENSE*'] & `git ls-files`.split("\n")
+  s.files = Dir['Rakefile', '{bin,lib,test,spec}/**/*', 'README*', 'LICENSE*']
+  s.files &= `git ls-files -z`.split("\0") if `type -t git 2>/dev/null || which git 2>/dev/null` && $?.success?
 end
