@@ -5,9 +5,11 @@ require 'active_support/multibyte' # needed for Ruby 1.9.1
 
 $query_count = $query_sql = nil
 
-class ActiverecordTestConnector
-  cattr_accessor :able_to_connect
-  cattr_accessor :connected
+module ActiverecordTestConnector
+  extend self
+  
+  attr_accessor :able_to_connect
+  attr_accessor :connected
 
   FIXTURES_PATH = File.expand_path('../../fixtures', __FILE__)
 
@@ -15,7 +17,7 @@ class ActiverecordTestConnector
   self.connected = false
   self.able_to_connect = true
 
-  def self.setup
+  def setup
     unless self.connected || !self.able_to_connect
       setup_connection
       load_schema
@@ -29,12 +31,12 @@ class ActiverecordTestConnector
 
   private
   
-  def self.add_load_path(path)
+  def add_load_path(path)
     dep = defined?(ActiveSupport::Dependencies) ? ActiveSupport::Dependencies : ::Dependencies
     dep.autoload_paths.unshift path
   end
 
-  def self.setup_connection
+  def setup_connection
     db = ENV['DB'].blank?? 'sqlite3' : ENV['DB']
     
     configurations = YAML.load_file(File.expand_path('../../database.yml', __FILE__))
@@ -49,14 +51,14 @@ class ActiverecordTestConnector
     prepare ActiveRecord::Base.connection
   end
 
-  def self.load_schema
+  def load_schema
     ActiveRecord::Base.silence do
       ActiveRecord::Migration.verbose = false
       load File.join(FIXTURES_PATH, 'schema.rb')
     end
   end
 
-  def self.prepare(conn)
+  def prepare(conn)
     class << conn
       IGNORED_SQL = /^(?:PRAGMA|SELECT (?:currval|CAST|@@IDENTITY|@@ROWCOUNT)|SHOW FIELDS)\b/
 
