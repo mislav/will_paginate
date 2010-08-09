@@ -41,7 +41,7 @@ class ActiverecordTestConnector
     raise "no configuration for '#{db}'" unless configurations.key? db
     configuration = configurations[db]
     
-    ActiveRecord::Base.logger = Logger.new(STDOUT) if $0 == 'irb'
+    # ActiveRecord::Base.logger = Logger.new(STDOUT) if $0 == 'irb'
     puts "using #{configuration['adapter']} adapter"
     
     ActiveRecord::Base.configurations = { db => configuration }
@@ -69,12 +69,6 @@ class ActiverecordTestConnector
       end
 
       alias_method_chain :execute, :counting
-    end
-  end
-  
-  def self.show_sql
-    ActiveSupport::Notifications.subscribe('active_record.sql') do |*args|
-      puts args.last[:sql]
     end
   end
   
