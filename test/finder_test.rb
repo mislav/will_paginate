@@ -444,7 +444,7 @@ class FinderTest < ActiveRecordTestCase
       Developer.expects(:paginate).with(:page => 1).returns(collection)
       Developer.expects(:paginate).with(:page => 2).returns(second_collection)
       Developer.expects(:paginate).with(:page => 3).returns(last_collection)
-      Developer.each_page { }
+      assert_nil Developer.each_page { }
     end
 
     def test_paginated_each
