@@ -113,7 +113,21 @@ module WillPaginate
         
         total
       end
-      
+
+      # Iterates through each page, passing it to the block
+      #
+      # It uses +paginate+ internally; therefore it accepts all of its options.
+      # You can specify a starting page with <tt>:page</tt> (default is 1). Default
+      # <tt>:order</tt> is <tt>"id"</tt>, override if necessary.
+      def each_page(options = {})
+        page = 1
+        while page
+          collection = paginate(options.merge(:page => page))
+          yield collection
+          page = collection.next_page
+        end
+      end
+
       # Wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
       # based on the params otherwise used by paginating finds: +page+ and
       # +per_page+.

@@ -431,6 +431,22 @@ class FinderTest < ActiveRecordTestCase
       assert_equal original_query, query
     end
 
+    def test_each_page
+      collection = stub('collection', :size => 5, :empty? => false, :per_page => 5)
+      collection.expects(:next_page).returns(2)
+      second_collection = stub('collection', :size => 5, :empty? => false, :per_page => 5)
+      second_collection.expects(:next_page).returns(3)
+      last_collection = stub('collection', :size => 4, :empty? => false, :per_page => 5)
+      last_collection.expects(:next_page).returns(nil)
+
+      params = { :order => 'id', :total_entries => 0 }
+
+      Developer.expects(:paginate).with(:page => 1).returns(collection)
+      Developer.expects(:paginate).with(:page => 2).returns(second_collection)
+      Developer.expects(:paginate).with(:page => 3).returns(last_collection)
+      Developer.each_page { }
+    end
+
     def test_paginated_each
       collection = stub('collection', :size => 5, :empty? => false, :per_page => 5)
       collection.expects(:each).times(2).returns(collection)
