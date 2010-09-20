@@ -2,7 +2,7 @@
 require File.expand_path('../lib/will_paginate/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.name    = 'will_paginate'
+  gem.name    = 'Empact-will_paginate'
   gem.version = WillPaginate::VERSION::STRING
   gem.date    = Time.now.strftime('%Y-%m-%d')
   
