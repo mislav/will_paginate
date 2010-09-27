@@ -31,23 +31,9 @@ them mixed in.
 
 == Installation
 
-The recommended way is that you get the gem hosted on {gems.github.com}[http://gems.github.com/]:
+In your Gemfile (if using Bundler):
 
-  gem install mislav-will_paginate
-
-In <b>Rails 2.1</b>, add a gem dependency:
-
-  # for Rails 2.1 and newer
-  config.gem 'mislav-will_paginate', :lib => 'will_paginate', :version => '~> 3.0'
-
-If you're using Rails 2.0 or older, or any other Ruby framework, just add a simple require to a file
-that initializes your application. For example, in Rails you would put this at the end of
-"config/environment.rb".
-
-  gem 'mislav-will_paginate', '~> 3.0'
-  require 'will_paginate'
-
-That's it. Remember to install the gem on <strong>all</strong> machines that you are deploying to.
+  gem 'will_paginate', '~> 3.0.beta'
 
 <i>There are extensive {installation
 instructions}[http://github.com/mislav/will_paginate/wikis/installation] on {the
