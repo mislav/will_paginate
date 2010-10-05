@@ -32,6 +32,16 @@ describe WillPaginate::ViewHelpers do
       collection = mock 'Collection', :total_pages => 1
       will_paginate(collection).should be_nil
     end
+
+    it "should render for single-page collections if :show_always is set" do
+      collection = mock 'Collection', :total_pages => 1
+      renderer   = mock 'Renderer'
+      renderer.expects(:prepare).with(collection, instance_of(Hash), self)
+      renderer.expects(:to_html).returns('<PAGES>')
+
+      will_paginate(collection, :renderer => renderer, :show_always => true).
+        should == '<PAGES>'
+    end
   end
   
   describe "page_entries_info" do
