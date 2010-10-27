@@ -35,7 +35,7 @@ module WillPaginate
       ActiveRecord::Base.send :include, Finder
       
       require 'will_paginate/fixes'
-      Fixes.each { |f| f.fix }
+      Fixes.each(&:fix)
     end
 
     # Enable named_scope, a feature of Rails 2.1, even if you have older Rails
