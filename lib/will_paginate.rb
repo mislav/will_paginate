@@ -33,28 +33,9 @@ module WillPaginate
       return if ActiveRecord::Base.respond_to? :paginate
       require 'will_paginate/finder'
       ActiveRecord::Base.send :include, Finder
-
-      # support pagination on associations
-      a = ActiveRecord::Associations
-      [ a::AssociationCollection ].tap { |classes|
-        # detect http://dev.rubyonrails.org/changeset/9230
-        unless a::HasManyThroughAssociation.superclass == a::HasManyAssociation
-          classes << a::HasManyThroughAssociation
-        end
-      }.each do |klass|
-        klass.send :include, Finder::ClassMethods
-        klass.class_eval { alias_method_chain :method_missing, :paginate }
-      end
       
-      # monkeypatch Rails ticket #2189: "count breaks has_many :through"
-      ActiveRecord::Base.class_eval do
-        protected
-        def self.construct_count_options_from_args(*args)
-          result = super
-          result[0] = '*' if result[0].is_a?(String) and result[0] =~ /\.\*$/
-          result
-        end
-      end
+      require 'will_paginate/fixes'
+      Fixes.each { |f| f.fix }
     end
 
     # Enable named_scope, a feature of Rails 2.1, even if you have older Rails
