@@ -22,6 +22,7 @@ module WillPaginate
   module ViewHelpers
     # default options that can be overridden on the global level
     @@pagination_options = {
+      :html_tag       => 'div',
       :class          => 'pagination',
       :previous_label => '&laquo; Previous',
       :next_label     => 'Next &raquo;',
@@ -32,6 +33,7 @@ module WillPaginate
       :params         => nil,
       :renderer       => 'WillPaginate::LinkRenderer',
       :page_links     => true,
+      :prev_and_next_links => true,
       :container      => true
     }
     mattr_reader :pagination_options
@@ -45,13 +47,16 @@ module WillPaginate
     # * <tt>:previous_label</tt> -- default: "« Previous" (this parameter is called <tt>:prev_label</tt> in versions <b>2.3.2</b> and older!)
     # * <tt>:next_label</tt> -- default: "Next »"
     # * <tt>:page_links</tt> -- when false, only previous/next links are rendered (default: true)
+    # * <tt>:prev_and_next_links</tt> -- when false, only render page numbers (default: true)
+
     # * <tt>:inner_window</tt> -- how many links are shown around the current page (default: 4)
     # * <tt>:outer_window</tt> -- how many links are around the first and the last page (default: 1)
     # * <tt>:separator</tt> -- string separator for page HTML elements (default: single space)
     # 
     # HTML options:
-    # * <tt>:class</tt> -- CSS class name for the generated DIV (default: "pagination")
-    # * <tt>:container</tt> -- toggles rendering of the DIV container for pagination links, set to
+    # * <tt>:html_tag</tt> -- tag name for the generated container (default: "div")
+    # * <tt>:class</tt> -- CSS class name for the generated container (default: "pagination")
+    # * <tt>:container</tt> -- toggles rendering of the container for pagination links, set to
     #   false only when you are rendering your own pagination markup (default: true)
     # * <tt>:id</tt> -- HTML ID for the container (default: nil). Pass +true+ to have the ID
     #   automatically generated from the class name of objects in collection: for example, paginating
@@ -234,12 +239,14 @@ module WillPaginate
     def to_html
       links = @options[:page_links] ? windowed_links : []
       # previous/next buttons
-      links.unshift page_link_or_span(@collection.previous_page, 'disabled prev_page', @options[:previous_label])
-      links.push    page_link_or_span(@collection.next_page,     'disabled next_page', @options[:next_label])
+      if @options[:prev_and_next_links]
+        links.unshift page_link_or_span(@collection.previous_page, 'disabled prev_page', @options[:previous_label])
+        links.push    page_link_or_span(@collection.next_page,     'disabled next_page', @options[:next_label])
+      end
       
       html = links.join(@options[:separator])
       html = html.html_safe if html.respond_to? :html_safe
-      @options[:container] ? @template.content_tag(:div, html, html_attributes) : html
+      @options[:container] ? @template.content_tag(@options[:html_tag], html, html_attributes) : html
     end
 
     # Returns the subset of +options+ this instance was initialized with that

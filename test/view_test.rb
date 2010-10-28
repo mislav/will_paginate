@@ -120,6 +120,11 @@ class ViewTest < WillPaginate::ViewTestCase
     assert_select 'div.pagination', 0, 'main DIV present when it shouldn\'t'
     assert_select 'a[href]', 3
   end
+  
+  def test_will_paginate_with_alternative_tag
+    paginate({}, :html_tag => "span")
+    assert_select 'span.pagination', 1, 'should have SPAN tag'
+  end
 
   def test_will_paginate_without_page_links
     paginate({ :page => 2 }, :page_links => false) do
@@ -127,6 +132,16 @@ class ViewTest < WillPaginate::ViewTestCase
         validate_page_numbers [1,3], elements
       end
     end
+  end
+  
+  def test_will_paginate_without_next_prev_links 
+    paginate({ :page => 2 }, :prev_and_next_links => false) do
+      assert_select 'a[href]', 2 do |elements|
+        validate_page_numbers [1,3], elements
+        assert_select elements.first, 'a', '1'
+        assert_select elements.last, 'a', '3'
+      end
+    end    
   end
 
   def test_will_paginate_windows
