@@ -32,7 +32,8 @@ module WillPaginate
       :params         => nil,
       :renderer       => 'WillPaginate::LinkRenderer',
       :page_links     => true,
-      :container      => true
+      :container      => true,
+      :first_page_param => true
     }
     mattr_reader :pagination_options
 
@@ -63,6 +64,7 @@ module WillPaginate
     #   (eg. <tt>:controller => "foo", :action => nil</tt>)
     # * <tt>:renderer</tt> -- class name, class or instance of a link renderer (default:
     #   <tt>WillPaginate::LinkRenderer</tt>)
+    # * <tt>:first_page_param</tt> -- include parameter :param_name when it's first page (default: true)
     #
     # All options not recognized by will_paginate will become HTML attributes on the container
     # element for pagination links (the DIV). For example:
@@ -332,6 +334,7 @@ module WillPaginate
           stringified_merge @url_params, page_param
         else
           @url_params[param_name] = page_one ? 1 : 2
+          page_one && !@options[:first_page_param] ? @url_params.delete(param_name) : @url_params[param_name]
         end
 
         url = @template.url_for(@url_params)

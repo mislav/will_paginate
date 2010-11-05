@@ -128,6 +128,14 @@ class ViewTest < WillPaginate::ViewTestCase
       end
     end
   end
+  
+  def test_will_paginate_without_first_page_param
+    paginate({ :page => 2 }, :first_page_param => false) do
+      assert_select 'a[href]', 4 do |elements|
+        validate_page_numbers [nil, nil, 3, 3], elements
+      end
+    end
+  end
 
   def test_will_paginate_windows
     paginate({ :page => 6, :per_page => 1 }, :inner_window => 1) do |pagination|
