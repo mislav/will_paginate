@@ -37,6 +37,7 @@ module WillPaginate
     # For perfomance reasons you will also want to add an index to that column.
     module Base
       def per_page
+        return klass.per_page if self.respond_to?(:klass)
         @per_page ||= 30
       end
       
