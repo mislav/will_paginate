@@ -140,7 +140,7 @@ module WillPaginate
     # apply. Don't use the <tt>:id</tt> option; otherwise you'll finish with two
     # blocks of pagination links sharing the same ID (which is invalid HTML).
     def paginated_section(*args, &block)
-      pagination = will_paginate(*args).to_s
+      pagination = will_paginate(*args).to_s.html_safe
       
       unless ActionView::Base.respond_to? :erb_variable
         concat pagination
