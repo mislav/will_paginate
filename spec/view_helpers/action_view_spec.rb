@@ -166,7 +166,18 @@ describe WillPaginate::ViewHelpers::ActionView do
   end
 
   ## other helpers ##
-  
+
+  it "should not render a paginated section with a single page" do
+    @template = <<-ERB
+      <%= paginated_section collection, options do %>
+        <%= content_tag :div, '', :id => "developers" %>
+      <% end %>
+    ERB
+    paginate(:total_entries => 1)
+    assert_select 'div.pagination', 0
+    assert_select 'div#developers', 1
+  end
+
   it "should render a paginated section" do
     @template = <<-ERB
       <%= paginated_section collection, options do %>
