@@ -343,9 +343,9 @@ module WillPaginate
         else
           @url_string = url
           @url_params[param_name] = 3
-          @template.url_for(@url_params).split(//).each_with_index do |char, i|
-            if char == '3' and url[i, 1] == '2'
-              @url_string[i] = "\0"
+          @template.url_for(@url_params).mb_chars.split(//).each_with_index do |char, i|
+            if char.to_s == '3' and url.mb_chars[i, 1].to_s == '2'
+              @url_string.mb_chars[i] = "\0"
               break
             end
           end
