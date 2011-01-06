@@ -56,8 +56,16 @@ module WillPaginate::Finders
       WillPaginate::Collection.create(*wp_parse_options(options)) do |pager|
         query = sanitize_sql(sql.dup)
         original_query = query.dup
-        # add limit, offset
-        query << " LIMIT #{pager.per_page} OFFSET #{pager.offset}"
+
+        # add limit, offset. Oracle doesn't support LIMIT/OFFSET. This should be taken care of by Arel but
+        # for now, just manually add them in here.
+        if self.connection.adapter_name =~ /^(oracle|oci$)/i
+          query = "SELECT * FROM (SELECT raw_sql_.*, rownum raw_rnum_ FROM (#{query}) raw_sql_ WHERE " + 
+                  " rownum <= #{pager.offset + pager.per_page }) WHERE raw_rnum_ > #{pager.offset}"
+        else
+          query << " LIMIT #{pager.per_page} OFFSET #{pager.offset}"
+        end
+
         # perfom the find
         pager.replace find_by_sql(query)
         
