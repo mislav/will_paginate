@@ -297,6 +297,12 @@ class ViewTest < WillPaginate::ViewTestCase
     end
   end
 
+  def test_remote_links
+    paginate({}, :remote => true) do
+      assert_select 'a[remote=true]', 3
+    end
+  end
+
   def test_custom_routing_page_param
     @request.symbolized_path_parameters.update :controller => 'dummy', :action => nil
     paginate :per_page => 2 do

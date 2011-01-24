@@ -56,6 +56,7 @@ module WillPaginate
     # * <tt>:id</tt> -- HTML ID for the container (default: nil). Pass +true+ to have the ID
     #   automatically generated from the class name of objects in collection: for example, paginating
     #   ArticleComment models would yield an ID of "article_comments_pagination".
+    # * <tt>:remote</tt> -- sets to true the data-remote or remote attribute, depending of the inplementation of link_to
     #
     # Advanced options:
     # * <tt>:param_name</tt> -- parameter name for page number in URLs (default: <tt>:page</tt>)
@@ -302,7 +303,7 @@ module WillPaginate
       
       if page and page != current_page
         classnames = span_class && span_class.index(' ') && span_class.split(' ', 2).last
-        page_link page, text, :rel => rel_value(page), :class => classnames
+        page_link page, text, :rel => rel_value(page), :class => classnames, :remote => @options[:remote]
       else
         page_span page, text, :class => span_class
       end
