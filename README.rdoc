@@ -98,7 +98,7 @@ are {showcased online here}[http://mislav.uniqpath.com/will_paginate/].
 
 More reading about pagination as design pattern:
 
-* {Pagination 101}[http://kurafire.net/log/archive/2007/06/22/pagination-101]
+* {Pagination 101}[https://gist.github.com/622561]
 * {Pagination gallery}[http://www.smashingmagazine.com/2007/11/16/pagination-gallery-examples-and-good-practices/]
 * {Pagination on Yahoo Design Pattern Library}[http://developer.yahoo.com/ypatterns/parent.php?pattern=pagination]
 
