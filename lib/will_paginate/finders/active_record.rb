@@ -154,5 +154,10 @@ module WillPaginate::Finders
       
       count_options
     end
+    
+    def derive_per_page
+      self.is_a?(::ActiveRecord::Relation) ? self.klass.per_page : super
+    end
+    
   end
 end
