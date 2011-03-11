@@ -308,6 +308,13 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 1, entries.size
   end
 
+  def test_paginated_each_with_scoped_order
+    paginated_developers = []
+    Developer.poor.paginated_each {|d| paginated_developers << d}
+
+    assert_equal Developer.poor.all, paginated_developers, 'should use scoped :order option'
+  end
+
   ## misc ##
 
   def test_count_and_total_entries_options_are_mutually_exclusive
