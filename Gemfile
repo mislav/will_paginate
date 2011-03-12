@@ -15,3 +15,4 @@ gem 'do_sqlite3', '~> 0.10.1.1'
 gem 'mysql', '~> 2.8.1', :group => :mysql
 gem 'pg', '~> 0.8.0', :group => :pg
 gem 'ruby-debug', '~> 0.10.3', :group => :debug
+gem "i18n", ">=0.5.0"

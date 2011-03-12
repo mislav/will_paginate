@@ -27,8 +27,8 @@ module WillPaginate
     
     self.pagination_options = {
       :class          => 'pagination',
-      :previous_label => '&#8592; Previous',
-      :next_label     => 'Next &#8594;',
+      :previous_label => I18n.t('will_paginate.pagination_options.previous'),
+      :next_label     => I18n.t('will_paginate.pagination_options.next'),
       :inner_window   => 4, # links around the current page
       :outer_window   => 1, # links around beginning and end
       :separator      => ' ', # single space is friendly to spiders and non-graphic browsers

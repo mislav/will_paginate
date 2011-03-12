@@ -1,5 +1,6 @@
 require 'will_paginate/deprecation'
-
+Dir.chdir(File.expand_path('./../../config/locales', __FILE__))
+Dir.glob("*.yml").each { |locale| I18n.load_path.push(File.expand_path('./../../config/locales', __FILE__) +'/'+ locale.to_s) } 
 # = You *will* paginate!
 #
 # First read about WillPaginate::Finders::Base, then see

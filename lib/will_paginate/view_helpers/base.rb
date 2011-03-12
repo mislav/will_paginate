@@ -107,18 +107,25 @@ module WillPaginate
           sp = ' '
         end
         
-        if collection.total_pages < 2
-          case collection.size
-          when 0; "No #{plural_name} found"
-          when 1; "Displaying #{b}1#{eb} #{entry_name}"
-          else;   "Displaying #{b}all #{collection.size}#{eb} #{plural_name}"
+        if (I18n.locale.to_s == 'en')
+          if collection.total_pages < 2
+            case collection.size
+            when 0; I18n.t('will_paginate.page_entries.nothing', :plural_name => plural_name)
+            when 1; I18n.t('will_paginate.page_entries.one', :entry_name => entry_name, :b => b, :eb => eb)
+            else;   I18n.t('will_paginate.page_entries.other', :plural_name => plural_name, :size => collection.size, :b => b, :eb => eb)
+            end
+          else
+            I18n.t('will_paginate.page_entries.range', :plural_name => plural_name, :begin => collection.offset + 1, :end => collection.offset + collection.length, :total => collection.total_entries, :b => b, :eb => eb, :sp => sp)
           end
-        else
-          %{Displaying #{plural_name} #{b}%d#{sp}-#{sp}%d#{eb} of #{b}%d#{eb} in total} % [
-            collection.offset + 1,
-            collection.offset + collection.length,
-            collection.total_entries
-          ]
+        elsif (I18n.locale.to_s == 'ru')
+          if collection.total_pages < 2
+            case collection.size
+            when 0; I18n.t('will_paginate.page_entries.nothing', :entry_name => entry_name)
+            else;   I18n.t('will_paginate.page_entries.other', :entry_name => entry_name, :size => collection.size, :b => b, :eb => eb)
+            end
+          else
+            I18n.t('will_paginate.page_entries.range', :entry_name => entry_name, :begin => collection.offset + 1, :end => collection.offset + collection.length, :total => collection.total_entries, :b => b, :eb => eb, :sp => sp)
+          end
         end
       end
     end

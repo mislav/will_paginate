@@ -1,0 +1,10 @@
+en:
+  will_paginate:
+    pagination_options:
+      previous: '&#8592; Previous'
+      next: 'Next &#8594;'
+    page_entries:
+      nothing: "No %{plural_name} found"
+      one: "Displaying %{b}1%{eb} %{entry_name}"
+      other: "Displaying %{b}all %{size}%{eb} %{plural_name}"
+      range: "Displaying %{plural_name} %{b}%{begin}%{sp}-%{sp}%{end}%{eb} of %{b}%{total}%{eb} in total"
