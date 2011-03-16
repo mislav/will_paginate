@@ -51,3 +51,24 @@ task :examples do
   %x(haml examples/index.haml examples/index.html)
   %x(sass examples/pagination.sass examples/pagination.css)
 end
+
+require 'jeweler'
+Jeweler::Tasks.new do |gem|
+  gem.name = 'tism-will_paginate'
+  gem.date = Time.now.strftime('%Y-%m-%d')
+  
+  gem.summary = "Pagination for Rails"
+  gem.description = "Relase to use https://github.com/tism/will_paginate/commit/adea61b139285357d72ae61e97bb49d709c20bb9"
+  
+  gem.authors = ['Mislav Marohnić', 'PJ Hyett']
+  gem.email = 'mislav.marohnic@gmail.com'
+  gem.homepage = 'http://github.com/mislav/will_paginate/wikis'
+  
+  gem.rubyforge_project = nil
+  gem.has_rdoc = true
+  gem.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
+  gem.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
+  
+  gem.files = Dir['Rakefile', '{bin,lib,rails,test,spec}/**/*', 'README*', 'LICENSE*'] & `git ls-files -z`.split("\0")
+end
+
