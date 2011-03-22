@@ -112,15 +112,27 @@ class ArrayPaginationTest < Test::Unit::TestCase
   end
 
   def test_invalid_page
-    bad_inputs = [0, -1, nil, '', 'Schnitzel']
+    bad_inputs = [0, -1, nil, '', 9223372036854775808, 'Schnitzel']
 
     bad_inputs.each do |bad|
       assert_raise(WillPaginate::InvalidPage) { create bad }
     end
   end
 
-  def test_invalid_per_page_setting
-    assert_raise(ArgumentError) { create(1, -1) }
+  def test_invalid_per_page
+    bad_inputs = [0, -1, 9223372036854775808, 'Schnitzel']
+
+    bad_inputs.each do |bad|
+      assert_raise(ArgumentError) { create(1, bad) }
+    end
+  end
+
+  def test_invalid_total_entries
+    bad_inputs = [-1, 9223372036854775808, 'Schnitzel']
+
+    bad_inputs.each do |bad|
+      assert_raise(ArgumentError) { create(1, 1, bad) }
+    end
   end
 
   def test_page_count_was_removed

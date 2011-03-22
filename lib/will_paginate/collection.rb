@@ -47,10 +47,16 @@ module WillPaginate
     def initialize(page, per_page, total = nil)
       @current_page = page.to_i
       raise InvalidPage.new(page, @current_page) if @current_page < 1
+      raise InvalidPage.new(page, @current_page) if @current_page > 9223372036854775807
       @per_page = per_page.to_i
       raise ArgumentError, "`per_page` setting cannot be less than 1 (#{@per_page} given)" if @per_page < 1
-      
-      self.total_entries = total if total
+      raise ArgumentError, "`per_page` setting cannot be greater than BIGINT" if @per_page > 9223372036854775807
+
+      if total
+        raise ArgumentError, "`total_entries` setting cannot be less than 0 (#{total} given)" if total < 0
+        raise ArgumentError, "`total_entries` setting cannot be greater than BIGINT" if total > 9223372036854775807
+        self.total_entries = total
+      end
     end
 
     # Just like +new+, but yields the object after instantiation and returns it
