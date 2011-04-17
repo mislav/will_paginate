@@ -36,7 +36,10 @@ module WillPaginate
 
       # support pagination on associations
       a = ActiveRecord::Associations
-      [ a::AssociationCollection ].tap { |classes|
+      [ a.const_defined?('CollectionAssociation') ?
+          a::CollectionAssociation :
+          a::AssociationCollection
+      ].tap { |classes|
         # detect http://dev.rubyonrails.org/changeset/9230
         unless a::HasManyThroughAssociation.superclass == a::HasManyAssociation
           classes << a::HasManyThroughAssociation
