@@ -1,8 +1,8 @@
 ru:
   will_paginate:
     pagination_options:
-      previous: '&#8592; След.'
-      next: 'Пред. &#8594;'
+      previous: '&#8592; Пред.'
+      next: 'След. &#8594;'
     page_entries:
       nothing: "%{entry_name} не найдено"
       other: "Показано %{b}%{size}%{eb} %{entry_name}"
