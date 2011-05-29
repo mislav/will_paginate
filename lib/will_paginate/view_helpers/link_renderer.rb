@@ -92,6 +92,9 @@ module WillPaginate
           target = url(target)
         end
         attributes[:href] = target
+        if @options[:ajax]
+          attributes["data-remote"] = true
+        end
         tag(:a, text, attributes)
       end
       
