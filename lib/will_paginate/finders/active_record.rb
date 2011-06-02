@@ -33,7 +33,7 @@ module WillPaginate::Finders
       end
 
       # support pagination on associations and scopes
-      [::ActiveRecord::Relation, ::ActiveRecord::Associations::AssociationCollection].each do |klass|
+      [::ActiveRecord::Relation, ::ActiveRecord::Associations::CollectionAssociation].each do |klass|
         klass.send(:include, ActiveRecord)
       end
     end
