@@ -13,7 +13,6 @@ Gem::Specification.new do |s|
   s.email    = 'mislav.marohnic@gmail.com'
   s.homepage = 'http://github.com/mislav/will_paginate/wikis'
   
-  s.has_rdoc = true
   s.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
   s.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
   
