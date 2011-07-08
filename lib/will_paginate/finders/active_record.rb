@@ -104,7 +104,10 @@ module WillPaginate::Finders
       count_options = wp_parse_count_options(options, klass)
 
       # we may have to scope ...
-      counter = Proc.new { count(count_options) }
+      relation = clone
+      relation.includes_values = {}
+
+      counter = Proc.new { relation.count(count_options) }
 
       count = if finder.index('find_') == 0 and klass.respond_to?(scoper = finder.sub('find', 'with'))
                 # scope_out adds a 'with_finder' method which acts like with_scope, if it's present
@@ -123,7 +126,7 @@ module WillPaginate::Finders
     end
     
     def wp_parse_count_options(options, klass) #:nodoc:
-      excludees = [:count, :order, :limit, :offset, :readonly]
+      excludees = [:count, :order, :limit, :offset, :readonly, :include]
       
       # Use :select from scope if it isn't already present.
       # FIXME: this triggers extra queries when going through associations
