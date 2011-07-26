@@ -1,6 +1,4 @@
 require 'will_paginate/view_helpers/base'
-require 'action_view'
-require 'action_pack/version'
 require 'will_paginate/view_helpers/link_renderer'
 
 module WillPaginate
