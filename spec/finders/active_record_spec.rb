@@ -351,6 +351,18 @@ describe WillPaginate::Finders::ActiveRecord do
       QueryCountMatcher.new(num)
     end
 
+    def show_queries(&block)
+      counter = QueryCountMatcher.new(nil)
+      counter.run block
+    ensure
+      queries = counter.performed_queries
+      if queries.any?
+        puts queries
+      else
+        puts "no queries"
+      end
+    end
+
 end
 
 class QueryCountMatcher
