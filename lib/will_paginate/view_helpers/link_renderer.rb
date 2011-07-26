@@ -59,11 +59,13 @@ module WillPaginate
       end
       
       def previous_page
-        previous_or_next_page(@collection.previous_page, @options[:previous_label], 'previous_page')
+        num = @collection.current_page > 1 && @collection.current_page - 1
+        previous_or_next_page(num, @options[:previous_label], 'previous_page')
       end
       
       def next_page
-        previous_or_next_page(@collection.next_page, @options[:next_label], 'next_page')
+        num = @collection.current_page < @collection.total_pages && @collection.current_page + 1
+        previous_or_next_page(num, @options[:next_label], 'next_page')
       end
       
       def previous_or_next_page(page, text, classname)
@@ -107,8 +109,8 @@ module WillPaginate
 
       def rel_value(page)
         case page
-        when @collection.previous_page; 'prev' + (page == 1 ? ' start' : '')
-        when @collection.next_page; 'next'
+        when @collection.current_page - 1; 'prev' + (page == 1 ? ' start' : '')
+        when @collection.current_page + 1; 'next'
         when 1; 'start'
         end
       end
