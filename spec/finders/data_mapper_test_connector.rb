@@ -1,4 +1,6 @@
 require 'dm-core'
+require 'dm-migrations'
+
 DataMapper.setup :default, 'sqlite3::memory:'
 
 # Define models
