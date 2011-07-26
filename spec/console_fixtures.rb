@@ -10,7 +10,7 @@ windows = RUBY_PLATFORM =~ /(:?mswin|mingw)/
 # used just for the `color` method
 log_subscriber = ActiveSupport::LogSubscriber.log_subscribers.first
 
-IGNORE_SQL = /\b(sqlite_master|sqlite_version)\b|^CREATE TABLE/
+IGNORE_SQL = /\b(sqlite_master|sqlite_version)\b|^(CREATE TABLE|PRAGMA)\b/
 
 ActiveSupport::Notifications.subscribe(/^sql\./) do |*args|
   data = args.last
