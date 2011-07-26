@@ -7,7 +7,7 @@ gem 'rake'
 gem 'activerecord', '~> 3.1.0.rc'
 gem 'activeresource', '~> 3.1.0.rc'
 gem 'actionpack', '~> 3.1.0.rc'
-gem 'sequel', '~> 3.8.0'
+gem 'sequel', '~> 3.8.0', :platforms => :ruby_18 # broken on 1.9
 gem 'rspec', '~> 2.6.0'
 gem 'mocha', '~> 0.9.8'
 gem 'sqlite3', '~> 1.3.3'

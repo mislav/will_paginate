@@ -1,6 +1,14 @@
 require 'spec_helper'
-require 'will_paginate/finders/sequel'
-require File.expand_path('../sequel_test_connector', __FILE__)
+
+begin
+  require 'will_paginate/finders/sequel'
+  require File.expand_path('../sequel_test_connector', __FILE__)
+rescue LoadError, ArgumentError => error
+  warn "Error running Sequel specs: #{error.message}"
+  sequel_loaded = false
+else
+  sequel_loaded = true
+end
 
 describe Sequel::Dataset::Pagination, 'extension' do
   
@@ -50,4 +58,4 @@ describe Sequel::Dataset::Pagination, 'extension' do
     end
   end
 
-end
+end if sequel_loaded

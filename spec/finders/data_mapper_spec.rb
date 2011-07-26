@@ -1,8 +1,14 @@
 require 'spec_helper'
-require 'will_paginate/finders/data_mapper'
-require File.expand_path('../data_mapper_test_connector', __FILE__)
 
-require 'will_paginate'
+begin
+  require 'will_paginate/finders/data_mapper'
+  require File.expand_path('../data_mapper_test_connector', __FILE__)
+rescue LoadError => error
+  warn "Error running DataMapper specs: #{error.message}"
+  datamapper_loaded = false
+else
+  datamapper_loaded = true
+end
 
 describe WillPaginate::Finders::DataMapper do
     
@@ -59,4 +65,4 @@ describe WillPaginate::Finders::DataMapper do
     end
   end
   
-end
+end if datamapper_loaded
