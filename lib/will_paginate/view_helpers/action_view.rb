@@ -86,7 +86,7 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
   protected
   
   def default_url_params
-    { :escape => false }
+    {}
   end
   
   def url(page)

@@ -1,6 +1,7 @@
+require 'active_support'
 require 'action_dispatch/testing/assertions'
 
-class ViewExampleGroup < Spec::Example::ExampleGroup
+module ViewExampleGroup
   
   include ActionDispatch::Assertions::SelectorAssertions
   
@@ -38,8 +39,8 @@ class ViewExampleGroup < Spec::Example::ExampleGroup
   def validate_page_numbers(expected, links, param_name = :page)
     param_pattern = /\W#{Regexp.escape(param_name.to_s)}=([^&]*)/
     
-    links.map { |e|
-      e['href'] =~ param_pattern
+    links.map { |el|
+      unescape_href(el) =~ param_pattern
       $1 ? $1.to_i : $1
     }.should == expected
   end
@@ -52,9 +53,10 @@ class ViewExampleGroup < Spec::Example::ExampleGroup
     pages = [] if numbers
     
     links.each do |el|
-      el['href'].should =~ pattern
+      href = unescape_href(el)
+      href.should =~ pattern
       if numbers
-        el['href'] =~ pattern
+        href =~ pattern
         pages << ($1.nil?? nil : $1.to_i)
       end
     end
@@ -65,9 +67,13 @@ class ViewExampleGroup < Spec::Example::ExampleGroup
   def assert_no_links_match(pattern)
     assert_select 'div.pagination a[href]' do |elements|
       elements.each do |el|
-        el['href'] !~ pattern
+        unescape_href(el).should_not =~ pattern
       end
     end
+  end
+
+  def unescape_href(el)
+    CGI.unescape CGI.unescapeHTML(el['href'])
   end
   
   def build_message(message, pattern, *args)
@@ -80,7 +86,11 @@ class ViewExampleGroup < Spec::Example::ExampleGroup
   
 end
 
-Spec::Example::ExampleGroupFactory.register(:view_helpers, ViewExampleGroup)
+RSpec.configure do |config|
+  config.include ViewExampleGroup, :type => :view, :example_group => {
+    :file_path => %r{spec/view_helpers/}
+  }
+end
 
 module HTML
   Node.class_eval do

@@ -3,7 +3,18 @@ require 'active_record/version'
 require 'active_record/fixtures'
 require 'active_support/multibyte' # needed for Ruby 1.9.1
 
-$query_count = $query_sql = nil
+$query_count = 0
+$query_sql = []
+
+ignore_sql = /^(?:PRAGMA|SELECT (?:currval|CAST|@@IDENTITY|@@ROWCOUNT)|SHOW FIELDS)\b|\bFROM sqlite_master\b/
+
+ActiveSupport::Notifications.subscribe(/^sql\./) do |*args|
+  payload = args.last
+  unless payload[:name] =~ /^Fixture/ or payload[:sql] =~ ignore_sql
+    $query_count += 1
+    $query_sql << payload[:sql]
+  end
+end
 
 module ActiverecordTestConnector
   extend self
@@ -12,6 +23,8 @@ module ActiverecordTestConnector
   attr_accessor :connected
 
   FIXTURES_PATH = File.expand_path('../../fixtures', __FILE__)
+
+  Fixtures = defined?(ActiveRecord::Fixtures) ? ActiveRecord::Fixtures : ::Fixtures
 
   # Set our defaults
   self.connected = false
@@ -48,29 +61,12 @@ module ActiverecordTestConnector
     
     ActiveRecord::Base.configurations = { db => configuration }
     ActiveRecord::Base.establish_connection(db)
-    prepare ActiveRecord::Base.connection
   end
 
   def load_schema
     ActiveRecord::Base.silence do
       ActiveRecord::Migration.verbose = false
       load File.join(FIXTURES_PATH, 'schema.rb')
-    end
-  end
-
-  def prepare(conn)
-    class << conn
-      IGNORED_SQL = /^(?:PRAGMA|SELECT (?:currval|CAST|@@IDENTITY|@@ROWCOUNT)|SHOW FIELDS)\b/
-
-      def execute_with_counting(sql, name = nil, &block)
-        if $query_count and IGNORED_SQL !~ sql
-          $query_count += 1
-          $query_sql << sql
-        end
-        execute_without_counting(sql, name, &block)
-      end
-
-      alias_method_chain :execute, :counting
     end
   end
   

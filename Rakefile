@@ -1,9 +1,19 @@
 require 'rake/rdoctask'
+require 'rspec/core/rake_task'
 
-load 'spec/tasks.rake'
-
-desc 'Default: run specs.'
 task :default => :spec
+
+desc 'Run ALL OF the specs'
+RSpec::Core::RakeTask.new(:spec) do |t|
+  # t.ruby_opts = '-w'
+end
+
+namespace :spec do
+  desc "Run Rails specs"
+  RSpec::Core::RakeTask.new(:rails) do |t|
+    t.pattern = %w'spec/finders/active_record_spec.rb spec/view_helpers/action_view_spec.rb'
+  end
+end
 
 desc 'Generate RDoc documentation for the will_paginate plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|

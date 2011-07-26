@@ -24,6 +24,7 @@ ActiveSupport::Notifications.subscribe(/^sql\./) do |*args|
 end
 
 # load all fixtures
-Fixtures.create_fixtures(ActiverecordTestConnector::FIXTURES_PATH, ActiveRecord::Base.connection.tables)
+ActiverecordTestConnector::Fixtures.create_fixtures \
+  ActiverecordTestConnector::FIXTURES_PATH, ActiveRecord::Base.connection.tables
 
 WillPaginate::Finders::ActiveRecord.enable!

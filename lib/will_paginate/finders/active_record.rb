@@ -28,14 +28,17 @@ module WillPaginate::Finders
     
     # In Rails, this is automatically called to mix-in pagination functionality to ActiveRecord.
     def self.enable!
-      ::ActiveRecord::Base.class_eval do
-        extend ActiveRecord
+      ::ActiveRecord::Base.extend ActiveRecord
+
+      klasses = [::ActiveRecord::Relation]
+      if defined? ::ActiveRecord::Associations::CollectionProxy
+        klasses << ::ActiveRecord::Associations::CollectionProxy
+      else
+        klasses << ::ActiveRecord::Associations::AssociationCollection
       end
 
       # support pagination on associations and scopes
-      [::ActiveRecord::Relation, ::ActiveRecord::Associations::AssociationCollection].each do |klass|
-        klass.send(:include, ActiveRecord)
-      end
+      klasses.each { |klass| klass.send(:include, ActiveRecord) }
     end
     
     # Wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string

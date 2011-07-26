@@ -1,6 +1,5 @@
-require 'rubygems'
-require 'bundler'
-require 'spec/autorun'
+require 'rspec'
+require File.expand_path('../view_helpers/view_example_group', __FILE__)
 
 module MyExtras
   protected
@@ -22,7 +21,7 @@ module MyExtras
   end
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   # config.include My::Pony, My::Horse, :type => :farm
   config.include MyExtras
   # config.predicate_matchers[:swim] = :can_swim?

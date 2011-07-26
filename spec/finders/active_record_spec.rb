@@ -176,7 +176,7 @@ describe WillPaginate::Finders::ActiveRecord do
     lambda {
       Developer.paginate :page => 1, :per_page => 1, :include => :projects
       $query_sql.last.should_not include(' JOIN ')
-    }.should run_queries(4)
+    }.should run_queries(3..4)
   end
 
   it "should keep :include for count when they are referenced in :conditions" do
@@ -199,7 +199,7 @@ describe WillPaginate::Finders::ActiveRecord do
 
       expected = Topic.find :all, 
         :include    => 'replies', 
-        :conditions => ["project_id = #{project.id} AND replies.content LIKE ?", 'Nice%'],
+        :conditions => ["project_id = ? AND replies.content LIKE ?", project.id, 'Nice%'],
         :limit      => 10
 
       result.should == expected
@@ -359,12 +359,26 @@ class QueryCountMatcher
   end
 
   def matches?(block)
+    run(block)
+
+    if @expected_count.respond_to? :include?
+      @expected_count.include? @count
+    else
+      @count == @expected_count
+    end
+  end
+
+  def run(block)
     $query_count = 0
     $query_sql = []
     block.call
-    @queries = $query_sql
+  ensure
+    @queries = $query_sql.dup
     @count = $query_count
-    @count == @expected_count
+  end
+
+  def performed_queries
+    @queries
   end
 
   def failure_message
@@ -372,6 +386,6 @@ class QueryCountMatcher
   end
 
   def negative_failure_message
-    "expected query count not to be #{$expected_count}"
+    "expected query count not to be #{@expected_count}"
   end
 end
