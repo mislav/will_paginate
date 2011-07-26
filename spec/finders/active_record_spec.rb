@@ -17,7 +17,7 @@ describe WillPaginate::Finders::ActiveRecord do
   
   it "should paginate" do
     lambda {
-      users = User.paginate(:page => 1, :per_page => 5)
+      users = User.paginate(:page => 1, :per_page => 5).to_a
       users.length.should == 5
     }.should run_queries(2)
   end
@@ -26,6 +26,58 @@ describe WillPaginate::Finders::ActiveRecord do
     lambda {
       User.paginate :foo => 'bar', :page => 1, :per_page => 4
     }.should raise_error(ArgumentError)
+  end
+
+  describe "relation" do
+    it "should return a relation" do
+      rel = nil
+      lambda {
+        rel = Developer.paginate(:page => 1)
+        rel.per_page.should == 10
+        rel.current_page.should == 1
+      }.should run_queries(0)
+
+      lambda {
+        rel.total_pages.should == 2
+      }.should run_queries(1)
+    end
+
+    it "should keep per-class per_page number" do
+      rel = Developer.order('id').paginate(:page => 1)
+      rel.per_page.should == 10
+    end
+
+    it "should be able to change per_page number" do
+      rel = Developer.order('id').paginate(:page => 1).limit(5)
+      rel.per_page.should == 5
+    end
+
+    it "supports the page() method" do
+      rel = Developer.page('1').order('id')
+      rel.current_page.should == 1
+      rel.per_page.should == 10
+      rel.offset.should == 0
+
+      rel = rel.limit(5).page(2)
+      rel.per_page.should == 5
+      rel.offset.should == 5
+    end
+
+    it "raises on invalid page number" do
+      lambda {
+        Developer.page('foo')
+      }.should raise_error(ArgumentError)
+    end
+
+    it "supports first limit() then page()" do
+      rel = Developer.limit(3).page(3)
+      rel.offset.should == 6
+    end
+
+    it "supports first page() then limit()" do
+      rel = Developer.page(3).limit(3)
+      rel.offset.should == 6
+    end
   end
 
   describe "counting" do
@@ -111,6 +163,7 @@ describe WillPaginate::Finders::ActiveRecord do
   it "should get first page of Topics with a single query" do
     lambda {
       result = Topic.paginate :page => nil
+      result.to_a # trigger loading of records
       result.current_page.should == 1
       result.total_pages.should == 1
       result.size.should == 4
@@ -156,11 +209,8 @@ describe WillPaginate::Finders::ActiveRecord do
   it "should paginate with :include and :order" do
     result = nil
     lambda {
-      result = Topic.paginate \
-        :page     => 1, 
-        :include  => :replies,  
-        :order    => 'replies.created_at asc, topics.created_at asc', 
-        :per_page => 10
+      result = Topic.paginate(:page => 1, :include => :replies, :per_page => 10,
+        :order => 'replies.created_at asc, topics.created_at asc').to_a
     }.should run_queries(2)
 
     expected = Topic.find :all, 
@@ -174,17 +224,19 @@ describe WillPaginate::Finders::ActiveRecord do
   
   it "should remove :include for count" do
     lambda {
-      Developer.paginate :page => 1, :per_page => 1, :include => :projects
-      $query_sql.last.should_not include(' JOIN ')
+      Developer.paginate(:page => 1, :per_page => 1, :include => :projects).to_a
+      $query_sql.last.should_not =~ /\bJOIN\b/
     }.should run_queries(3..4)
   end
 
   it "should keep :include for count when they are referenced in :conditions" do
-    Developer.expects(:find).returns([1])
-    Developer.expects(:count).with({ :include => :projects, :conditions => 'projects.id > 2' }).returns(0)
+    Developer.paginate(
+      :page => 1, :per_page => 1,
+      :include => :projects,
+      :conditions => 'projects.id > 2'
+    ).to_a
 
-    Developer.paginate :page => 1, :per_page => 1,
-      :include => :projects, :conditions => 'projects.id > 2'
+    $query_sql.last.should =~ /\bJOIN\b/
   end
   
   describe "associations" do
@@ -218,7 +270,7 @@ describe WillPaginate::Finders::ActiveRecord do
       }.should run_queries(2)
 
       # with explicit order
-      result = dhh.projects.paginate(:page => 1, :order => 'projects.id')
+      result = dhh.projects.paginate(:page => 1).reorder('projects.id')
       result.should == expected_id_ordered
       result.total_entries.should == 2
 
@@ -226,7 +278,7 @@ describe WillPaginate::Finders::ActiveRecord do
         dhh.projects.find(:all, :order => 'projects.id', :limit => 4)
       }.should_not raise_error
       
-      result = dhh.projects.paginate(:page => 1, :order => 'projects.id', :per_page => 4)
+      result = dhh.projects.paginate(:page => 1, :per_page => 4).reorder('projects.id')
       result.should == expected_id_ordered
 
       # has_many with implicit order
@@ -234,7 +286,7 @@ describe WillPaginate::Finders::ActiveRecord do
       expected = replies(:spam, :witty_retort)
       # FIXME: wow, this is ugly
       topic.replies.paginate(:page => 1).map(&:id).sort.should == expected.map(&:id).sort
-      topic.replies.paginate(:page => 1, :order => 'replies.id ASC').should == expected.reverse
+      topic.replies.paginate(:page => 1).reorder('replies.id ASC').should == expected.reverse
     end
 
     it "should paginate through association extension" do
@@ -253,7 +305,8 @@ describe WillPaginate::Finders::ActiveRecord do
     join_sql = 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id'
 
     lambda {
-      result = Developer.paginate :page => 1, :joins => join_sql, :conditions => 'project_id = 1'
+      result = Developer.paginate(:page => 1, :joins => join_sql, :conditions => 'project_id = 1')
+      result.to_a # trigger loading of records
       result.size.should == 2
       developer_names = result.map(&:name)
       developer_names.should include('David')
@@ -262,8 +315,8 @@ describe WillPaginate::Finders::ActiveRecord do
 
     lambda {
       expected = result.to_a
-      result = Developer.paginate :page => 1, :joins => join_sql,
-                           :conditions => 'project_id = 1', :count => { :select => "users.id" }
+      result = Developer.paginate(:page => 1, :joins => join_sql,
+        :conditions => 'project_id = 1', :count => { :select => "users.id" }).to_a
       result.should == expected
       result.total_entries.should == 2
     }.should run_queries(1)
@@ -272,8 +325,8 @@ describe WillPaginate::Finders::ActiveRecord do
   it "should paginate with group" do
     result = nil
     lambda {
-      result = Developer.paginate :page => 1, :per_page => 10,
-                                  :group => 'salary', :select => 'salary', :order => 'salary'
+      result = Developer.paginate(:page => 1, :per_page => 10,
+        :group => 'salary', :select => 'salary', :order => 'salary').to_a
     }.should run_queries(1)
 
     expected = users(:david, :jamis, :dev_10, :poor_jamis).map(&:salary).sort
@@ -337,12 +390,10 @@ describe WillPaginate::Finders::ActiveRecord do
     }.should_not raise_error
   end
   
-  it "should paginate an array of IDs" do
+  it "should not paginate an array of IDs" do
     lambda {
-      result = Developer.paginate((1..8).to_a, :per_page => 3, :page => 2, :order => 'id')
-      result.map(&:id).should == (4..6).to_a
-      result.total_entries.should == 8
-    }.should run_queries(1)
+      Developer.paginate((1..8).to_a, :per_page => 3, :page => 2, :order => 'id')
+    }.should raise_error(ArgumentError)
   end
   
   protected

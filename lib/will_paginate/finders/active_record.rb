@@ -5,30 +5,20 @@ module WillPaginate::Finders
   # = Paginating finders for ActiveRecord models
   # 
   # WillPaginate adds +paginate+, +per_page+ and other methods to
-  # ActiveRecord::Base class methods and associations. It also hooks into
-  # +method_missing+ to intercept pagination calls to dynamic finders such as
-  # +paginate_by_user_id+ and translate them to ordinary finders
-  # (+find_all_by_user_id+ in this case).
+  # ActiveRecord::Base class methods and associations.
   # 
   # In short, paginating finders are equivalent to ActiveRecord finders; the
   # only difference is that we start with "paginate" instead of "find" and
   # that <tt>:page</tt> is required parameter:
   #
   #   @posts = Post.paginate :all, :page => params[:page], :order => 'created_at DESC'
-  # 
-  # In paginating finders, "all" is implicit. There is no sense in paginating
-  # a single record, right? So, you can drop the <tt>:all</tt> argument:
-  # 
-  #   Post.paginate(...)              =>  Post.find :all
-  #   Post.paginate_all_by_something  =>  Post.find_all_by_something
-  #   Post.paginate_by_something      =>  Post.find_all_by_something
   #
   module ActiveRecord
-    include WillPaginate::Finders::Base
-    
     # In Rails, this is automatically called to mix-in pagination functionality to ActiveRecord.
     def self.enable!
-      ::ActiveRecord::Base.extend ActiveRecord
+      ::ActiveRecord::Base.extend Base
+      ::ActiveRecord::Base.extend ActiveRecord::Pagination
+      ::ActiveRecord::Base.extend ActiveRecord::BaseMethods
 
       klasses = [::ActiveRecord::Relation]
       if defined? ::ActiveRecord::Associations::CollectionProxy
@@ -38,124 +28,140 @@ module WillPaginate::Finders
       end
 
       # support pagination on associations and scopes
-      klasses.each { |klass| klass.send(:include, ActiveRecord) }
+      klasses.each { |klass| klass.send(:include, ActiveRecord::Pagination) }
     end
-    
-    # Wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
-    # based on the params otherwise used by paginating finds: +page+ and
-    # +per_page+.
-    #
-    # Example:
-    # 
-    #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
-    #                          :page => params[:page], :per_page => 3
-    #
-    # A query for counting rows will automatically be generated if you don't
-    # supply <tt>:total_entries</tt>. If you experience problems with this
-    # generated SQL, you might want to perform the count manually in your
-    # application.
-    # 
-    def paginate_by_sql(sql, options)
-      WillPaginate::Collection.create(*wp_parse_options(options)) do |pager|
-        query = sanitize_sql(sql.dup)
-        original_query = query.dup
-        # add limit, offset
-        query << " LIMIT #{pager.per_page} OFFSET #{pager.offset}"
-        # perfom the find
-        pager.replace find_by_sql(query)
-        
-        unless pager.total_entries
-          count_query = original_query.sub /\bORDER\s+BY\s+[\w`,\s]+$/mi, ''
-          count_query = "SELECT COUNT(*) FROM (#{count_query})"
-          
-          unless self.connection.adapter_name =~ /^(oracle|oci$)/i
-            count_query << ' AS count_table'
+
+    # makes a Relation look like WillPaginate::Collection
+    module RelationMethods
+      attr_accessor :current_page
+      attr_writer :total_entries, :wp_count_options
+
+      def per_page(value = nil)
+        if value.nil? then limit_value
+        else limit(value)
+        end
+      end
+
+      # TODO: solve with less relation clones and code dups
+      def limit(num)
+        rel = super
+        if rel.current_page
+          rel.offset((rel.current_page-1) * rel.limit_value)
+        else
+          rel
+        end
+      end
+
+      def offset(value = nil)
+        if value.nil? then offset_value
+        else super(value)
+        end
+      end
+
+      def total_entries
+        @total_entries ||= begin
+          if loaded? and size < limit_value and (current_page == 1 or size > 0)
+            offset_value + size
+          else
+            excluded = [:order, :limit, :offset]
+            excluded << :includes unless eager_loading?
+            rel = self.except(*excluded)
+            # TODO: hack. decide whether to keep
+            rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
+            rel.count
           end
-          # perform the count query
-          pager.total_entries = count_by_sql(count_query)
+        end
+      end
+
+      # workaround for Active Record 3.0
+      def size
+        if !loaded? and limit_value
+          [super, limit_value].min
+        else
+          super
+        end
+      end
+
+      def total_pages
+        (total_entries / limit_value.to_f).ceil
+      end
+
+      def clone
+        other = super
+        other.current_page = current_page unless other.current_page
+        other.total_entries = nil
+        other
+      end
+
+      def to_a
+        if current_page.nil? then super # workaround for Active Record 3.0
+        else
+          ::WillPaginate::Collection.create(current_page, limit_value) do |col|
+            col.replace super
+            col.total_entries ||= total_entries
+          end
         end
       end
     end
 
-  protected
-
-    def wp_query(options, pager, args, &block) #:nodoc:
-      finder = (options.delete(:finder) || 'find').to_s
-      find_options = options.except(:count).update(:offset => pager.offset, :limit => pager.per_page) 
-
-      if finder == 'find'
-        if Array === args.first and !pager.total_entries
-          pager.total_entries = args.first.size
-        end
-        args << :all if args.empty?
+    module Pagination
+      def paginate(options)
+        pagenum, per_page, total = wp_parse_options(options)
+        count_options = options[:count]
+        options = options.except(:page, :per_page, :total_entries, :count)
+        rel = limit(per_page).page(pagenum)
+        rel = rel.apply_finder_options(options) if options.any?
+        rel.wp_count_options = count_options    if count_options
+        rel
       end
-      
-      args << find_options
-      pager.replace send(finder, *args, &block)
-      
-      unless pager.total_entries
-        # magic counting
-        pager.total_entries = wp_count(options, args, finder) 
+
+      def page(num)
+        pagenum = num.nil? ? 1 : num.to_i
+        raise ::WillPaginate::InvalidPage, num, pagenum if pagenum < 1
+        rel = scoped.extending(RelationMethods)
+        rel = rel.offset((pagenum-1) * (rel.limit_value || per_page))
+        rel = rel.limit(per_page) unless rel.limit_value
+        rel.current_page = pagenum
+        rel
       end
     end
 
-    # Does the not-so-trivial job of finding out the total number of entries
-    # in the database. It relies on the ActiveRecord +count+ method.
-    def wp_count(options, args, finder) #:nodoc:
-      # find out if we are in a model or an association proxy
-      klass = (@owner and @reflection) ? @reflection.klass : self
-      count_options = wp_parse_count_options(options, klass)
+    module BaseMethods
+      # Wraps +find_by_sql+ by simply adding LIMIT and OFFSET to your SQL string
+      # based on the params otherwise used by paginating finds: +page+ and
+      # +per_page+.
+      #
+      # Example:
+      # 
+      #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
+      #                          :page => params[:page], :per_page => 3
+      #
+      # A query for counting rows will automatically be generated if you don't
+      # supply <tt>:total_entries</tt>. If you experience problems with this
+      # generated SQL, you might want to perform the count manually in your
+      # application.
+      # 
+      def paginate_by_sql(sql, options)
+        WillPaginate::Collection.create(*wp_parse_options(options)) do |pager|
+          query = sanitize_sql(sql.dup)
+          original_query = query.dup
+          # add limit, offset
+          query << " LIMIT #{pager.per_page} OFFSET #{pager.offset}"
+          # perfom the find
+          pager.replace find_by_sql(query)
 
-      # we may have to scope ...
-      counter = Proc.new { count(count_options) }
+          unless pager.total_entries
+            count_query = original_query.sub /\bORDER\s+BY\s+[\w`,\s]+$/mi, ''
+            count_query = "SELECT COUNT(*) FROM (#{count_query})"
 
-      count = if finder.index('find_') == 0 and klass.respond_to?(scoper = finder.sub('find', 'with'))
-                # scope_out adds a 'with_finder' method which acts like with_scope, if it's present
-                # then execute the count with the scoping provided by the with_finder
-                send(scoper, &counter)
-              elsif finder =~ /^find_(all_by|by)_([_a-zA-Z]\w*)$/
-                # extract conditions from calls like "paginate_by_foo_and_bar"
-                attribute_names = $2.split('_and_')
-                conditions = construct_attributes_from_arguments(attribute_names, args)
-                with_scope(:find => { :conditions => conditions }, &counter)
-              else
-                counter.call
-              end
-
-      count.respond_to?(:length) ? count.length : count
-    end
-    
-    def wp_parse_count_options(options, klass) #:nodoc:
-      excludees = [:count, :order, :limit, :offset, :readonly]
-      
-      # Use :select from scope if it isn't already present.
-      # FIXME: this triggers extra queries when going through associations
-      # if options[:select].blank? && current_scoped_methods && current_scoped_methods.select_values.present?
-      #   options[:select] = current_scoped_methods.select_values.join(", ")
-      # end
-      
-      if options[:select] and options[:select] =~ /^\s*DISTINCT\b/i
-        # Remove quoting and check for table_name.*-like statement.
-        if options[:select].gsub('`', '') =~ /\w+\.\*/
-          options[:select] = "DISTINCT #{klass.table_name}.#{klass.primary_key}"
+            unless self.connection.adapter_name =~ /^(oracle|oci$)/i
+              count_query << ' AS count_table'
+            end
+            # perform the count query
+            pager.total_entries = count_by_sql(count_query)
+          end
         end
-      else
-        excludees << :select
       end
-      
-      # count expects (almost) the same options as find
-      count_options = options.except *excludees
-
-      # merge the hash found in :count
-      # this allows you to specify :select, :order, or anything else just for the count query
-      count_options.update options[:count] if options[:count]
-      
-      # forget about includes if they are irrelevant when counting
-      if count_options[:include] and count_options[:conditions].blank? and count_options[:group].blank?
-        count_options.delete :include
-      end
-      
-      count_options
     end
   end
 end
