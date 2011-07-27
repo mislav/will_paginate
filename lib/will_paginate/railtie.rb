@@ -5,8 +5,8 @@ module WillPaginate
   class Railtie < Rails::Railtie
     initializer "will_paginate" do |app|
       ActiveSupport.on_load :active_record do
-        require 'will_paginate/finders/active_record'
-        WillPaginate::Finders::ActiveRecord.enable!
+        require 'will_paginate/active_record'
+        WillPaginate::ActiveRecord.setup
       end
 
       ActiveSupport.on_load :action_controller do

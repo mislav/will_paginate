@@ -1,7 +1,8 @@
-require 'will_paginate/finders/base'
+require 'will_paginate/per_page'
+require 'will_paginate/collection'
 require 'active_record'
 
-module WillPaginate::Finders
+module WillPaginate
   # = Paginating finders for ActiveRecord models
   # 
   # WillPaginate adds +paginate+, +per_page+ and other methods to
@@ -15,8 +16,8 @@ module WillPaginate::Finders
   #
   module ActiveRecord
     # In Rails, this is automatically called to mix-in pagination functionality to ActiveRecord.
-    def self.enable!
-      ::ActiveRecord::Base.extend Base
+    def self.setup
+      ::ActiveRecord::Base.extend PerPage
       ::ActiveRecord::Base.extend ActiveRecord::Pagination
       ::ActiveRecord::Base.extend ActiveRecord::BaseMethods
 
@@ -106,9 +107,14 @@ module WillPaginate::Finders
 
     module Pagination
       def paginate(options)
-        pagenum, per_page, total = wp_parse_options(options)
-        count_options = options[:count]
-        options = options.except(:page, :per_page, :total_entries, :count)
+        options  = options.dup
+        pagenum  = options.fetch(:page) { raise ArgumentError, ":page parameter required" }
+        per_page = options.delete(:per_page) || self.per_page
+        total    = options.delete(:total_entries)
+
+        count_options = options.delete(:count)
+        options.delete(:page)
+
         rel = limit(per_page).page(pagenum)
         rel = rel.apply_finder_options(options) if options.any?
         rel.wp_count_options = count_options    if count_options
@@ -142,7 +148,11 @@ module WillPaginate::Finders
       # application.
       # 
       def paginate_by_sql(sql, options)
-        WillPaginate::Collection.create(*wp_parse_options(options)) do |pager|
+        pagenum  = options.fetch(:page) { raise ArgumentError, ":page parameter required" }
+        per_page = options[:per_page] || self.per_page
+        total    = options[:total_entries]
+
+        WillPaginate::Collection.create(pagenum, per_page, total) do |pager|
           query = sanitize_sql(sql.dup)
           original_query = query.dup
           # add limit, offset

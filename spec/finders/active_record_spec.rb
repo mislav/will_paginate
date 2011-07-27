@@ -1,11 +1,11 @@
 require 'spec_helper'
-require 'will_paginate/finders/active_record'
+require 'will_paginate/active_record'
 require File.expand_path('../activerecord_test_connector', __FILE__)
 ActiverecordTestConnector.setup
 
-WillPaginate::Finders::ActiveRecord.enable!
+WillPaginate::ActiveRecord.setup
 
-describe WillPaginate::Finders::ActiveRecord do
+describe WillPaginate::ActiveRecord do
   
   extend ActiverecordTestConnector::FixtureSetup
   
