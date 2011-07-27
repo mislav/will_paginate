@@ -101,10 +101,14 @@ module WillPaginate
           end
 
           page     = options[:page] || 1
-          per_page = options[:per_page] || self.per_page
+          per_page = options[:per_page] || derive_per_page
           total    = options[:total_entries]
           
           return [page, per_page, total]
+        end
+        
+        def derive_per_page
+          self.per_page
         end
         
     end

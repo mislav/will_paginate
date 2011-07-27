@@ -351,6 +351,21 @@ describe WillPaginate::Finders::ActiveRecord do
       result.size.should == 1
       result.total_entries.should == 2
     end
+    
+    it "should respect the default per_page" do
+      Developer.singleton_class.class_eval do
+        def per_page_with_override() 1 end
+        alias_method_chain :per_page, :override
+      end
+      
+      result = Developer.poor.paginate :page => 1
+      result.size.should == 1
+      result.total_entries.should == 2
+      
+      Developer.singleton_class.class_eval do
+        alias_method :per_page, :per_page_without_override
+      end
+    end
 
     it "should paginate on habtm association" do
       project = projects(:active_record)
