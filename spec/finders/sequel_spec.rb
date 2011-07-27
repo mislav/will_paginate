@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 begin
-  require 'will_paginate/finders/sequel'
+  require 'will_paginate/sequel'
   require File.expand_path('../sequel_test_connector', __FILE__)
 rescue LoadError, ArgumentError => error
   warn "Error running Sequel specs: #{error.message}"
@@ -37,8 +37,6 @@ describe Sequel::Dataset::Pagination, 'extension' do
       result.total_pages.should == 2
       result.per_page.should == 2
       result.current_page.should == 1
-      result.previous_page.should be_nil
-      result.next_page.should == 2
     end
     
     it "should perform" do
