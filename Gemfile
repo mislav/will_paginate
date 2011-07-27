@@ -12,6 +12,7 @@ gem 'rspec', '~> 2.6.0'
 gem 'mocha', '~> 0.9.8'
 gem 'sqlite3', '~> 1.3.3'
 gem 'dm-core'
+gem 'dm-aggregates'
 gem 'dm-migrations'
 gem 'dm-sqlite-adapter'
 gem 'mysql', '~> 2.8.1', :group => :mysql

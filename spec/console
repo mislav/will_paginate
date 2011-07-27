@@ -1,4 +1,10 @@
 #!/usr/bin/env ruby
 irb = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb'
-opts = %w[--simple-prompt -rirb/completion -rconsole_fixtures]
+opts = %w[ --simple-prompt -rirb/completion ]
+if ARGV.include? '-dm'
+  opts << '-rwill_paginate/data_mapper' << '-rfinders/data_mapper_test_connector'
+else
+  opts << '-rconsole_fixtures'
+end
+
 exec 'bundle', 'exec', irb, '-Ilib:spec', *opts

@@ -36,6 +36,8 @@ GEM
     data_objects (0.10.6)
       addressable (~> 2.1)
     diff-lcs (1.1.2)
+    dm-aggregates (1.1.0)
+      dm-core (~> 1.1.0)
     dm-core (1.1.0)
       addressable (~> 2.2.4)
     dm-do-adapter (1.1.0)
@@ -106,6 +108,7 @@ DEPENDENCIES
   actionpack (~> 3.1.0.rc)
   activerecord (~> 3.1.0.rc)
   activeresource (~> 3.1.0.rc)
+  dm-aggregates
   dm-core
   dm-migrations
   dm-sqlite-adapter

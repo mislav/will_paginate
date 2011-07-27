@@ -1,4 +1,5 @@
 require 'dm-core'
+require 'dm-core/support/logger'
 require 'dm-migrations'
 
 DataMapper.setup :default, 'sqlite3::memory:'
@@ -20,3 +21,8 @@ end
 # Load fixtures
 Animal.auto_migrate!
 Animal.setup
+
+if 'irb' == $0
+  DataMapper.logger.set_log($stdout, :debug)
+  DataMapper.logger.auto_flush = true
+end
