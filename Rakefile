@@ -1,42 +1,25 @@
-require 'rake/rdoctask'
-require 'rspec/core/rake_task'
+begin
+  require 'rspec/core/rake_task'
+rescue LoadError
+  # no spec tasks
+else
+  task :default => :spec
 
-task :default => :spec
+  desc 'Run ALL OF the specs'
+  RSpec::Core::RakeTask.new(:spec) do |t|
+    # t.ruby_opts = '-w'
+    t.pattern = 'spec/finders/active_record_spec.rb' if ENV['DB'] and ENV['DB'] != 'sqlite3'
+  end
 
-desc 'Run ALL OF the specs'
-RSpec::Core::RakeTask.new(:spec) do |t|
-  # t.ruby_opts = '-w'
-end
-
-namespace :spec do
-  desc "Run Rails specs"
-  RSpec::Core::RakeTask.new(:rails) do |t|
-    t.pattern = %w'spec/finders/active_record_spec.rb spec/view_helpers/action_view_spec.rb'
+  namespace :spec do
+    desc "Run Rails specs"
+    RSpec::Core::RakeTask.new(:rails) do |t|
+      t.pattern = %w'spec/finders/active_record_spec.rb spec/view_helpers/action_view_spec.rb'
+    end
   end
 end
 
-desc 'Generate RDoc documentation for the will_paginate plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_files.include('README.rdoc', 'LICENSE', 'CHANGELOG.rdoc').
-    include('lib/**/*.rb').
-    exclude('lib/will_paginate/finders/active_record/named_scope*').
-    exclude('lib/will_paginate/finders/sequel.rb').
-    exclude('lib/will_paginate/view_helpers/merb.rb').
-    exclude('lib/will_paginate/deprecation.rb').
-    exclude('lib/will_paginate/core_ext.rb').
-    exclude('lib/will_paginate/version.rb')
-  
-  rdoc.main = "README.rdoc" # page to start on
-  rdoc.title = "will_paginate documentation"
-  
-  rdoc.rdoc_dir = 'doc' # rdoc output folder
-  rdoc.options << '--inline-source' << '--charset=UTF-8'
-  rdoc.options << '--webcvs=http://github.com/mislav/will_paginate/tree/master/'
-end
-
-task :website do
-  Dir.chdir('website') do
-    %x(haml index.haml index.html)
-    %x(sass pagination.sass pagination.css)
-  end
+desc 'Run specs against both Rails 3.1 and Rails 3.0'
+task :rails3 do |variable|
+  system 'bundle exec rake spec && BUNDLE_GEMFILE=Gemfile.rails3.0 bundle exec rake spec:rails'
 end

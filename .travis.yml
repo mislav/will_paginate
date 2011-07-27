@@ -1,0 +1,17 @@
+rvm:
+  - 1.8.7
+  - 1.9.2
+gemfile:
+  - Gemfile
+  - Gemfile.rails3.0
+before_script:
+  - "mysql -e 'create database will_paginate;'"
+  - "psql  -c 'create database will_paginate;' -U postgres"
+env:
+  - DB=sqlite3
+  - DB=mysql
+  - DB=mysql2
+  - DB=postgres
+branches:
+  only:
+    - rails3

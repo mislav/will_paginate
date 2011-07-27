@@ -1,3 +1,4 @@
+require 'sqlite3'
 require 'dm-core'
 require 'dm-core/support/logger'
 require 'dm-migrations'
