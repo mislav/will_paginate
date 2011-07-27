@@ -14,7 +14,6 @@ Gem::Specification.new do |gem|
   gem.homepage = 'http://github.com/mislav/will_paginate/wikis'
   
   gem.rubyforge_project = nil
-  gem.has_rdoc = true
   gem.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
   gem.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
   

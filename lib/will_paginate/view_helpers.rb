@@ -168,7 +168,7 @@ module WillPaginate
       entry_name = options[:entry_name] ||
         (collection.empty?? 'entry' : collection.first.class.name.underscore.sub('_', ' '))
       
-      if collection.total_pages < 2
+      html = if collection.total_pages < 2
         case collection.size
         when 0; "No #{entry_name.pluralize} found"
         when 1; "Displaying <b>1</b> #{entry_name}"
@@ -181,6 +181,8 @@ module WillPaginate
           collection.total_entries
         ]
       end
+      html = html.html_safe if html.respond_to? :html_safe
+      html
     end
     
     if respond_to? :safe_helper
