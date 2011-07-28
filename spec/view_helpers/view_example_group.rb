@@ -1,5 +1,6 @@
 require 'active_support'
 require 'action_dispatch/testing/assertions'
+require 'will_paginate/array'
 
 module ViewExampleGroup
   

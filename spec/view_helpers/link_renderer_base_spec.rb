@@ -5,19 +5,18 @@ require 'will_paginate/collection'
 describe WillPaginate::ViewHelpers::LinkRendererBase do
   
   before do
-    @renderer = WillPaginate::ViewHelpers::LinkRendererBase.new
+    @renderer = described_class.new
   end
   
   it "should raise error when unprepared" do
     lambda {
-      @renderer.send :param_name
+      @renderer.pagination
     }.should raise_error
   end
   
   it "should prepare with collection and options" do
-    prepare({}, :param_name => 'mypage')
+    prepare({})
     @renderer.send(:current_page).should == 1
-    @renderer.send(:param_name).should == 'mypage'
   end
   
   it "should have total_pages accessor" do
@@ -28,13 +27,11 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
   end
   
   it "should clear old cached values when prepared" do
-    prepare({ :total_pages => 1 }, :param_name => 'foo')
+    prepare(:total_pages => 1)
     @renderer.send(:total_pages).should == 1
-    @renderer.send(:param_name).should == 'foo'
-    # prepare with different object and options:
-    prepare({ :total_pages => 2 }, :param_name => 'bar')
+    # prepare with different object:
+    prepare(:total_pages => 2)
     @renderer.send(:total_pages).should == 2
-    @renderer.send(:param_name).should == 'bar'
   end
   
   it "should have pagination definition" do

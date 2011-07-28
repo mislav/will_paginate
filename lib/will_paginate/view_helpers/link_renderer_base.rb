@@ -1,5 +1,3 @@
-require 'will_paginate/view_helpers'
-
 module WillPaginate
   module ViewHelpers
     # This class does the heavy lifting of actually building the pagination
@@ -14,7 +12,7 @@ module WillPaginate
         @options    = options
 
         # reset values in case we're re-using this instance
-        @total_pages = @param_name = nil
+        @total_pages = nil
       end
       
       def pagination
@@ -72,11 +70,7 @@ module WillPaginate
       end
 
       def total_pages
-        @collection.total_pages
-      end
-
-      def param_name
-        @param_name ||= @options[:param_name].to_s
+        @total_pages ||= @collection.total_pages
       end
     end
   end

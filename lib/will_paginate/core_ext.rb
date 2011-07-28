@@ -1,5 +1,4 @@
 require 'set'
-require 'will_paginate/array'
 
 # copied from ActiveSupport so we don't depend on it
 
@@ -14,33 +13,6 @@ unless Hash.method_defined? :except
     # Replaces the hash without only the given keys.
     def except!(*keys)
       replace(except(*keys))
-    end
-  end
-end
-
-unless Hash.method_defined? :slice
-  Hash.class_eval do
-    # Returns a new hash with only the given keys.
-    def slice(*keys)
-      allowed = Set.new(respond_to?(:convert_key) ? keys.map { |key| convert_key(key) } : keys)
-      reject { |key,| !allowed.include?(key) }
-    end
-
-    # Replaces the hash with only the given keys.
-    def slice!(*keys)
-      replace(slice(*keys))
-    end
-  end
-end
-
-unless String.method_defined? :constantize
-  String.class_eval do
-    def constantize
-      unless /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/ =~ self
-        raise NameError, "#{self.inspect} is not a valid constant name!"
-      end
-
-      Object.module_eval("::#{$1}", __FILE__, __LINE__)
     end
   end
 end

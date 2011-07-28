@@ -1,5 +1,6 @@
 require 'cgi'
 require 'will_paginate/core_ext'
+require 'will_paginate/view_helpers'
 require 'will_paginate/view_helpers/link_renderer_base'
 
 module WillPaginate
@@ -26,7 +27,7 @@ module WillPaginate
           item.is_a?(Fixnum) ?
             page_number(item) :
             send(item)
-        end.join(@options[:separator])
+        end.join(@options[:link_separator])
         
         @options[:container] ? html_container(html) : html
       end
@@ -34,14 +35,7 @@ module WillPaginate
       # Returns the subset of +options+ this instance was initialized with that
       # represent HTML attributes for the container element of pagination links.
       def container_attributes
-        @container_attributes ||= begin
-          attributes = @options.except *(WillPaginate::ViewHelpers.pagination_options.keys - [:class])
-          # pagination of Post models will have the ID of "posts_pagination"
-          if @options[:container] and @options[:id] === true
-            attributes[:id] = @collection.first.class.name.underscore.pluralize + '_pagination'
-          end
-          attributes
-        end
+        @container_attributes ||= @options.except(*(ViewHelpers.pagination_options.keys - [:class]))
       end
       
     protected
@@ -55,7 +49,8 @@ module WillPaginate
       end
       
       def gap
-        '<span class="gap">&hellip;</span>'
+        text = @template.will_paginate_translate('views.will_paginate.page_gap') { '&hellip;' }
+        %(<span class="gap">#{text}</span>)
       end
       
       def previous_page
@@ -87,6 +82,10 @@ module WillPaginate
       end
       
     private
+
+      def param_name
+        @options[:param_name].to_s
+      end
 
       def link(text, target, attributes = {})
         if target.is_a? Fixnum

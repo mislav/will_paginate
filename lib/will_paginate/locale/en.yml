@@ -1,0 +1,19 @@
+en:
+  views:
+    will_paginate:
+      previous_label: "&#8592; Previous"
+      next_label: "Next &#8594;"
+      page_gap: "&hellip;"
+
+      page_entries_info:
+        single_page:
+          zero:  "No %{plural} found"
+          one:   "Displaying 1 %{name}"
+          other: "Displaying all %{count} %{plural}"
+        single_page_html:
+          zero:  "No %{plural} found"
+          one:   "Displaying <b>1</b> %{name}"
+          other: "Displaying <b>all&nbsp;%{count}</b> %{plural}"
+
+        multi_page: "Displaying %{plural} %{from} - %{to} of %{total} in total"
+        multi_page_html: "Displaying %{plural} <b class='range'>%{from}&nbsp;-&nbsp;%{to}</b> of <b class='total'>%{total}</b> in total"

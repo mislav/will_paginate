@@ -1,10 +1,17 @@
 require 'spec_helper'
-require 'will_paginate/view_helpers/base'
+require 'will_paginate/view_helpers'
 require 'will_paginate/array'
+require 'i18n'
 
-describe WillPaginate::ViewHelpers::Base do
+describe WillPaginate::ViewHelpers do
 
-  include WillPaginate::ViewHelpers::Base
+  before(:all) do
+    # make sure default translations aren't loaded
+    I18n.load_path.clear
+    I18n.reload!
+  end
+
+  include WillPaginate::ViewHelpers
   
   describe "will_paginate" do
     it "should render" do

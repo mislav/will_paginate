@@ -4,7 +4,7 @@ require 'action_controller'
 require 'will_paginate/view_helpers/action_view'
 require 'will_paginate/collection'
 
-ActionView::Base.send(:include, WillPaginate::ViewHelpers::ActionView)
+ActionView::Base.send(:include, WillPaginate::ActionView)
 
 Routes = ActionDispatch::Routing::RouteSet.new
 
@@ -17,7 +17,13 @@ Routes.draw do
   match ':controller(/:action(/:id(.:format)))'
 end
 
-describe WillPaginate::ViewHelpers::ActionView do
+describe WillPaginate::ActionView do
+
+  before(:all) do
+    I18n.load_path << File.expand_path('../../../lib/will_paginate/locale/en.yml', __FILE__)
+    I18n.reload!
+  end
+
   before(:each) do
     @assigns = {}
     @controller = DummyController.new
@@ -79,7 +85,7 @@ describe WillPaginate::ViewHelpers::ActionView do
   end
 
   it "should paginate using a custom renderer instance" do
-    renderer = WillPaginate::ViewHelpers::LinkRenderer.new
+    renderer = WillPaginate::ActionView::LinkRenderer.new
     def renderer.gap() '<span class="my-gap">~~</span>' end
     
     paginate({ :per_page => 2 }, :inner_window => 0, :outer_window => 0, :renderer => renderer) do
@@ -97,14 +103,6 @@ describe WillPaginate::ViewHelpers::ActionView do
       assert_select 'span.disabled.previous_page:first-child'
       assert_select 'a.next_page[href]:last-child'
     end
-  end
-  
-  it "should warn about :prev_label being deprecated" do
-    lambda {
-      paginate({ :page => 2 }, :prev_label => 'Deprecated') do
-        assert_select 'a[href]:first-child', 'Deprecated'
-      end
-    }.should have_deprecation
   end
 
   it "should match expected markup" do
@@ -145,22 +143,6 @@ describe WillPaginate::ViewHelpers::ActionView do
       assert_select 'a[href]', 2 do |elements|
         validate_page_numbers [1,3], elements
       end
-    end
-  end
-
-  it "should have magic HTML ID for the container" do
-    paginate do |div|
-      div.first['id'].should be_nil
-    end
-    
-    # magic ID
-    paginate({}, :id => true) do |div|
-      div.first['id'].should == 'fixnums_pagination'
-    end
-    
-    # explicit ID
-    paginate({}, :id => 'custom_id') do |div|
-      div.first['id'].should == 'custom_id'
     end
   end
 
@@ -297,7 +279,7 @@ describe WillPaginate::ViewHelpers::ActionView do
   end
 end
 
-class AdditionalLinkAttributesRenderer < WillPaginate::ViewHelpers::LinkRenderer
+class AdditionalLinkAttributesRenderer < WillPaginate::ActionView::LinkRenderer
   def initialize(link_attributes = nil)
     super()
     @additional_link_attributes = link_attributes || { :default => 'true' }

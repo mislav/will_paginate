@@ -15,8 +15,11 @@ module WillPaginate
 
       ActiveSupport.on_load :action_view do
         require 'will_paginate/view_helpers/action_view'
-        include WillPaginate::ViewHelpers::ActionView
+        include WillPaginate::ActionView
       end
+
+      locale_path = File.expand_path('../locale', __FILE__)
+      config.i18n.railties_load_path.concat Dir["#{locale_path}/*.{rb,yml}"]
     end
   end
 end

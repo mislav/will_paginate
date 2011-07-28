@@ -1,5 +1,6 @@
 require 'rspec'
 require File.expand_path('../view_helpers/view_example_group', __FILE__)
+require 'will_paginate/deprecation'
 
 module MyExtras
   protected
