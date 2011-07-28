@@ -1,3 +1,0 @@
-[submodule "website"]
-	path = website
-	url = git://github.com/mislav/will_paginate.git
