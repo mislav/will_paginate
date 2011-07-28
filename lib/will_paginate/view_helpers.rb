@@ -164,18 +164,29 @@ module WillPaginate
     #
     #   <%= page_entries_info @posts, :entry_name => 'item' %>
     #   #-> Displaying items 6 - 10 of 26 in total
+    # Text is by default in english but can be changed by passing in the options
+    # hash the attributes :display_text, :found_text, :total_text, :all_text, 
+    # :of_text, :in_text, :no_text, :one_text
     def page_entries_info(collection, options = {})
       entry_name = options[:entry_name] ||
         (collection.empty?? 'entry' : collection.first.class.name.underscore.sub('_', ' '))
+      display_text = options[:display_text] || "Displaying"
+      total_text   = options[:total_text]   || "total"
+      found_text   = options[:found_text]   || "found"
+      all_text     = options[:all_text]     || "all"
+      of_text      = options[:of_text]      || "of"
+      in_text      = options[:in_text]      || "in"
+      no_text      = options[:no_text]      || "No"
+      one_text     = options[:one_text]     || "1"
       
       if collection.total_pages < 2
         case collection.size
-        when 0; "No #{entry_name.pluralize} found"
-        when 1; "Displaying <b>1</b> #{entry_name}"
-        else;   "Displaying <b>all #{collection.size}</b> #{entry_name.pluralize}"
+        when 0; "#{no_text} #{entry_name.pluralize} #{found_text}"
+        when 1; "#{display_text} <b>#{one_text}</b> #{entry_name}"
+        else;   "#{display_text} <b>#{all_text} #{collection.size}</b> #{entry_name.pluralize}"
         end
       else
-        %{Displaying #{entry_name.pluralize} <b>%d&nbsp;-&nbsp;%d</b> of <b>%d</b> in total} % [
+        %{#{display_text} #{entry_name.pluralize} <b>%d&nbsp;-&nbsp;%d</b> #{of_text} <b>%d</b> #{in_text} #{total_text}} % [
           collection.offset + 1,
           collection.offset + collection.length,
           collection.total_entries
