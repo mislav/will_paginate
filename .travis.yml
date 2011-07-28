@@ -9,6 +9,3 @@ env:
   - DB=mysql
   - DB=mysql2
   - DB=postgres
-branches:
-  only:
-    - rails3
