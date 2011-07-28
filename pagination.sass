@@ -1,91 +1,104 @@
 .digg_pagination
-  :background white
-  a, span
-    :padding .2em .5em
-    :display block
-    :float left
-    :margin-right 1px
-  span.disabled
-    :color #999
-    :border 1px solid #DDD
-  span.current
-    :font-weight bold
-    :background #2E6AB1
-    :color white
-    :border 1px solid #2E6AB1
+  background: white
+  cursor: default
+  a, span, em
+    padding: 0.2em 0.5em
+    display: block
+    float: left
+    margin-right: 1px
+  .disabled
+    color: #999999
+    border: 1px solid #dddddd
+  .current
+    font-style: normal
+    font-weight: bold
+    background: #2e6ab1
+    color: white
+    border: 1px solid #2e6ab1
   a
-    :text-decoration none
-    :color #105CB6
-    :border 1px solid #9AAFE5
+    text-decoration: none
+    color: #105cb6
+    border: 1px solid #9aafe5
     &:hover, &:focus
-      :color #003
-      :border-color #003
+      color: #000033
+      border-color: #000033
   .page_info
-    :background #2E6AB1
-    :color white
-    :padding .4em .6em
-    :width 22em
-    :margin-bottom .3em
-    :text-align center
+    background: #2e6ab1
+    color: white
+    padding: 0.4em 0.6em
+    width: 22em
+    margin-bottom: 0.3em
+    text-align: center
     b
-      :color #003
-      :background = #2E6AB1 + 60
-      :padding .1em .25em
-    
+      color: #000033
+      background: #2e6ab1 + 60
+      padding: 0.1em 0.25em
   /* self-clearing method:
   &:after
-    :content "."
-    :display block
-    :height 0
-    :clear both
-    :visibility hidden
+    content: "."
+    display: block
+    height: 0
+    clear: both
+    visibility: hidden
   * html &
-    :height 1%
+    height: 1%
   *:first-child+html &
-    :overflow hidden
+    overflow: hidden
 
 .apple_pagination
-  :background #F1F1F1
-  :border 1px solid #E5E5E5
-  :text-align center
-  :padding 1em
+  background: #f1f1f1
+  border: 1px solid #e5e5e5
+  text-align: center
+  padding: 1em
+  cursor: default
   a, span
-    :padding .2em .3em
-  span.disabled
-    :color #AAA
-  span.current
-    :font-weight bold
-    :background transparent url(apple-circle.gif) no-repeat 50% 50%
+    padding: 0.2em 0.3em
+  .disabled
+    color: #aaaaaa
+  .current
+    font-style: normal
+    font-weight: bold
+    background-color: darken(#f1f1f1, 20)
+    display: inline-block
+    width: 1.4em
+    height: 1.4em
+    line-height: 1.5
+    -moz-border-radius: 1em
+    -webkit-border-radius: 1em
+    border-radius: 1em
+    text-shadow: rgba(white, .8) 1px 1px 1px
   a
-    :text-decoration none
-    :color black
+    text-decoration: none
+    color: black
     &:hover, &:focus
-      :text-decoration underline
+      text-decoration: underline
 
 .flickr_pagination
-  :text-align center
-  :padding .3em
-  a, span
-    :padding .2em .5em
-  span.disabled
-    :color #AAA
-  span.current
-    :font-weight bold
-    :color #FF0084
+  text-align: center
+  padding: 0.3em
+  cursor: default
+  a, span, em
+    padding: 0.2em 0.5em
+  .disabled
+    color: #aaaaaa
+  .current
+    font-style: normal
+    font-weight: bold
+    color: #ff0084
   a
-    :border 1px solid #DDDDDD
-    :color #0063DC
-    :text-decoration none
+    border: 1px solid #dddddd
+    color: #0063dc
+    text-decoration: none
     &:hover, &:focus
-      :border-color #003366
-      :background #0063DC
-      :color white
+      border-color: #003366
+      background: #0063dc
+      color: white
   .page_info
-    :color #aaa
-    :padding-top .8em
-  .prev_page, .next_page
-    :border-width 2px
-  .prev_page
-    :margin-right 1em
+    color: #aaaaaa
+    padding-top: 0.8em
+  .previous_page, .next_page
+    border-width: 2px
+  .previous_page
+    margin-right: 1em
   .next_page
-    :margin-left 1em
+    margin-left: 1em
