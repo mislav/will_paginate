@@ -1,31 +1,38 @@
-require 'rubygems'
-begin
-  hanna_dir = '/Users/mislav/Projects/Hanna/lib'
-  $:.unshift hanna_dir if File.exists? hanna_dir
-  require 'hanna/rdoctask'
-rescue LoadError
-  require 'rake'
-  require 'rake/rdoctask'
-end
-load 'test/tasks.rake'
+require 'rake/testtask'
 
 desc 'Default: run unit tests.'
-task :default => :test
+task :default => [:create_database, :test]
 
-desc 'Generate RDoc documentation for the will_paginate plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_files.include('README.rdoc', 'LICENSE', 'CHANGELOG.rdoc').
-    include('lib/**/*.rb').
-    exclude('lib/will_paginate/named_scope*').
-    exclude('lib/will_paginate/array.rb').
-    exclude('lib/will_paginate/version.rb')
-  
-  rdoc.main = "README.rdoc" # page to start on
-  rdoc.title = "will_paginate documentation"
-  
-  rdoc.rdoc_dir = 'doc' # rdoc output folder
-  rdoc.options << '--inline-source' << '--charset=UTF-8'
-  rdoc.options << '--webcvs=http://github.com/mislav/will_paginate/tree/master/'
+desc 'Test the will_paginate plugin.'
+Rake::TestTask.new(:test) do |t|
+  t.pattern = 'test/**/*_test.rb'
+  t.libs << 'test'
+end
+
+namespace :test do ||
+  desc 'Test only Rails integration'
+  Rake::TestTask.new(:rails) do |t|
+    t.pattern = %w[test/finder_test.rb test/view_test.rb]
+    t.libs << 'test'
+  end
+
+  desc 'Test only ActiveRecord integration'
+  Rake::TestTask.new(:db) do |t|
+    t.pattern = %w[test/finder_test.rb]
+    t.libs << 'test'
+  end
+end
+
+desc 'Create necessary databases'
+task :create_database do |variable|
+  case ENV['DB']
+  when 'mysql', 'mysql2'
+    `mysql -e 'create database will_paginate;'`
+    abort "failed to create mysql database" unless $?.success?
+  when 'postgres'
+    `psql -c 'create database will_paginate;' -U postgres`
+    abort "failed to create postgres database" unless $?.success?
+  end
 end
 
 desc %{Update ".manifest" with the latest list of project filenames. Respect\

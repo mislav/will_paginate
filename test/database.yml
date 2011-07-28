@@ -3,20 +3,14 @@ sqlite3:
   adapter: sqlite3
   timeout: 500
 
-sqlite2:
-  database: ":memory:"
-  adapter: sqlite2
-
 mysql:
   adapter: mysql
-  username: root
-  password: 
+  database: will_paginate
+  username: 
   encoding: utf8
-  database: will_paginate_unittest
 
 postgres:
   adapter: postgresql
-  username: mislav
-  password: 
-  database: will_paginate_unittest
+  database: will_paginate
+  username: postgres
   min_messages: warning

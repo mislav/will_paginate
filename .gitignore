@@ -2,3 +2,4 @@
 /rails
 *.gem
 /coverage
+.bundle

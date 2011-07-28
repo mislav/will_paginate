@@ -35,9 +35,14 @@ class ActiveRecordTestCase < Test::Unit::TestCase
       assert_equal num, $query_count, "#{$query_count} instead of #{num} queries were executed."
     end
 
+    def method_name
+      'moo' # hack
+    end
+
     def assert_no_queries(&block)
       assert_queries(0, &block)
     end
 end
 
 ActiveRecordTestConnector.setup
+abort unless ActiveRecordTestConnector.able_to_connect

@@ -42,10 +42,9 @@ class ActiveRecordTestConnector
     ActiveRecord::Base.logger = Logger.new(STDOUT) if $0 == 'irb'
     puts "using #{configuration['adapter']} adapter" unless ENV['DB'].blank?
     
-    gem 'sqlite3-ruby' if 'sqlite3' == db
-    
     ActiveRecord::Base.establish_connection(configuration)
     ActiveRecord::Base.configurations = { db => configuration }
+    ActiveRecord::Base.default_timezone = :utc if ActiveRecord::Base.respond_to? :default_timezone
     prepare ActiveRecord::Base.connection
 
     unless Object.const_defined?(:QUOTED_TYPE)
@@ -62,11 +61,18 @@ class ActiveRecordTestConnector
 
   def self.prepare(conn)
     class << conn
-      IGNORED_SQL = [/^PRAGMA/, /^SELECT currval/, /^SELECT CAST/, /^SELECT @@IDENTITY/, /^SELECT @@ROWCOUNT/, /^SHOW FIELDS /]
+      IGNORED_SQL = /
+          ^(
+            PRAGMA | SHOW\ max_identifier_length |
+            SELECT\ (currval|CAST|@@IDENTITY|@@ROWCOUNT) |
+            SHOW\ (FIELDS|TABLES)
+          )\b |
+          \bFROM\ (sqlite_master|pg_tables|pg_attribute)\b
+        /x
 
       def execute_with_counting(sql, name = nil, &block)
         $query_count ||= 0
-        $query_count  += 1 unless IGNORED_SQL.any? { |r| sql =~ r }
+        $query_count  += 1 unless sql =~ IGNORED_SQL
         execute_without_counting(sql, name, &block)
       end
 

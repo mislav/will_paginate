@@ -1,10 +1,6 @@
 require 'test/unit'
-require 'rubygems'
-
-# gem install redgreen for colored test output
-begin require 'redgreen'; rescue LoadError; end
-
-require 'boot' unless defined?(ActiveRecord)
+require 'mocha'
+require 'will_paginate'
 
 class Test::Unit::TestCase
   protected
@@ -29,9 +25,5 @@ end
 
 # Wrap tests that use Mocha and skip if unavailable.
 def uses_mocha(test_name)
-  require 'mocha'
-rescue LoadError
-  $stderr.puts "Skipping #{test_name} tests. `gem install mocha` and try again."
-else
   yield
 end

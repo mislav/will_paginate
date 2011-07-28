@@ -1,4 +1,5 @@
-require 'boot'
+require 'bundler'
+Bundler.setup
 require 'lib/activerecord_test_connector'
 
 # setup the connection
