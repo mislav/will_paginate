@@ -4,9 +4,6 @@ rvm:
 gemfile:
   - Gemfile
   - Gemfile.rails3.0
-before_script:
-  - "mysql -e 'create database will_paginate;'"
-  - "psql  -c 'create database will_paginate;' -U postgres"
 env:
   - DB=sqlite3
   - DB=mysql
