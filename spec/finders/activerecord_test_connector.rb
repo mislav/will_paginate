@@ -67,6 +67,7 @@ module ActiverecordTestConnector
     
     ActiveRecord::Base.configurations = { db => configuration }
     ActiveRecord::Base.establish_connection(db)
+    ActiveRecord::Base.default_timezone = :utc
   end
 
   def load_schema
