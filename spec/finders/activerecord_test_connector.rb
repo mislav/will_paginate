@@ -5,7 +5,14 @@ require 'active_support/multibyte' # needed for Ruby 1.9.1
 $query_count = 0
 $query_sql = []
 
-ignore_sql = /^(?:PRAGMA|SELECT (?:currval|CAST|@@IDENTITY|@@ROWCOUNT)|SHOW FIELDS)\b|\bFROM sqlite_master\b/
+ignore_sql = /
+    ^(
+      PRAGMA | SHOW\ max_identifier_length |
+      SELECT\ (currval|CAST|@@IDENTITY|@@ROWCOUNT) |
+      SHOW\ (FIELDS|TABLES)
+    )\b |
+    \bFROM\ (sqlite_master|pg_tables|pg_attribute)\b
+  /x
 
 ActiveSupport::Notifications.subscribe(/^sql\./) do |*args|
   payload = args.last
