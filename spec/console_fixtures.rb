@@ -1,7 +1,7 @@
 require 'bundler'
 Bundler.setup
 
-require 'will_paginate/finders/active_record'
+require 'will_paginate/active_record'
 require 'finders/activerecord_test_connector'
 
 ActiverecordTestConnector.setup
@@ -27,4 +27,4 @@ end
 ActiverecordTestConnector::Fixtures.create_fixtures \
   ActiverecordTestConnector::FIXTURES_PATH, ActiveRecord::Base.connection.tables
 
-WillPaginate::Finders::ActiveRecord.enable!
+WillPaginate::ActiveRecord.setup
