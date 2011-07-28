@@ -8,7 +8,7 @@ GEM
     activesupport (2.0.5)
     mocha (0.9.12)
     mysql (2.8.1)
-    pg (0.11.0)
+    postgres (0.7.9.2008.01.28)
     rake (0.8.7)
     sqlite3 (1.3.4)
 
@@ -20,6 +20,6 @@ DEPENDENCIES
   activerecord (~> 2.0.4)
   mocha
   mysql
-  pg
+  postgres
   rake (~> 0.8.7)
   sqlite3
