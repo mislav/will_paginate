@@ -50,7 +50,7 @@ describe WillPaginate::ActionView do
       end
       assert_select 'span', 1
       assert_select 'span.disabled:first-child', '&#8592; Previous'
-      assert_select 'em', '1'
+      assert_select 'em.current', '1'
       pagination.first.inner_text.should == '&#8592; Previous 1 2 3 Next &#8594;'
     end
   end
@@ -74,7 +74,7 @@ describe WillPaginate::ActionView do
           link.first['rel'].should == 'next'
         end
       end
-      assert_select 'em', '2'
+      assert_select '.current', '2'
     end
   end
 
@@ -109,7 +109,7 @@ describe WillPaginate::ActionView do
     paginate
     expected = <<-HTML
       <div class="pagination"><span class="previous_page disabled">&#8592; Previous</span>
-      <em>1</em>
+      <em class="current">1</em>
       <a href="/foo/bar?page=2" rel="next">2</a>
       <a href="/foo/bar?page=3">3</a>
       <a href="/foo/bar?page=2" class="next_page" rel="next">Next &#8594;</a></div>

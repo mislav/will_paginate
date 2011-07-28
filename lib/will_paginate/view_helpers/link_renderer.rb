@@ -44,7 +44,7 @@ module WillPaginate
         unless page == current_page
           link(page, page, :rel => rel_value(page))
         else
-          tag(:em, page)
+          tag(:em, page, :class => 'current')
         end
       end
       
