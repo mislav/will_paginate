@@ -1,53 +1,37 @@
-require 'rubygems'
 begin
-  hanna_dir = '/Users/mislav/Projects/Hanna/lib'
-  $:.unshift hanna_dir if File.exists? hanna_dir
-  require 'hanna/rdoctask'
+  require 'rspec/core/rake_task'
 rescue LoadError
-  require 'rake'
-  require 'rake/rdoctask'
-end
-load 'test/tasks.rake'
+  # no spec tasks
+else
+  task :default => [:create_database, :spec]
 
-desc 'Default: run unit tests.'
-task :default => :test
-
-desc 'Generate RDoc documentation for the will_paginate plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_files.include('README.rdoc', 'LICENSE', 'CHANGELOG.rdoc').
-    include('lib/**/*.rb').
-    exclude('lib/will_paginate/named_scope*').
-    exclude('lib/will_paginate/array.rb').
-    exclude('lib/will_paginate/version.rb')
-  
-  rdoc.main = "README.rdoc" # page to start on
-  rdoc.title = "will_paginate documentation"
-  
-  rdoc.rdoc_dir = 'doc' # rdoc output folder
-  rdoc.options << '--inline-source' << '--charset=UTF-8'
-  rdoc.options << '--webcvs=http://github.com/mislav/will_paginate/tree/master/'
-end
-
-desc %{Update ".manifest" with the latest list of project filenames. Respect\
-.gitignore by excluding everything that git ignores. Update `files` and\
-`test_files` arrays in "*.gemspec" file if it's present.}
-task :manifest do
-  list = `git ls-files --full-name --exclude=*.gemspec --exclude=.*`.chomp.split("\n")
-  
-  if spec_file = Dir['*.gemspec'].first
-    spec = File.read spec_file
-    spec.gsub! /^(\s* s.(test_)?files \s* = \s* )( \[ [^\]]* \] | %w\( [^)]* \) )/mx do
-      assignment = $1
-      bunch = $2 ? list.grep(/^test\//) : list
-      '%s%%w(%s)' % [assignment, bunch.join(' ')]
-    end
-      
-    File.open(spec_file, 'w') { |f| f << spec }
+  desc 'Run ALL OF the specs'
+  RSpec::Core::RakeTask.new(:spec) do |t|
+    # t.ruby_opts = '-w'
+    t.pattern = 'spec/finders/active_record_spec.rb' if ENV['DB'] and ENV['DB'] != 'sqlite3'
   end
-  File.open('.manifest', 'w') { |f| f << list.join("\n") }
+
+  namespace :spec do
+    desc "Run Rails specs"
+    RSpec::Core::RakeTask.new(:rails) do |t|
+      t.pattern = %w'spec/finders/active_record_spec.rb spec/view_helpers/action_view_spec.rb'
+    end
+  end
 end
 
-task :examples do
-  %x(haml examples/index.haml examples/index.html)
-  %x(sass examples/pagination.sass examples/pagination.css)
+desc 'Create necessary databases'
+task :create_database do |variable|
+  case ENV['DB']
+  when 'mysql', 'mysql2'
+    `mysql -e 'create database will_paginate;'`
+    abort "failed to create mysql database" unless $?.success?
+  when 'postgres'
+    `psql -c 'create database will_paginate;' -U postgres`
+    abort "failed to create postgres database" unless $?.success?
+  end
+end
+
+desc 'Run specs against both Rails 3.1 and Rails 3.0'
+task :rails3 do |variable|
+  system 'bundle exec rake spec && BUNDLE_GEMFILE=Gemfile.rails3.0 bundle exec rake spec:rails'
 end

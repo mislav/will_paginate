@@ -1,22 +1,20 @@
 # encoding: utf-8
 require File.expand_path('../lib/will_paginate/version', __FILE__)
 
-Gem::Specification.new do |gem|
-  gem.name    = 'will_paginate'
-  gem.version = WillPaginate::VERSION::STRING
-  gem.date    = Time.now.strftime('%Y-%m-%d')
+Gem::Specification.new do |s|
+  s.name    = 'will_paginate'
+  s.version = WillPaginate::VERSION::STRING
   
-  gem.summary = "Pagination for Rails"
-  gem.description = "The will_paginate library provides a simple, yet powerful and extensible API for ActiveRecord pagination and rendering of pagination links in ActionView templates."
+  s.summary = "Adaptive pagination plugin for web frameworks and other applications"
+  s.description = "The will_paginate library provides a simple, yet powerful and extensible API for pagination and rendering of page links in web application templates."
   
-  gem.authors  = ['Mislav Marohnić', 'PJ Hyett']
-  gem.email    = 'mislav.marohnic@gmail.com'
-  gem.homepage = 'http://github.com/mislav/will_paginate/wikis'
+  s.authors  = ['Mislav Marohnić']
+  s.email    = 'mislav.marohnic@gmail.com'
+  s.homepage = 'http://github.com/mislav/will_paginate/wikis'
   
-  gem.rubyforge_project = nil
-  gem.has_rdoc = true
-  gem.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
-  gem.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
+  s.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
+  s.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
   
-  gem.files = Dir['Rakefile', '{bin,lib,rails,test,spec}/**/*', 'README*', 'LICENSE*'] & `git ls-files -z`.split("\0")
+  s.files = Dir['Rakefile', '{bin,lib,test,spec}/**/*', 'README*', 'LICENSE*']
+  s.files &= `git ls-files -z`.split("\0") if `type -t git 2>/dev/null || which git 2>/dev/null` && $?.success?
 end
