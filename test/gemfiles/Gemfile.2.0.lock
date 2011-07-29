@@ -6,7 +6,8 @@ GEM
     activerecord (2.0.5)
       activesupport (= 2.0.5)
     activesupport (2.0.5)
-    mocha (0.9.12)
+    mocha (0.9.2)
+      rake
     mysql (2.8.1)
     pg (0.11.0)
     postgres (0.7.9.2008.01.28)
@@ -19,7 +20,7 @@ PLATFORMS
 DEPENDENCIES
   actionpack (~> 2.0.4)
   activerecord (~> 2.0.4)
-  mocha
+  mocha (= 0.9.2)
   mysql
   pg
   postgres
