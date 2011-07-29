@@ -17,12 +17,14 @@ if ENV['TRAVIS']
 end
 
 gemfiles = ['Gemfile']
-gemfiles.concat Dir['test/gemfiles/*'].reject { |f| f.include? '.lock' }
+gemfiles.concat Dir['test/gemfiles/*'].reject { |f| f.include? '.lock' }.sort.reverse
 
 ruby19 = RUBY_VERSION > '1.9'
 ruby19_gemfiles = gemfiles.first
 
 bundler_options = ENV['TRAVIS'] ? '--path vendor/bundle' : ''
+
+failed = false
 
 gemfiles.each do |gemfile|
   next if ruby19 and !ruby19_gemfiles.include? gemfile
@@ -31,8 +33,9 @@ gemfiles.each do |gemfile|
     for db in databases
       announce "Rails #{rails_version(gemfile)}", "with #{db}"
       ENV['DB'] = db
-      system %(bundle exec rake)
+      failed = true unless system %(bundle exec rake)
     end
   end
 end
 
+exit 1 if failed

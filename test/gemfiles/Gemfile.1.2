@@ -6,4 +6,8 @@ gem 'rake', '~> 0.8.7'
 gem 'mocha'
 gem 'sqlite3-ruby', '1.3.1'
 gem 'mysql', :group => :mysql
-gem 'postgres', :group => :pg
+
+group :pg do
+  gem 'postgres', :platforms => :ruby_18
+  gem 'pg',       :platforms => :ruby_19
+end
