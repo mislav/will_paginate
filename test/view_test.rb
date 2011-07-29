@@ -283,7 +283,7 @@ class ViewTest < WillPaginate::ViewTestCase
     renderer = WillPaginate::LinkRenderer.new
     
     paginate({ :page => 1 }, :renderer=>renderer)
-    assert_links_match %r[/foo/@tag\?page=\d]
+    assert_links_match %r[/foo/(?:@|%40)tag\?page=\d]
   end
   
   def test_complex_custom_page_param

@@ -142,7 +142,7 @@ module WillPaginate
     def paginated_section(*args, &block)
       pagination = will_paginate(*args).to_s
       
-      unless ActionView::Base.respond_to? :erb_variable
+      if respond_to? :output_buffer
         concat pagination
         yield
         concat pagination
@@ -395,7 +395,8 @@ module WillPaginate
       if defined? Rack::Utils
         # For Rails > 2.3
         Rack::Utils.parse_nested_query(params)
-      elsif defined?(ActionController::AbstractRequest)
+      elsif defined?(ActionController::AbstractRequest) and
+          ActionController::AbstractRequest.respond_to? :parse_query_parameters
         ActionController::AbstractRequest.parse_query_parameters(params)
       elsif defined?(ActionController::UrlEncodedPairParser)
         # For Rails > 2.2
