@@ -2,6 +2,10 @@ require 'active_record'
 require 'active_record/version'
 require 'active_record/fixtures'
 
+# prevent psych kicking in on 1.9 and interpreting
+# local timestamps in fixtures as UTC
+YAML::ENGINE.yamler = 'syck' if defined? YAML::ENGINE
+
 class ActiveRecordTestConnector
   cattr_accessor :able_to_connect
   cattr_accessor :connected
@@ -44,7 +48,7 @@ class ActiveRecordTestConnector
     
     ActiveRecord::Base.establish_connection(configuration)
     ActiveRecord::Base.configurations = { db => configuration }
-    ActiveRecord::Base.default_timezone = :utc if ActiveRecord::Base.respond_to? :default_timezone
+    ActiveRecord::Base.default_timezone = :local if ActiveRecord::Base.respond_to? :default_timezone
     prepare ActiveRecord::Base.connection
 
     unless Object.const_defined?(:QUOTED_TYPE)
