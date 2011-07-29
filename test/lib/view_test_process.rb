@@ -111,6 +111,13 @@ class WillPaginate::ViewTestCase < Test::Unit::TestCase
         end
       end
     end
+
+  private
+
+    def load_fixtures
+      # fix for Rails 1.2
+      @loaded_fixtures = {}
+    end
 end
 
 class DummyRequest
