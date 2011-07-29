@@ -1,13 +1,5 @@
+script: test/ci.rb
 rvm:
   - 1.8.6
   - 1.8.7
-gemfile:
-  - Gemfile
-  - test/gemfiles/Gemfile.2.2
-  - test/gemfiles/Gemfile.2.1
-  - test/gemfiles/Gemfile.2.0
-  - test/gemfiles/Gemfile.1.2
-env:
-  - DB=sqlite3
-  - DB=mysql
-  - DB=postgres
+  - 1.9.2
