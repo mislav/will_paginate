@@ -11,6 +11,11 @@ def rails_version(gemfile)
   gemfile =~ /\d[\d.]*$/ ? $& : '2.3'
 end
 
+def system(*args)
+  puts "$ #{args.join(' ')}"
+  super
+end
+
 if ENV['TRAVIS']
   if run_mysql
     system "mysql -e 'create database will_paginate;' >/dev/null"
@@ -26,20 +31,25 @@ gemfiles.concat Dir['test/gemfiles/*'].reject { |f| f.include? '.lock' }.sort.re
 ruby19 = RUBY_VERSION > '1.9'
 ruby19_gemfiles = gemfiles.first
 
-bundler_options = ENV['TRAVIS'] ? '--path vendor/bundle' : ''
+bundler_options = ENV['TRAVIS'] ? "--path #{Dir.pwd}/vendor/bundle" : ''
 
 failed = false
 
 gemfiles.each do |gemfile|
   next if ruby19 and !ruby19_gemfiles.include? gemfile
+  version = rails_version(gemfile)
   ENV['BUNDLE_GEMFILE'] = gemfile
-  if system %(bundle install #{bundler_options})
+  skip_install = gemfile == gemfiles.first
+  if skip_install or system %(bundle install #{bundler_options})
     for db in databases
       next if 'mysql' == db and !run_mysql
-      announce "Rails #{rails_version(gemfile)}", "with #{db}"
+      announce "Rails #{version}", "with #{db}"
       ENV['DB'] = db
       failed = true unless system %(bundle exec rake)
     end
+  else
+    # bundle install failed
+    failed = true
   end
 end
 
