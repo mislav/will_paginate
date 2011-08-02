@@ -17,3 +17,7 @@ if defined?(Merb::AbstractController)
     end
   end
 end
+
+if defined?(Sinatra) and Sinatra.respond_to? :register
+  require 'will_paginate/view_helpers/sinatra'
+end
