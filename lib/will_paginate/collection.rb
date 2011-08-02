@@ -17,6 +17,16 @@ module WillPaginate
   # requested. Use <tt>WillPaginate::Collection#out_of_bounds?</tt> method to
   # check for those cases and manually deal with them as you see fit.
   class InvalidPage < ArgumentError
+    # a value bigger than this would result in invalid SQL queries
+    BIGINT = 9223372036854775807
+
+    def self.validate(value)
+      num = value.to_i
+      if num < 1 or num > BIGINT then yield num
+      else num
+      end
+    end
+
     def initialize(page, page_num)
       super "#{page.inspect} given as value, which translates to '#{page_num}' as page number"
     end
@@ -45,12 +55,12 @@ module WillPaginate
     # is best to do lazy counting; in other words, count *conditionally* after
     # populating the collection using the +replace+ method.
     def initialize(page, per_page, total = nil)
-      @current_page = page.to_i
-      raise InvalidPage.new(page, @current_page) if @current_page < 1
-      raise InvalidPage.new(page, @current_page) if @current_page > 9223372036854775807
-      @per_page = per_page.to_i
-      raise ArgumentError, "`per_page` setting cannot be less than 1 (#{@per_page} given)" if @per_page < 1
-      raise ArgumentError, "`per_page` setting cannot be greater than BIGINT" if @per_page > 9223372036854775807
+      @current_page = InvalidPage.validate(page) do |num|
+        raise InvalidPage.new(page, num)
+      end
+      @per_page = InvalidPage.validate(per_page) do |num|
+        raise ArgumentError, "invalid :per_page value: #{per_page.inspect}"
+      end
 
       self.total_entries = total if total
     end
