@@ -20,15 +20,21 @@ module WillPaginate
     # a value bigger than this would result in invalid SQL queries
     BIGINT = 9223372036854775807
 
-    def self.validate(value)
-      num = value.to_i
-      if num < 1 or num > BIGINT then yield num
-      else num
-      end
+    def self.validate(page_value, per_page_value)
+      page = page_value.to_i
+      raise self.new(page_value, page) if page < 1
+      per_page = per_page_value.to_i
+      offset = (page - 1) * per_page
+      raise self, "invalid offset: #{offset.inspect}" if offset < 0 or offset > BIGINT
+      [page, per_page]
     end
 
-    def initialize(page, page_num)
-      super "#{page.inspect} given as value, which translates to '#{page_num}' as page number"
+    def initialize(value, page_num = nil)
+      if page_num
+        super "#{value.inspect} given as value, which translates to '#{page_num}' as page number"
+      else
+        super value
+      end
     end
   end
   
@@ -55,13 +61,7 @@ module WillPaginate
     # is best to do lazy counting; in other words, count *conditionally* after
     # populating the collection using the +replace+ method.
     def initialize(page, per_page, total = nil)
-      @current_page = InvalidPage.validate(page) do |num|
-        raise InvalidPage.new(page, num)
-      end
-      @per_page = InvalidPage.validate(per_page) do |num|
-        raise ArgumentError, "invalid :per_page value: #{per_page.inspect}"
-      end
-
+      @current_page, @per_page = InvalidPage.validate(page, per_page)
       self.total_entries = total if total
     end
 
