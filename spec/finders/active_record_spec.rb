@@ -102,6 +102,28 @@ describe WillPaginate::ActiveRecord do
         topics.total_entries.should == 0
       }.should run_queries(1)
     end
+
+    it "forgets count in sub-relations" do
+      lambda {
+        topics = Topic.paginate :page => 1, :per_page => 3
+        topics.total_entries.should == 4
+        topics.where('1 = 1').total_entries.should == 4
+      }.should run_queries(2)
+    end
+
+    it "overrides total_entries count with a fixed value" do
+      lambda {
+        topics = Topic.paginate :page => 1, :per_page => 3, :total_entries => 999
+        topics.total_entries.should == 999
+        # value is kept even in sub-relations
+        topics.where('1 = 1').total_entries.should == 999
+      }.should run_queries(0)
+    end
+
+    it "supports a non-int for total_entries" do
+      topics = Topic.paginate :page => 1, :per_page => 3, :total_entries => "999"
+      topics.total_entries.should == 999
+    end
   end
   
   it "should not ignore :select parameter when it says DISTINCT" do

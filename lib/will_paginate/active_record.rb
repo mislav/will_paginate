@@ -69,6 +69,7 @@ module WillPaginate
             rel = self.except(*excluded)
             # TODO: hack. decide whether to keep
             rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
+            @total_entries_queried = true
             rel.count
           end
         end
@@ -90,7 +91,7 @@ module WillPaginate
       def clone
         other = super
         other.current_page = current_page unless other.current_page
-        other.total_entries = nil
+        other.total_entries = nil if defined? @total_entries_queried
         other
       end
 
@@ -118,6 +119,7 @@ module WillPaginate
         rel = limit(per_page).page(pagenum)
         rel = rel.apply_finder_options(options) if options.any?
         rel.wp_count_options = count_options    if count_options
+        rel.total_entries = total.to_i          unless total.blank?
         rel
       end
 
