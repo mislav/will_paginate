@@ -418,6 +418,13 @@ describe WillPaginate::ActiveRecord do
       Developer.paginate((1..8).to_a, :per_page => 3, :page => 2, :order => 'id')
     }.should raise_error(ArgumentError)
   end
+
+  it "errors out for invalid values" do |variable|
+    lambda {
+      # page that results in an offset larger than BIGINT
+      Project.page(307445734561825862)
+    }.should raise_error(WillPaginate::InvalidPage, "invalid offset: 9223372036854775830")
+  end
   
   protected
   

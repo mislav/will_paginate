@@ -47,7 +47,7 @@ module WillPaginate
       def limit(num)
         rel = super
         if rel.current_page
-          rel.offset((rel.current_page-1) * rel.limit_value)
+          rel.offset ::WillPaginate.calculate_offset(rel.current_page, rel.limit_value)
         else
           rel
         end
@@ -124,10 +124,9 @@ module WillPaginate
       end
 
       def page(num)
-        pagenum = num.nil? ? 1 : num.to_i
-        raise ::WillPaginate::InvalidPage, num, pagenum if pagenum < 1
         rel = scoped.extending(RelationMethods)
-        rel = rel.offset((pagenum-1) * (rel.limit_value || per_page))
+        pagenum, per_page, offset = ::WillPaginate.process_values(num, rel.limit_value || self.per_page)
+        rel = rel.offset(offset)
         rel = rel.limit(per_page) unless rel.limit_value
         rel.current_page = pagenum
         rel

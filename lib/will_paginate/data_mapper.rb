@@ -7,9 +7,8 @@ module WillPaginate
   module DataMapper
     module Pagination
       def page(num)
-        pagenum = num.nil? ? 1 : num.to_i
-        raise ::WillPaginate::InvalidPage, num, pagenum if pagenum < 1
-        options = {:offset => (pagenum-1) * (query.limit || per_page)}
+        pagenum, per_page, offset = ::WillPaginate.process_values(num, query.limit || self.per_page)
+        options = {:offset => offset}
         options[:limit] = per_page unless query.limit
         col = new_collection(query.merge(options))
         col.current_page = pagenum

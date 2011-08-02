@@ -29,17 +29,6 @@ describe WillPaginate::Collection do
     result.size.should == 30
   end
 
-  describe "old API" do
-    it "should fail with numeric params" do
-      Proc.new { [].paginate(2) }.should raise_error(ArgumentError)
-      Proc.new { [].paginate(2, 10) }.should raise_error(ArgumentError)
-    end
-
-    it "should fail with both options and numeric param" do
-      Proc.new { [].paginate({}, 5) }.should raise_error(ArgumentError)
-    end
-  end
-
   it "should give total_entries precedence over actual size" do
     %w(a b c).paginate(:total_entries => 5).total_entries.should == 5
   end
@@ -118,26 +107,29 @@ describe WillPaginate::Collection do
   end
 
   it "should raise WillPaginate::InvalidPage on invalid input" do
-    for bad_input in [0, -1, nil, '', 'Schnitzel']
-      Proc.new { create bad_input }.should raise_error(WillPaginate::InvalidPage)
+    [0, -1, nil, '', 'Schnitzel'].each do |bad_input|
+      lambda {
+        create bad_input
+      }.should raise_error(WillPaginate::InvalidPage, "invalid page: #{bad_input.inspect}")
     end
-  end
-
-  it "should raise Argument error on invalid per_page setting" do
-    Proc.new { create(1, -1) }.should raise_error(ArgumentError)
   end
 
   it "should not respond to page_count anymore" do
     Proc.new { create.page_count }.should raise_error(NoMethodError)
   end
 
+  it "inherits per_page from global value" do
+    collection = described_class.new(1)
+    collection.per_page.should == 30
+  end
+
   private
   
     def create(page = 2, limit = 5, total = nil, &block)
       if block_given?
-        WillPaginate::Collection.create(page, limit, total, &block)
+        described_class.create(page, limit, total, &block)
       else
-        WillPaginate::Collection.new(page, limit, total)
+        described_class.new(page, limit, total)
       end
     end
 
