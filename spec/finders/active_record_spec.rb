@@ -53,6 +53,19 @@ describe WillPaginate::ActiveRecord do
       rel.per_page.should == 5
     end
 
+    it "remembers pagination in sub-relations" do
+      rel = Topic.paginate(:page => 2, :per_page => 3)
+      lambda {
+        rel.total_entries.should == 4
+      }.should run_queries(1)
+      rel = rel.mentions_activerecord
+      rel.current_page.should == 2
+      rel.per_page.should == 3
+      lambda {
+        rel.total_entries.should == 1
+      }.should run_queries(1)
+    end
+
     it "supports the page() method" do
       rel = Developer.page('1').order('id')
       rel.current_page.should == 1
@@ -82,13 +95,6 @@ describe WillPaginate::ActiveRecord do
   end
 
   describe "counting" do
-    it "should not accept :count parameter" do
-      pending
-      lambda {
-        User.paginate :page => 1, :count => {}
-      }.should raise_error(ArgumentError)
-    end
-    
     it "should guess the total count" do
       lambda {
         topics = Topic.paginate :page => 2, :per_page => 3
@@ -109,6 +115,13 @@ describe WillPaginate::ActiveRecord do
         topics.total_entries.should == 4
         topics.where('1 = 1').total_entries.should == 4
       }.should run_queries(2)
+    end
+
+    it "supports empty? method" do
+      topics = Topic.paginate :page => 1, :per_page => 3
+      lambda {
+        topics.should_not be_empty
+      }.should run_queries(1)
     end
 
     it "overrides total_entries count with a fixed value" do

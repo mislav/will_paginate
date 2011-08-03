@@ -64,14 +64,22 @@ module WillPaginate
           if loaded? and size < limit_value and (current_page == 1 or size > 0)
             offset_value + size
           else
-            excluded = [:order, :limit, :offset]
-            excluded << :includes unless eager_loading?
-            rel = self.except(*excluded)
-            # TODO: hack. decide whether to keep
-            rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
             @total_entries_queried = true
-            rel.count
+            count
           end
+        end
+      end
+
+      def count
+        if limit_value
+          excluded = [:order, :limit, :offset]
+          excluded << :includes unless eager_loading?
+          rel = self.except(*excluded)
+          # TODO: hack. decide whether to keep
+          rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
+          rel.count
+        else
+          super
         end
       end
 
@@ -79,6 +87,15 @@ module WillPaginate
       def size
         if !loaded? and limit_value
           [super, limit_value].min
+        else
+          super
+        end
+      end
+
+      # overloaded to be pagination-aware
+      def empty?
+        if !loaded? and offset_value
+          count <= offset_value
         else
           super
         end
