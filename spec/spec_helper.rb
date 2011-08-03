@@ -1,6 +1,11 @@
 require 'rspec'
 require File.expand_path('../view_helpers/view_example_group', __FILE__)
 require 'will_paginate/deprecation'
+begin
+  require 'ruby-debug'
+rescue LoadError
+  # no debugger available
+end
 
 module MyExtras
   protected
