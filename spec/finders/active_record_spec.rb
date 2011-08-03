@@ -117,6 +117,15 @@ describe WillPaginate::ActiveRecord do
       }.should run_queries(2)
     end
 
+    it "remembers custom count options in sub-relations" do
+      topics = Topic.paginate :page => 1, :per_page => 3, :count => {:conditions => "title LIKE '%futurama%'"}
+      topics.total_entries.should == 1
+      topics.length.should == 3
+      lambda {
+        topics.order('id').total_entries.should == 1
+      }.should run_queries(1)
+    end
+
     it "supports empty? method" do
       topics = Topic.paginate :page => 1, :per_page => 3
       lambda {

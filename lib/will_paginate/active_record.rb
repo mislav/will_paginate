@@ -109,6 +109,7 @@ module WillPaginate
         other = super
         other.current_page = current_page unless other.current_page
         other.total_entries = nil if defined? @total_entries_queried
+        other.wp_count_options = @wp_count_options if defined? @wp_count_options
         other
       end
 
