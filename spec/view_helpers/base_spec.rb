@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'will_paginate/view_helpers'
 require 'will_paginate/array'
-require 'i18n'
+require 'active_support'
 
 describe WillPaginate::ViewHelpers do
 
