@@ -14,3 +14,8 @@ group :pg do
   gem 'postgres', :platforms => :ruby_18
   gem 'pg',       :platforms => :ruby_19
 end
+
+group :debug do
+  gem 'ruby-debug', :platforms => :mri_18
+  gem 'ruby-debug19', :platforms => :mri_19
+end unless ENV['TRAVIS']
