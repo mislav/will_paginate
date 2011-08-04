@@ -33,6 +33,9 @@ describe Sequel::Dataset::Pagination, 'extension' do
     it "should imitate WillPaginate::Collection" do
       result = Car.paginate(1, 2)
       
+      result.should_not be_empty
+      result.size.should == 2
+      result.length.should == 2
       result.total_entries.should == 3
       result.total_pages.should == 2
       result.per_page.should == 2
@@ -41,6 +44,11 @@ describe Sequel::Dataset::Pagination, 'extension' do
     
     it "should perform" do
       Car.paginate(1, 2).all.should == [Car[1], Car[2]]
+    end
+
+    it "should be empty" do
+      result = Car.paginate(3, 2)
+      result.should be_empty
     end
     
     it "should perform with #select and #order" do

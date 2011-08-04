@@ -13,6 +13,11 @@ module WillPaginate
       page_size
     end
 
+    def size
+      current_page_record_count
+    end
+    alias length size
+
     def total_entries
       pagination_record_count
     end
