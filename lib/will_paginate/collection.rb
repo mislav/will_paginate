@@ -1,3 +1,5 @@
+require 'will_paginate/per_page'
+
 module WillPaginate
   # = Invalid page number error
   # This is an ArgumentError raised in case a page was requested that is either
@@ -60,7 +62,7 @@ module WillPaginate
     # and the total number of entries. The last argument is optional because it
     # is best to do lazy counting; in other words, count *conditionally* after
     # populating the collection using the +replace+ method.
-    def initialize(page, per_page, total = nil)
+    def initialize(page, per_page = WillPaginate.per_page, total = nil)
       @current_page, @per_page = InvalidPage.validate(page, per_page)
       self.total_entries = total if total
     end

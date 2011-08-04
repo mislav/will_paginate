@@ -10,5 +10,5 @@ class Developer < User
   named_scope :distinct, :select => 'DISTINCT `users`.*'
   named_scope :poor, :conditions => ['salary <= ?', 80000], :order => 'salary'
 
-  def self.per_page() 10 end
+  self.per_page = 10
 end

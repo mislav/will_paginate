@@ -1,4 +1,5 @@
 require 'will_paginate/core_ext'
+require 'will_paginate/per_page'
 
 module WillPaginate
   # A mixin for ActiveRecord::Base. Provides +per_page+ class method
@@ -8,11 +9,10 @@ module WillPaginate
   #
   module Finder
     def self.included(base)
+      base.extend PerPage
       base.extend ClassMethods
       class << base
         alias_method_chain :method_missing, :paginate
-        # alias_method_chain :find_every,     :paginate
-        define_method(:per_page) { 30 } unless respond_to?(:per_page)
       end
     end
 

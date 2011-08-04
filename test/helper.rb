@@ -1,6 +1,11 @@
 require 'test/unit'
 require 'mocha'
 require 'will_paginate'
+begin
+  require 'ruby-debug'
+rescue LoadError
+  # no debuggging
+end
 
 class Test::Unit::TestCase
   protected

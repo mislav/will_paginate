@@ -36,25 +36,21 @@ pagination, just stick this in:
 You're done. (You can find the option list at WillPaginate::ViewHelpers.)
 
 How does it know how much items to fetch per page? It asks your model by calling
-its <tt>per_page</tt> class method. You can define it like this:
+its <tt>per_page</tt> class method. You can set a custom value like this:
 
   class Post < ActiveRecord::Base
-    cattr_reader :per_page
-    @@per_page = 50
-  end
-
-... or like this:
-
-  class Post < ActiveRecord::Base
-    def self.per_page
-      50
-    end
+    self.per_page = 10
   end
 
 ... or don't worry about it at all. WillPaginate defines it to be <b>30</b> by default.
-But you can always specify the count explicitly when calling +paginate+:
+You can always specify the count explicitly when calling +paginate+:
 
-  @posts = Post.paginate :page => params[:page], :per_page => 50
+  @posts = Post.paginate :page => params[:page], :per_page => 10
+
+You can also set `per_page` globally, which will affect all models that haven't got a
+custom value. Use this if you're unhappy with 30 as the default:
+
+  WillPaginate.per_page = 10
 
 The +paginate+ finder wraps the original finder and returns your resultset that now has
 some new properties. You can use the collection as you would with any ActiveRecord

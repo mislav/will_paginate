@@ -129,6 +129,22 @@ class ArrayPaginationTest < Test::Unit::TestCase
     # It's `total_pages` now.
   end
 
+  def test_inherits_global_per_page
+    col = WillPaginate::Collection.new(1)
+    assert_equal 30, col.per_page
+
+    WillPaginate.per_page = 12
+    begin
+      col = WillPaginate::Collection.new(1)
+      assert_equal 12, col.per_page
+
+      col = ('a'..'z').to_a.paginate(:page => 1)
+      assert_equal 12, col.per_page
+    ensure
+      WillPaginate.per_page = 30
+    end
+  end
+
   private
     def create(page = 2, limit = 5, total = nil, &block)
       if block_given?

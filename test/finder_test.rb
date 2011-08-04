@@ -27,6 +27,27 @@ class FinderTest < ActiveRecordTestCase
     end
   end
 
+  def test_per_page_setting
+    assert_equal 30, Topic.per_page
+    Topic.per_page = 12
+    begin
+      assert_equal 12, Topic.per_page
+    ensure
+      Topic.per_page = 30
+    end
+    assert_equal 10, Developer.per_page
+  end
+
+  def test_per_page_inheritance
+    subclass = Class.new(Topic)
+    assert_equal 30, subclass.per_page
+    subclass.per_page = 12
+    assert_equal 12, subclass.per_page
+    assert_equal 30, Topic.per_page
+    sub_subclass = Class.new(subclass)
+    assert_equal 12, sub_subclass.per_page
+  end
+
   def test_parameter_api
     # :page parameter in options is required!
     assert_raise(ArgumentError){ Topic.paginate }
