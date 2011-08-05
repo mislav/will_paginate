@@ -15,23 +15,6 @@ module WillPaginate
   #   @posts = Post.paginate :all, :page => params[:page], :order => 'created_at DESC'
   #
   module ActiveRecord
-    # In Rails, this is automatically called to mix-in pagination functionality to ActiveRecord.
-    def self.setup
-      ::ActiveRecord::Base.extend PerPage
-      ::ActiveRecord::Base.extend ActiveRecord::Pagination
-      ::ActiveRecord::Base.extend ActiveRecord::BaseMethods
-
-      klasses = [::ActiveRecord::Relation]
-      if defined? ::ActiveRecord::Associations::CollectionProxy
-        klasses << ::ActiveRecord::Associations::CollectionProxy
-      else
-        klasses << ::ActiveRecord::Associations::AssociationCollection
-      end
-
-      # support pagination on associations and scopes
-      klasses.each { |klass| klass.send(:include, ActiveRecord::Pagination) }
-    end
-
     # makes a Relation look like WillPaginate::Collection
     module RelationMethods
       attr_accessor :current_page
@@ -192,5 +175,20 @@ module WillPaginate
         end
       end
     end
+
+    # mix everything into Active Record
+    ::ActiveRecord::Base.extend PerPage
+    ::ActiveRecord::Base.extend Pagination
+    ::ActiveRecord::Base.extend BaseMethods
+
+    klasses = [::ActiveRecord::Relation]
+    if defined? ::ActiveRecord::Associations::CollectionProxy
+      klasses << ::ActiveRecord::Associations::CollectionProxy
+    else
+      klasses << ::ActiveRecord::Associations::AssociationCollection
+    end
+
+    # support pagination on associations and scopes
+    klasses.each { |klass| klass.send(:include, Pagination) }
   end
 end

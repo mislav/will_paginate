@@ -26,5 +26,3 @@ end
 # load all fixtures
 ActiverecordTestConnector::Fixtures.create_fixtures \
   ActiverecordTestConnector::FIXTURES_PATH, ActiveRecord::Base.connection.tables
-
-WillPaginate::ActiveRecord.setup

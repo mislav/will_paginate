@@ -135,5 +135,7 @@ module WillPaginate
         Rack::Utils.parse_nested_query(params)
       end
     end
+
+    ::ActionView::Base.send :include, self
   end
 end

@@ -1,9 +1,8 @@
 require 'spec_helper'
 require 'will_paginate/active_record'
 require File.expand_path('../activerecord_test_connector', __FILE__)
-ActiverecordTestConnector.setup
 
-WillPaginate::ActiveRecord.setup
+ActiverecordTestConnector.setup
 abort unless ActiverecordTestConnector.able_to_connect
 
 describe WillPaginate::ActiveRecord do
