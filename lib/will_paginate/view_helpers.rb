@@ -67,9 +67,8 @@ module WillPaginate
 
       options = WillPaginate::ViewHelpers.pagination_options.merge(options)
 
-      scope = 'views.will_paginate'
-      options[:previous_label] ||= will_paginate_translate(:previous_label, :scope => scope) { '&#8592; Previous' }
-      options[:next_label]     ||= will_paginate_translate(:next_label, :scope => scope) { 'Next &#8594;' }
+      options[:previous_label] ||= will_paginate_translate(:previous_label) { '&#8592; Previous' }
+      options[:next_label]     ||= will_paginate_translate(:next_label) { 'Next &#8594;' }
 
       # get the renderer instance
       renderer = case options[:renderer]
@@ -88,74 +87,73 @@ module WillPaginate
       renderer.to_html
     end
 
-    # Renders a helpful message with numbers of displayed vs. total entries.
-    # You can use this as a blueprint for your own, similar helpers.
+    # Renders a message containing number of displayed vs. total entries.
     #
     #   <%= page_entries_info @posts %>
-    #   #-> Displaying posts 6 - 10 of 26 in total
+    #   #-> Displaying posts 6 - 12 of 26 in total
     #
-    # By default, the message will use the humanized class name of objects
-    # in collection: for instance, "project types" for ProjectType models.
-    # Override this with the <tt>:entry_name</tt> parameter:
-    #
-    #   <%= page_entries_info @posts, :entry_name => 'item' %>
-    #   #-> Displaying items 6 - 10 of 26 in total
-    #
-    # Entry name is entered in singular and pluralized with
-    # <tt>String#pluralize</tt> method from ActiveSupport. If it isn't
-    # loaded, specify plural with <tt>:plural_name</tt> parameter:
-    #
-    #   <%= page_entries_info @posts, :entry_name => 'item', :plural_name => 'items' %>
-    #
-    # By default, this method produces HTML output. You can trigger plain
-    # text output by passing <tt>:html => false</tt> in options.
+    # The default output contains HTML. Use ":html => false" for plain text.
     def page_entries_info(collection, options = {})
-      entry_name = options[:entry_name] || (collection.empty?? 'entry' :
-                   collection.first.class.name.underscore.gsub('_', ' '))
+      html  = options[:html] != false
+      model = options[:model]
+      model = collection.first.class unless model or collection.empty?
+      model ||= 'entry'
+      model_key = if model.respond_to? :model_name
+                    model.model_name.i18n_key  # ActiveModel::Naming
+                  else
+                    model.to_s.underscore
+                  end
 
-      plural_name = if options[:plural_name]
-        options[:plural_name]
-      elsif entry_name == 'entry'
-        plural_name = 'entries'
-      elsif entry_name.respond_to? :pluralize
-        plural_name = entry_name.pluralize
-      else
-        raise ArgumentError, "must provide :plural_name for #{entry_name.inspect}"
-      end
-
-      unless options[:html] == false
-        b  = '<b>'
-        eb = '</b>'
+      if html
+        b, eb = '<b>', '</b>'
         sp = '&nbsp;'
-        key = '_html'
+        html_key = '_html'
       else
-        b = eb = key = ''
+        b = eb = html_key = ''
         sp = ' '
       end
 
-      scope = 'views.will_paginate.page_entries_info'
+      model_count = collection.total_pages > 1 ? 5 : collection.size
+      model_name = will_paginate_translate "models.#{model_key}", :count => model_count do |_, opts|
+        if model.respond_to? :model_name
+          model.model_name.human(:count => opts[:count])
+        else
+          name = model_key.to_s.tr('_', ' ')
+          raise "can't pluralize model name: #{model.inspect}" unless name.respond_to? :pluralize
+          opts[:count] == 1 ? name : name.pluralize
+        end
+      end
 
       if collection.total_pages < 2
-        will_paginate_translate "single_page#{key}", :scope => scope, :count => collection.size,
-          :name => entry_name, :plural => plural_name do |_, opts|
-            case opts[:count]
-            when 0; "No #{opts[:plural]} found"
-            when 1; "Displaying #{b}1#{eb} #{opts[:name]}"
-            else    "Displaying #{b}all #{opts[:count]}#{eb} #{opts[:plural]}"
-            end
+        i18n_key = :"page_entries_info.single_page#{html_key}"
+        keys = [:"#{model_key}.#{i18n_key}", i18n_key]
+
+        will_paginate_translate keys, :count => collection.size, :model => model_name do |_, opts|
+          case opts[:count]
+          when 0; "No #{opts[:model]} found"
+          when 1; "Displaying #{b}1#{eb} #{opts[:model]}"
+          else    "Displaying #{b}all #{opts[:count]}#{eb} #{opts[:model]}"
           end
+        end
       else
-        will_paginate_translate "multi_page#{key}", :scope => scope, :total => collection.total_entries, :plural => plural_name,
-          :from => collection.offset + 1, :to => collection.offset + collection.length do |_, opts|
-            %{Displaying %s #{b}%d#{sp}-#{sp}%d#{eb} of #{b}%d#{eb} in total} %
-              [ opts[:plural], opts[:from], opts[:to], opts[:total] ]
-          end
+        i18n_key = :"page_entries_info.multi_page#{html_key}"
+        keys = [:"#{model_key}.#{i18n_key}", i18n_key]
+        params = {
+          :model => model_name, :count => collection.total_entries,
+          :from => collection.offset + 1, :to => collection.offset + collection.length
+        }
+        will_paginate_translate keys, params do |_, opts|
+          %{Displaying %s #{b}%d#{sp}-#{sp}%d#{eb} of #{b}%d#{eb} in total} %
+            [ opts[:model], opts[:from], opts[:to], opts[:count] ]
+        end
       end
     end
 
-    def will_paginate_translate(key, options = {})
+    def will_paginate_translate(keys, options = {})
       if defined? ::I18n
-        ::I18n.translate(key, options.merge(:default => Proc.new))
+        defaults = Array(keys).dup
+        defaults << Proc.new if block_given?
+        ::I18n.translate(defaults.shift, options.merge(:default => defaults, :scope => :will_paginate))
       else
         yield key, options
       end

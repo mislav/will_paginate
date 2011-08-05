@@ -71,8 +71,15 @@ module WillPaginate
       end
     end
 
-    def will_paginate_translate(key, options = {})
-      translate(key, options)
+    def will_paginate_translate(keys, options = {})
+      if Array === keys
+        defaults = keys.dup
+        key = defaults.shift
+      else
+        defaults = nil
+        key = keys
+      end
+      translate(key, options.merge(:default => defaults, :scope => :will_paginate))
     end
 
     protected
