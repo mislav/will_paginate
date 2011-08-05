@@ -25,7 +25,7 @@ module WillPaginate
 
     def self.add_locale_path(config)
       locale_path = File.expand_path('../locale', __FILE__)
-      config.i18n.railties_load_path.concat Dir["#{locale_path}/*.{rb,yml}"]
+      config.i18n.railties_load_path.unshift(*Dir["#{locale_path}/*.{rb,yml}"])
     end
   end
 end
