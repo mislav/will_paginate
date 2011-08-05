@@ -145,6 +145,22 @@ describe WillPaginate::ActiveRecord do
       topics = Topic.paginate :page => 1, :per_page => 3, :total_entries => "999"
       topics.total_entries.should == 999
     end
+
+    it "removes :include for count" do
+      lambda {
+        developers = Developer.paginate(:page => 1, :per_page => 1).includes(:projects)
+        developers.total_entries.should == 11
+        $query_sql.last.should_not =~ /\bJOIN\b/
+      }.should run_queries(1)
+    end
+
+    it "keeps :include for count when they are referenced in :conditions" do
+      developers = Developer.paginate(:page => 1, :per_page => 1).includes(:projects)
+      with_condition = developers.where('projects.id > 1')
+      with_condition.total_entries.should == 1
+
+      $query_sql.last.should =~ /\bJOIN\b/
+    end
   end
   
   it "should not ignore :select parameter when it says DISTINCT" do
@@ -264,23 +280,6 @@ describe WillPaginate::ActiveRecord do
 
     result.should == expected
     result.total_entries.should == 4
-  end
-  
-  it "should remove :include for count" do
-    lambda {
-      Developer.paginate(:page => 1, :per_page => 1, :include => :projects).to_a
-      $query_sql.last.should_not =~ /\bJOIN\b/
-    }.should run_queries(3..4)
-  end
-
-  it "should keep :include for count when they are referenced in :conditions" do
-    Developer.paginate(
-      :page => 1, :per_page => 1,
-      :include => :projects,
-      :conditions => 'projects.id > 2'
-    ).to_a
-
-    $query_sql.last.should =~ /\bJOIN\b/
   end
   
   describe "associations" do
