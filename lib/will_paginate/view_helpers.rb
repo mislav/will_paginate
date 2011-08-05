@@ -114,7 +114,8 @@ module WillPaginate
       end
 
       model_count = collection.total_pages > 1 ? 5 : collection.size
-      model_name = will_paginate_translate "models.#{model_key}", :count => model_count do |_, opts|
+      defaults = ["models.#{model_key}"]
+      defaults << Proc.new { |_, opts|
         if model.respond_to? :model_name
           model.model_name.human(:count => opts[:count])
         else
@@ -122,7 +123,8 @@ module WillPaginate
           raise "can't pluralize model name: #{model.inspect}" unless name.respond_to? :pluralize
           opts[:count] == 1 ? name : name.pluralize
         end
-      end
+      }
+      model_name = will_paginate_translate defaults, :count => model_count
 
       if collection.total_pages < 2
         i18n_key = :"page_entries_info.single_page#{html_key}"
