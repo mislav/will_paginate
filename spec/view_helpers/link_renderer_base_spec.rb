@@ -21,9 +21,7 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
   
   it "should have total_pages accessor" do
     prepare :total_pages => 42
-    lambda {
-      @renderer.send(:total_pages).should == 42
-    }.should_not have_deprecation
+    @renderer.send(:total_pages).should == 42
   end
   
   it "should clear old cached values when prepared" do
