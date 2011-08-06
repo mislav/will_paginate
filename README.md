@@ -2,30 +2,15 @@
 
 will_paginate is a pagination library that integrates with Ruby on Rails, Sinatra, Merb, DataMapper and Sequel.
 
-Quick install:
+Installation:
 
 ``` ruby
-## Rails 3, Sinatra, Merb: Gemfile
+## Gemfile for Rails 3, Sinatra, and Merb
 gem 'will_paginate', '~> 3.0.pre4'
-
-## Sinatra app also needs:
-require 'will_paginate'
-require 'will_paginate/active_record'  # or "data_mapper" or "sequel"
-```
-
-Latest will_paginate doesn't support Rails older than 3.0 anymore. If you run an older version of Rails, you have to use the 2.3.x version of will_paginate:
-
-``` ruby
-## Rails 2.1 - 2.3: environment.rb
-Rails::Initializer.run do |config|
-  config.gem 'will_paginate', :version => '~> 2.3.15'
-end
-
-## Rails 1.2 - 2.0: environment.rb
-require 'will_paginate'
 ```
 
 See [installation instructions][install] on the wiki for more info.
+
 
 ## Basic will_paginate use
 
