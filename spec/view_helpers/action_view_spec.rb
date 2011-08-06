@@ -4,8 +4,6 @@ require 'action_controller'
 require 'will_paginate/view_helpers/action_view'
 require 'will_paginate/collection'
 
-ActionView::Base.send(:include, WillPaginate::ActionView)
-
 Routes = ActionDispatch::Routing::RouteSet.new
 
 Routes.draw do
@@ -20,7 +18,10 @@ end
 describe WillPaginate::ActionView do
 
   before(:all) do
-    I18n.load_path << File.expand_path('../../../lib/will_paginate/locale/en.yml', __FILE__)
+    I18n.load_path.concat WillPaginate::I18n.load_path
+  end
+
+  before(:each) do
     I18n.reload!
   end
 
@@ -276,6 +277,27 @@ describe WillPaginate::ActionView do
     lambda {
       paginate(nil)
     }.should raise_error(ActionView::TemplateError, /@developers/)
+  end
+
+  ## i18n
+
+  it "is able to translate previous/next labels" do
+    translation :will_paginate => {
+      :previous_label => 'Go back',
+      :next_label => 'Load more'
+    }
+
+    paginate do |pagination|
+      assert_select 'span.disabled:first-child', 'Go back'
+      assert_select 'a[rel=next]', 'Load more'
+    end
+  end
+
+  private
+
+  def translation(data)
+    I18n.available_locales # triggers loading existing translations
+    I18n.backend.store_translations(:en, data)
   end
 end
 

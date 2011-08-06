@@ -1,5 +1,6 @@
 require 'will_paginate'
 require 'will_paginate/collection'
+require 'will_paginate/i18n'
 
 module WillPaginate
   class Railtie < Rails::Railtie
@@ -24,8 +25,7 @@ module WillPaginate
     end
 
     def self.add_locale_path(config)
-      locale_path = File.expand_path('../locale', __FILE__)
-      config.i18n.railties_load_path.unshift(*Dir["#{locale_path}/*.{rb,yml}"])
+      config.i18n.railties_load_path.unshift(*WillPaginate::I18n.load_path)
     end
   end
 end

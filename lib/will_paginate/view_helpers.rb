@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'will_paginate/core_ext'
+require 'will_paginate/i18n'
 
 module WillPaginate
   # = Will Paginate view helpers
@@ -31,6 +32,8 @@ module WillPaginate
       :page_links     => true,
       :container      => true
     }
+
+    include WillPaginate::I18n
 
     # Returns HTML representing page links for a WillPaginate::Collection-like object.
     # In case there is no more than one page in total, nil is returned.
@@ -148,16 +151,6 @@ module WillPaginate
           %{Displaying %s #{b}%d#{sp}-#{sp}%d#{eb} of #{b}%d#{eb} in total} %
             [ opts[:model], opts[:from], opts[:to], opts[:count] ]
         end
-      end
-    end
-
-    def will_paginate_translate(keys, options = {})
-      if defined? ::I18n
-        defaults = Array(keys).dup
-        defaults << Proc.new if block_given?
-        ::I18n.translate(defaults.shift, options.merge(:default => defaults, :scope => :will_paginate))
-      else
-        yield key, options
       end
     end
   end
