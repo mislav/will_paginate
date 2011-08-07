@@ -1,4 +1,5 @@
 require 'will_paginate/per_page'
+require 'will_paginate/page_number'
 
 module WillPaginate
   # = The key to pagination
@@ -24,7 +25,7 @@ module WillPaginate
     # is best to do lazy counting; in other words, count *conditionally* after
     # populating the collection using the +replace+ method.
     def initialize(page, per_page = WillPaginate.per_page, total = nil)
-      @current_page = InvalidPage.validate(page, 'page')
+      @current_page = WillPaginate::PageNumber(page)
       @per_page = per_page.to_i
       self.total_entries = total if total
     end
@@ -74,7 +75,7 @@ module WillPaginate
     # the offset is 30. This property is useful if you want to render ordinals
     # side by side with records in the view: simply start with offset + 1.
     def offset
-      (current_page - 1) * per_page
+      @current_page.to_offset(per_page).to_i
     end
 
     # current_page - 1 or nil if there is no previous page

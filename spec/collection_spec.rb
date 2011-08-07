@@ -106,14 +106,6 @@ describe WillPaginate::Collection do
     end
   end
 
-  it "should raise WillPaginate::InvalidPage on invalid input" do
-    [0, -1, nil, '', 'Schnitzel'].each do |bad_input|
-      lambda {
-        create bad_input
-      }.should raise_error(WillPaginate::InvalidPage, "invalid page: #{bad_input.inspect}")
-    end
-  end
-
   it "should not respond to page_count anymore" do
     Proc.new { create.page_count }.should raise_error(NoMethodError)
   end

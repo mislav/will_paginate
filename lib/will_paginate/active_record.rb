@@ -1,4 +1,5 @@
 require 'will_paginate/per_page'
+require 'will_paginate/page_number'
 require 'will_paginate/collection'
 require 'active_record'
 
@@ -30,7 +31,7 @@ module WillPaginate
       def limit(num)
         rel = super
         if rel.current_page
-          rel.offset ::WillPaginate.calculate_offset(rel.current_page, rel.limit_value)
+          rel.offset rel.current_page.to_offset(rel.limit_value).to_i
         else
           rel
         end
@@ -117,7 +118,7 @@ module WillPaginate
         count_options = options.delete(:count)
         options.delete(:page)
 
-        rel = limit(per_page).page(pagenum)
+        rel = limit(per_page.to_i).page(pagenum)
         rel = rel.apply_finder_options(options) if options.any?
         rel.wp_count_options = count_options    if count_options
         rel.total_entries = total.to_i          unless total.blank?
@@ -126,8 +127,9 @@ module WillPaginate
 
       def page(num)
         rel = scoped.extending(RelationMethods)
-        pagenum, per_page, offset = ::WillPaginate.process_values(num, rel.limit_value || self.per_page)
-        rel = rel.offset(offset)
+        pagenum = ::WillPaginate::PageNumber(num.nil? ? 1 : num)
+        per_page = rel.limit_value || self.per_page
+        rel = rel.offset(pagenum.to_offset(per_page).to_i)
         rel = rel.limit(per_page) unless rel.limit_value
         rel.current_page = pagenum
         rel
