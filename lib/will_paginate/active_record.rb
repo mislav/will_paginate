@@ -165,7 +165,7 @@ module WillPaginate
           pager.replace find_by_sql(query)
 
           unless pager.total_entries
-            count_query = original_query.sub /\bORDER\s+BY\s+[\w`,\s]+$/mi, ''
+            count_query = original_query.sub /\bORDER\s+BY\s+[\w`,\s.]+$/mi, ''
             count_query = "SELECT COUNT(*) FROM (#{count_query})"
 
             unless self.connection.adapter_name =~ /^(oracle|oci$)/i

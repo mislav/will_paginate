@@ -197,12 +197,14 @@ describe WillPaginate::ActiveRecord do
 
     it "should strip the order when counting" do
       lambda {
-        sql = "select id, title, content from topics order by title"
+        sql = "select id, title, content from topics order by topics.title"
         topics = Topic.paginate_by_sql sql, :page => 1, :per_page => 2
         topics.first.should == topics(:ar)
       }.should run_queries(2)
+
+      $query_sql.find { |query| query =~ /^select count/i }.should_not include('order by topics.title')
     end
-    
+
     it "shouldn't change the original query string" do
       query = 'select * from topics where 1 = 2'
       original_query = query.dup
