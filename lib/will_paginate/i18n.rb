@@ -21,7 +21,7 @@ module WillPaginate
         end
         ::I18n.translate(defaults.shift, options.merge(:default => defaults, :scope => :will_paginate))
       else
-        key = keys.respond_to?(:first) ? keys.first : keys
+        key = Array === keys ? keys.first : keys
         yield key, options
       end
     end
