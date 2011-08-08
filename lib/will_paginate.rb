@@ -90,7 +90,8 @@ if defined? Rails
   WillPaginate.enable_actionpack if defined? ActionController
 end
 
-if defined? I18n
+# load default translations only for newer versions of I18n
+if defined? I18n and not defined? I18n::Backend::Simple::MATCH
   require 'will_paginate/i18n'
   I18n.load_path.unshift(*WillPaginate::I18n.load_path)
 end
