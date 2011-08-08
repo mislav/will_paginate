@@ -1,3 +1,22 @@
+= 2.3.16
+
+* added global <tt>WillPaginate.per_page = 30</tt> setting
+* added i18n capabilities to previous/next labels and page_entries_info
+* page_entries_info ":entry_name" parameter is now renamed to ":model"
+* fixed bugs with Rails 1.2.6
+
+= 2.3.15, released 2010-09-09
+
+* ensure respond_to? works as expected considering methods that begin with 'paginate'
+* fix counting in pagination when Integer has length method (Ruby Facets)
+* stop using deprecated Object#returning
+* fixed has_many :through in combination with `:uniq` for Postgres and SQLite3
+
+= 2.3.14, released 2010-05-26
+= 2.3.13, released 2010-05-26
+
+* better rails_xss compatibility
+
 = 2.3.12, released 2009-12-01
 
 * make view helpers "HTML safe" for Rails 2.3.5 with rails_xss plugin
