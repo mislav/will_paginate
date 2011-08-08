@@ -11,7 +11,14 @@ module WillPaginate
     def will_paginate_translate(keys, options = {})
       if defined? ::I18n
         defaults = Array(keys).dup
-        defaults << Proc.new if block_given?
+        if block_given?
+          if defined? ::I18n::Backend::Simple::MATCH
+            # procs in defaults array were not supported back then
+            defaults << yield(defaults.first, options)
+          else
+            defaults << Proc.new
+          end
+        end
         ::I18n.translate(defaults.shift, options.merge(:default => defaults, :scope => :will_paginate))
       else
         key = keys.respond_to?(:first) ? keys.first : keys
