@@ -14,6 +14,7 @@ module WillPaginate
         defaults << Proc.new if block_given?
         ::I18n.translate(defaults.shift, options.merge(:default => defaults, :scope => :will_paginate))
       else
+        key = Array === keys ? keys.first : keys
         yield key, options
       end
     end

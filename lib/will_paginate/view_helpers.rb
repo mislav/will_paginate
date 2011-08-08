@@ -97,7 +97,6 @@ module WillPaginate
     #
     # The default output contains HTML. Use ":html => false" for plain text.
     def page_entries_info(collection, options = {})
-      html  = options[:html] != false
       model = options[:model]
       model = collection.first.class unless model or collection.empty?
       model ||= 'entry'
@@ -107,7 +106,7 @@ module WillPaginate
                     model.to_s.underscore
                   end
 
-      if html
+      if options.fetch(:html, true)
         b, eb = '<b>', '</b>'
         sp = '&nbsp;'
         html_key = '_html'
@@ -137,7 +136,7 @@ module WillPaginate
           case opts[:count]
           when 0; "No #{opts[:model]} found"
           when 1; "Displaying #{b}1#{eb} #{opts[:model]}"
-          else    "Displaying #{b}all #{opts[:count]}#{eb} #{opts[:model]}"
+          else    "Displaying #{b}all#{sp}#{opts[:count]}#{eb} #{opts[:model]}"
           end
         end
       else
