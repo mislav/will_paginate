@@ -196,7 +196,7 @@ class ViewTest < WillPaginate::ViewTestCase
     def test_page_entries_info_with_longer_class_name
       @template = '<%= page_entries_info collection %>'
       collection = ('a'..'z').to_a.paginate
-      collection.first.stubs(:class).returns(mock('class', :name => 'ProjectType'))
+      collection.first.stubs(:class).returns(mock('class', :to_s => 'ProjectType'))
     
       paginate collection
       assert @html_result.index('project types'), "expected <#{@html_result.inspect}> to mention 'project types'"
@@ -207,7 +207,7 @@ class ViewTest < WillPaginate::ViewTestCase
     @template = '<%= page_entries_info collection %>'
     
     paginate(('a'..'d').to_a.paginate(:page => 1, :per_page => 5))
-    assert_equal %{Displaying <b>all 4</b> strings}, @html_result
+    assert_equal %{Displaying <b>all&nbsp;4</b> strings}, @html_result
     
     paginate(['a'].paginate(:page => 1, :per_page => 5))
     assert_equal %{Displaying <b>1</b> string}, @html_result
@@ -217,7 +217,7 @@ class ViewTest < WillPaginate::ViewTestCase
   end
   
   def test_page_entries_info_with_custom_entry_name
-    @template = '<%= page_entries_info collection, :entry_name => "author" %>'
+    @template = '<%= page_entries_info collection, :model => "author" %>'
     
     entries = (1..20).to_a
     
@@ -225,7 +225,7 @@ class ViewTest < WillPaginate::ViewTestCase
     assert_equal %{Displaying authors <b>1&nbsp;-&nbsp;5</b> of <b>20</b> in total}, @html_result
     
     paginate(entries.paginate(:page => 1, :per_page => 20))
-    assert_equal %{Displaying <b>all 20</b> authors}, @html_result
+    assert_equal %{Displaying <b>all&nbsp;20</b> authors}, @html_result
     
     paginate(['a'].paginate(:page => 1, :per_page => 5))
     assert_equal %{Displaying <b>1</b> author}, @html_result

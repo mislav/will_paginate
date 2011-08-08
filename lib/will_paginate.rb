@@ -89,3 +89,8 @@ if defined? Rails
   WillPaginate.enable_activerecord if defined? ActiveRecord
   WillPaginate.enable_actionpack if defined? ActionController
 end
+
+if defined? I18n
+  require 'will_paginate/i18n'
+  I18n.load_path.unshift(*WillPaginate::I18n.load_path)
+end

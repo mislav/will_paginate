@@ -1,4 +1,5 @@
 require 'will_paginate/core_ext'
+require 'will_paginate/i18n'
 
 module WillPaginate
   # = Will Paginate view helpers
@@ -20,11 +21,13 @@ module WillPaginate
   # older versions of Rails) you can easily translate link texts to previous
   # and next pages, as well as override some other defaults to your liking.
   module ViewHelpers
+    include WillPaginate::I18n
+
     # default options that can be overridden on the global level
     @@pagination_options = {
       :class          => 'pagination',
-      :previous_label => '&laquo; Previous',
-      :next_label     => 'Next &raquo;',
+      :previous_label => nil,
+      :next_label     => nil,
       :inner_window   => 4, # links around the current page
       :outer_window   => 1, # links around beginning and end
       :separator      => ' ', # single space is friendly to spiders and non-graphic browsers
@@ -102,7 +105,10 @@ module WillPaginate
         WillPaginate::Deprecation::warn(":prev_label view parameter is now :previous_label; the old name has been deprecated", caller)
         options[:previous_label] = options.delete(:prev_label)
       end
-      
+
+      options[:previous_label] ||= will_paginate_translate(:previous_label) { '&laquo; Previous' }
+      options[:next_label]     ||= will_paginate_translate(:next_label) { 'Next &raquo;' }
+
       # get the renderer instance
       renderer = case options[:renderer]
       when String
@@ -160,28 +166,64 @@ module WillPaginate
     #
     # By default, the message will use the humanized class name of objects
     # in collection: for instance, "project types" for ProjectType models.
-    # Override this with the <tt>:entry_name</tt> parameter:
+    # Override this with the <tt>:model</tt> parameter:
     #
-    #   <%= page_entries_info @posts, :entry_name => 'item' %>
+    #   <%= page_entries_info @posts, :model => 'item' %>
     #   #-> Displaying items 6 - 10 of 26 in total
     def page_entries_info(collection, options = {})
-      entry_name = options[:entry_name] ||
-        (collection.empty?? 'entry' : collection.first.class.name.underscore.sub('_', ' '))
-      
+      if options.key? :entry_name
+        WillPaginate::Deprecation::warn(":entry_name parameter is now called :model", caller)
+      end
+      model = options[:model] || options[:entry_name]
+      model = collection.first.class unless model or collection.empty?
+      model ||= 'entry'
+
+      if html = options.fetch(:html, true)
+        b, eb = '<b>', '</b>'
+        sp = '&nbsp;'
+        html_key = '_html'
+      else
+        b = eb = html_key = ''
+        sp = ' '
+      end
+
+      model_key = model.to_s.underscore
+      model_count = collection.total_pages > 1 ? 5 : collection.size
+      model_name = will_paginate_translate "models.#{model_key}", :count => model_count do |_, opts|
+        name = model_key.to_s.tr('_/', ' ')
+        raise "can't pluralize model name: #{model.inspect}" unless name.respond_to? :pluralize
+        opts[:count] == 1 ? name : name.pluralize
+      end
+
       output = if collection.total_pages < 2
-        case collection.size
-        when 0; "No #{entry_name.pluralize} found"
-        when 1; "Displaying <b>1</b> #{entry_name}"
-        else;   "Displaying <b>all #{collection.size}</b> #{entry_name.pluralize}"
+        i18n_key = :"page_entries_info.single_page#{html_key}"
+        keys = [:"#{model_key}.#{i18n_key}", i18n_key]
+
+        will_paginate_translate keys, :count => collection.size, :model => model_name do |_, opts|
+          case opts[:count]
+          when 0; "No #{opts[:model]} found"
+          when 1; "Displaying #{b}1#{eb} #{opts[:model]}"
+          else    "Displaying #{b}all#{sp}#{opts[:count]}#{eb} #{opts[:model]}"
+          end
         end
       else
-        %{Displaying #{entry_name.pluralize} <b>%d&nbsp;-&nbsp;%d</b> of <b>%d</b> in total} % [
-          collection.offset + 1,
-          collection.offset + collection.length,
-          collection.total_entries
-        ]
+        i18n_key = :"page_entries_info.multi_page#{html_key}"
+        keys = [:"#{model_key}.#{i18n_key}", i18n_key]
+        params = {
+          :model => model_name, :count => collection.total_entries,
+          :from => collection.offset + 1, :to => collection.offset + collection.length
+        }
+        will_paginate_translate keys, params do |_, opts|
+          %{Displaying %s #{b}%d#{sp}-#{sp}%d#{eb} of #{b}%d#{eb} in total} %
+            [ opts[:model], opts[:from], opts[:to], opts[:count] ]
+        end
       end
-      output.respond_to?(:html_safe) ? output.html_safe : output
+
+      if html and output.respond_to?(:html_safe)
+        output.html_safe
+      else
+        output
+      end
     end
     
     def self.total_pages_for_collection(collection) #:nodoc:
@@ -202,15 +244,6 @@ module WillPaginate
   # This class does the heavy lifting of actually building the pagination
   # links. It is used by the <tt>will_paginate</tt> helper internally.
   class LinkRenderer
-
-    # The gap in page links is represented by:
-    #
-    #   <span class="gap">&hellip;</span>
-    attr_accessor :gap_marker
-    
-    def initialize
-      @gap_marker = '<span class="gap">&hellip;</span>'
-    end
     
     # * +collection+ is a WillPaginate::Collection instance or any other object
     #   that conforms to that API
@@ -249,6 +282,18 @@ module WillPaginate
         @html_attributes[:id] = @collection.first.class.name.underscore.pluralize + '_pagination'
       end
       @html_attributes
+    end
+
+    attr_writer :gap_marker
+
+    # The gap in page links is represented by:
+    #
+    #   <span class="gap">&hellip;</span>
+    def gap_marker
+      @gap_marker ||= begin
+        gap_text = @template.will_paginate_translate(:page_gap) { '&hellip;' }
+        %(<span class="gap">#{gap_text}</span>)
+      end
     end
     
   protected
