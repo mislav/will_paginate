@@ -161,6 +161,10 @@ describe WillPaginate::ActiveRecord do
 
       $query_sql.last.should =~ /\bJOIN\b/
     end
+
+    it "should count with group" do
+      Developer.group(:salary).page(1).total_entries.should == 4
+    end
   end
   
   it "should not ignore :select parameter when it says DISTINCT" do
