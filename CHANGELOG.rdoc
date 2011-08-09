@@ -1,4 +1,4 @@
-= 2.3.16
+= 2.3.16, released 2011-08-09
 
 * added global <tt>WillPaginate.per_page = 30</tt> setting
 * added i18n capabilities to previous/next labels and page_entries_info

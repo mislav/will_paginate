@@ -5,15 +5,15 @@ Gem::Specification.new do |gem|
   gem.name    = 'will_paginate'
   gem.version = WillPaginate::VERSION::STRING
   
-  gem.summary = "Pagination for Rails"
-  gem.description = "The will_paginate library provides a simple, yet powerful and extensible API for ActiveRecord pagination and rendering of pagination links in ActionView templates."
+  gem.summary = "Easy pagination for Rails"
+  gem.description = "will_paginate provides a simple API for Active Record pagination and rendering of pagination links in Rails templates."
   
   gem.authors  = ['Mislav Marohnić', 'PJ Hyett']
   gem.email    = 'mislav.marohnic@gmail.com'
-  gem.homepage = 'http://github.com/mislav/will_paginate/wikis'
+  gem.homepage = 'https://github.com/mislav/will_paginate/wiki'
   
-  gem.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
-  gem.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
+  gem.rdoc_options = ['--main', 'README.md', '--charset=UTF-8']
+  gem.extra_rdoc_files = ['README.md', 'LICENSE', 'CHANGELOG.rdoc']
   
   gem.files = Dir['Rakefile', '{bin,lib,rails,test,spec}/**/*', 'README*', 'LICENSE*'] & `git ls-files -z`.split("\0")
 end
