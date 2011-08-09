@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.homepage = 'http://github.com/mislav/will_paginate/wikis'
   
   s.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
-  s.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
+  s.extra_rdoc_files = ['README.md', 'LICENSE', 'CHANGELOG.rdoc']
   
   s.files = Dir['Rakefile', '{bin,lib,test,spec}/**/*', 'README*', 'LICENSE*']
   s.files &= `git ls-files -z`.split("\0") if `type -t git 2>/dev/null || which git 2>/dev/null` && $?.success?
