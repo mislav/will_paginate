@@ -3,6 +3,9 @@
 * added global <tt>WillPaginate.per_page = 30</tt> setting
 * added i18n capabilities to previous/next labels and page_entries_info
 * page_entries_info ":entry_name" parameter is now renamed to ":model"
+* new option: page_entries_info(:html => false)
+* fix page_entries_info output with rails_xss
+* raise an InvalidPage exception if the calculated offset is bigger than BIGINT
 * fixed bugs with Rails 1.2.6
 
 = 2.3.15, released 2010-09-09
