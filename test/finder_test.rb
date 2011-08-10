@@ -312,7 +312,7 @@ class FinderTest < ActiveRecordTestCase
     paginated_developers = []
     Developer.poor.paginated_each {|d| paginated_developers << d}
 
-    assert_equal Developer.poor.all, paginated_developers, 'should use scoped :order option'
+    assert_equal Developer.poor.find(:all), paginated_developers, 'should use scoped :order option'
   end
 
   ## misc ##
