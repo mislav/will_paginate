@@ -72,14 +72,18 @@ module WillPaginate
     end
 
     def will_paginate_translate(keys, options = {})
-      if Array === keys
-        defaults = keys.dup
-        key = defaults.shift
+      if respond_to? :translate
+        if Array === keys
+          defaults = keys.dup
+          key = defaults.shift
+        else
+          defaults = nil
+          key = keys
+        end
+        translate(key, options.merge(:default => defaults, :scope => :will_paginate))
       else
-        defaults = nil
-        key = keys
+        super
       end
-      translate(key, options.merge(:default => defaults, :scope => :will_paginate))
     end
 
     protected
@@ -101,9 +105,8 @@ module WillPaginate
 
       def url(page)
         @base_url_params ||= begin
-          url_params = base_url_params
+          url_params = merge_get_params(default_url_params)
           merge_optional_params(url_params)
-          url_params
         end
 
         url_params = @base_url_params.dup
@@ -112,15 +115,16 @@ module WillPaginate
         @template.url_for(url_params)
       end
 
-      def base_url_params
-        url_params = default_url_params
-        # page links should preserve GET parameters
-        symbolized_update(url_params, @template.params) if get_request?
+      def merge_get_params(url_params)
+        if @template.respond_to? :request and @template.request and @template.request.get?
+          symbolized_update(url_params, @template.params)
+        end
         url_params
       end
 
       def merge_optional_params(url_params)
         symbolized_update(url_params, @options[:params]) if @options[:params]
+        url_params
       end
 
       def add_current_page_param(url_params, page)
@@ -130,10 +134,6 @@ module WillPaginate
           page_param = parse_query_parameters("#{param_name}=#{page}")
           symbolized_update(url_params, page_param)
         end
-      end
-
-      def get_request?
-        @template.request.get?
       end
 
       private

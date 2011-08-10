@@ -293,6 +293,45 @@ describe WillPaginate::ActionView do
     end
   end
 
+  it "renders using ActionView helpers on a custom object" do
+    helper = Object.new
+    class << helper
+      attr_reader :controller
+      include ActionView::Helpers::UrlHelper
+      include Routes.url_helpers
+      include WillPaginate::ActionView
+    end
+    helper.default_url_options[:controller] = 'dummy'
+
+    collection = WillPaginate::Collection.new(2, 1, 3)
+    @render_output = helper.will_paginate(collection)
+
+    assert_select 'a[href]', 4 do |links|
+      urls = links.map {|l| l['href'] }.uniq
+      urls.should == ['/dummy/page/1', '/dummy/page/3']
+    end
+  end
+
+  it "renders using ActionDispatch helper on a custom object" do
+    helper = Object.new
+    class << helper
+      include ActionDispatch::Routing::UrlFor
+      include Routes.url_helpers
+      include WillPaginate::ActionView
+    end
+    helper.default_url_options[:host] = 'example.com'
+    helper.default_url_options[:controller] = 'dummy'
+    # helper.default_url_options[:only_path] = true
+
+    collection = WillPaginate::Collection.new(2, 1, 3)
+    @render_output = helper.will_paginate(collection)
+
+    assert_select 'a[href]', 4 do |links|
+      urls = links.map {|l| l['href'] }.uniq
+      urls.should == ['http://example.com/dummy/page/1', 'http://example.com/dummy/page/3']
+    end
+  end
+
   private
 
   def translation(data)
