@@ -1,22 +1,29 @@
 # encoding: utf-8
+require 'rbconfig'
 require File.expand_path('../lib/will_paginate/version', __FILE__)
 
-Gem::Specification.new do |gem|
-  gem.name    = 'will_paginate'
-  gem.version = WillPaginate::VERSION::STRING
-  gem.date    = Time.now.strftime('%Y-%m-%d')
+Gem::Specification.new do |s|
+  s.name    = 'will_paginate'
+  s.version = WillPaginate::VERSION::STRING
   
-  gem.summary = "Pagination for Rails"
-  gem.description = "The will_paginate library provides a simple, yet powerful and extensible API for ActiveRecord pagination and rendering of pagination links in ActionView templates."
+  s.summary = "Pagination plugin for web frameworks and other apps"
+  s.description = "will_paginate provides a simple API for performing paginated queries with Active Record, DataMapper and Sequel, and includes helpers for rendering pagination links in Rails, Sinatra and Merb web apps."
   
-  gem.authors  = ['Mislav Marohnić', 'PJ Hyett']
-  gem.email    = 'mislav.marohnic@gmail.com'
-  gem.homepage = 'http://github.com/mislav/will_paginate/wikis'
+  s.authors  = ['Mislav Marohnić']
+  s.email    = 'mislav.marohnic@gmail.com'
+  s.homepage = 'https://github.com/mislav/will_paginate/wiki'
   
-  gem.rubyforge_project = nil
-  gem.has_rdoc = true
-  gem.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
-  gem.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
+  s.rdoc_options = ['--main', 'README.md', '--charset=UTF-8']
+  s.extra_rdoc_files = ['README.md', 'LICENSE']
   
-  gem.files = Dir['Rakefile', '{bin,lib,rails,test,spec}/**/*', 'README*', 'LICENSE*'] & `git ls-files -z`.split("\0")
+  s.files = Dir['Rakefile', '{bin,lib,test,spec}/**/*', 'README*', 'LICENSE*']
+
+  # include only files in version control
+  git_dir = File.expand_path('../.git', __FILE__)
+  void = defined?(File::NULL) ? File::NULL :
+    RbConfig::CONFIG['host_os'] =~ /msdos|mswin|djgpp|mingw/ ? 'NUL' : '/dev/null'
+
+  if File.directory?(git_dir) and system "git --version >>#{void} 2>&1"
+    s.files &= `git --git-dir='#{git_dir}' ls-files -z`.split("\0") 
+  end
 end

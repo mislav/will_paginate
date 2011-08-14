@@ -1,27 +1,7 @@
+require 'will_paginate/per_page'
+require 'will_paginate/page_number'
+
 module WillPaginate
-  # = Invalid page number error
-  # This is an ArgumentError raised in case a page was requested that is either
-  # zero or negative number. You should decide how do deal with such errors in
-  # the controller.
-  #
-  # If you're using Rails 2, then this error will automatically get handled like
-  # 404 Not Found. The hook is in "will_paginate.rb":
-  #
-  #   ActionController::Base.rescue_responses['WillPaginate::InvalidPage'] = :not_found
-  #
-  # If you don't like this, use your preffered method of rescuing exceptions in
-  # public from your controllers to handle this differently. The +rescue_from+
-  # method is a nice addition to Rails 2.
-  #
-  # This error is *not* raised when a page further than the last page is
-  # requested. Use <tt>WillPaginate::Collection#out_of_bounds?</tt> method to
-  # check for those cases and manually deal with them as you see fit.
-  class InvalidPage < ArgumentError
-    def initialize(page, page_num)
-      super "#{page.inspect} given as value, which translates to '#{page_num}' as page number"
-    end
-  end
-  
   # = The key to pagination
   # Arrays returned from paginating finds are, in fact, instances of this little
   # class. You may think of WillPaginate::Collection as an ordinary array with
@@ -44,12 +24,9 @@ module WillPaginate
     # and the total number of entries. The last argument is optional because it
     # is best to do lazy counting; in other words, count *conditionally* after
     # populating the collection using the +replace+ method.
-    def initialize(page, per_page, total = nil)
-      @current_page = page.to_i
-      raise InvalidPage.new(page, @current_page) if @current_page < 1
+    def initialize(page, per_page = WillPaginate.per_page, total = nil)
+      @current_page = WillPaginate::PageNumber(page)
       @per_page = per_page.to_i
-      raise ArgumentError, "`per_page` setting cannot be less than 1 (#{@per_page} given)" if @per_page < 1
-      
       self.total_entries = total if total
     end
 
@@ -98,7 +75,7 @@ module WillPaginate
     # the offset is 30. This property is useful if you want to render ordinals
     # side by side with records in the view: simply start with offset + 1.
     def offset
-      (current_page - 1) * per_page
+      @current_page.to_offset(per_page).to_i
     end
 
     # current_page - 1 or nil if there is no previous page

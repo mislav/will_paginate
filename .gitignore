@@ -1,4 +1,4 @@
-/doc
-/rails
+.bundle
+doc
 *.gem
-/coverage
+coverage
