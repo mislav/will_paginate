@@ -80,8 +80,9 @@ module WillPaginate
 
       # overloaded to be pagination-aware
       def empty?
+        relation_count = count.respond_to?(:size) and !count.is_a?(Integer) ? count.size : count
         if !loaded? and offset_value
-          count <= offset_value
+          relation_count <= offset_value
         else
           super
         end
