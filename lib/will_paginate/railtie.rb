@@ -19,6 +19,9 @@ module WillPaginate
       end
 
       self.class.add_locale_path config
+
+      # early access to ViewHelpers.pagination_options
+      require 'will_paginate/view_helpers'
     end
 
     def self.setup_actioncontroller
