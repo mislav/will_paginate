@@ -114,13 +114,24 @@ module WillPaginate
       def paginate(options)
         options  = options.dup
         pagenum  = options.fetch(:page) { raise ArgumentError, ":page parameter required" }
-        per_page = options.delete(:per_page) || self.per_page
+        per_page = (options.delete(:per_page) || self.per_page).to_i
         total    = options.delete(:total_entries)
 
         count_options = options.delete(:count)
         options.delete(:page)
 
-        rel = limit(per_page.to_i).page(pagenum)
+        limit_for_current_page = per_page
+        if total.present?
+          # if we happen to know that there's not enough items to fill the current page,
+          # we can be smarter about the LIMIT clause
+          successive_items = total.to_i - per_page*(pagenum-1)
+          if successive_items < per_page
+            limit_for_current_page = successive_items>0 ? successive_items : 0
+          end
+        end
+
+
+        rel = limit(limit_for_current_page).page(pagenum)
         rel = rel.apply_finder_options(options) if options.any?
         rel.wp_count_options = count_options    if count_options
         rel.total_entries = total.to_i          unless total.blank?
