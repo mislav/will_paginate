@@ -7,7 +7,7 @@ module WillPaginate
     include ViewHelpers
 
     def will_paginate(collection, options = {}) #:nodoc:
-      options = options.merge(:renderer => LinkRenderer) unless options[:renderer]
+      options[:renderer] ||= WillPaginate::ViewHelpers.pagination_options[:renderer] || LinkRenderer
       super(collection, options)
     end
 
