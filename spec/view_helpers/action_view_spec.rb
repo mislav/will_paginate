@@ -43,40 +43,38 @@ describe WillPaginate::ActionView do
   
  
   describe "Renderer" do
-    after(:each) do
-      WillPaginate::ViewHelpers.pagination_options.clear
+    before(:all) do
+      @collection  = WillPaginate::Collection.new(1,2,4)      
+      @options     = WillPaginate::ViewHelpers.pagination_options
+    end
+
+    after(:all) do
+      @options.unstub(:merge)
     end
     
     it "should default to LinkRenderer when pagination_options[:renderer] is nil" do
       expectation = { :renderer => WillPaginate::ActionView::LinkRenderer }
-      WillPaginate::ViewHelpers.pagination_options.stubs(:merge).with(expectation).returns(expectation)
+      ret = @options.merge(expectation)
 
-      view = ActionView::Base.new([], @assigns, @controller)
-      view.will_paginate WillPaginate::Collection.new(1, 1, 0), {}
-      
-      WillPaginate::ViewHelpers.pagination_options.unstub(:merge)
+      @options.stubs(:merge).with(expectation).returns(ret)     
+      render(:collection => @collection, :options => {})
     end
 
     it "should default to pagination_options[:renderer] when it is not nil" do
-      expectation = { :renderer => "CustomRenderer" }
+      @options.merge!({ :renderer => Class.new(WillPaginate::ActionView::LinkRenderer)})
 
-      WillPaginate::ViewHelpers.pagination_options[:renderer] = "CustomRenderer"
-      WillPaginate::ViewHelpers.pagination_options.stubs(:merge).with(expectation).returns(expectation)
+      @options.stubs(:merge).with(:renderer => @options[:renderer]).returns(@options)
+      render(:collection => @collection, :options => {})
 
-      view = ActionView::Base.new([], @assigns, @controller)
-      view.will_paginate WillPaginate::Collection.new(1, 1, 0), {}
-
-      WillPaginate::ViewHelpers.pagination_options.unstub(:merge)
+      @options.delete :renderer
     end
 
-    it "should use the :renderer supplied as an option if present." do
-      expectation = { :renderer => "OptionRenderer" }
-      WillPaginate::ViewHelpers.pagination_options.stubs(:merge).with(expectation).returns(expectation)
-
-      view = ActionView::Base.new([], @assigns, @controller)
-      view.will_paginate WillPaginate::Collection.new(1, 1, 0), expectation
-
-      WillPaginate::ViewHelpers.pagination_options.unstub(:merge)
+   it "should use the :renderer supplied as an option if present." do
+      expectation = { :renderer => Class.new(WillPaginate::ActionView::LinkRenderer) }
+      ret = @options.merge(expectation)
+      
+      @options.stubs(:merge).with(expectation).returns(ret)
+      render(:collection => @collection, :options => expectation)
     end
   end
 
