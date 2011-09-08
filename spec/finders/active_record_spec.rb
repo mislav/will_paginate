@@ -131,6 +131,13 @@ describe WillPaginate::ActiveRecord do
         topics.should_not be_empty
       }.should run_queries(1)
     end
+    
+    it "support empty? for grouped queries" do
+      topics = Topic.group(:project_id).paginate :page => 1, :per_page => 3
+      lambda {
+        topics.should_not be_empty
+      }.should run_queries(1)
+    end
 
     it "overrides total_entries count with a fixed value" do
       lambda {
