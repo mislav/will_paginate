@@ -35,7 +35,7 @@ module WillPaginate
       # Returns the subset of +options+ this instance was initialized with that
       # represent HTML attributes for the container element of pagination links.
       def container_attributes
-        @container_attributes ||= @options.except(*(ViewHelpers.pagination_options.keys - [:class]))
+        @container_attributes ||= @options.except(*(ViewHelpers.pagination_options.keys + [:renderer] - [:class]))
       end
       
     protected

@@ -28,7 +28,6 @@ module WillPaginate
       :link_separator => ' ', # single space is friendly to spiders and non-graphic browsers
       :param_name     => :page,
       :params         => nil,
-      :renderer       => nil,
       :page_links     => true,
       :container      => true
     }
@@ -49,8 +48,8 @@ module WillPaginate
     # * <tt>:param_name</tt> -- parameter name for page number in URLs (default: <tt>:page</tt>)
     # * <tt>:params</tt> -- additional parameters when generating pagination links
     #   (eg. <tt>:controller => "foo", :action => nil</tt>)
-    # * <tt>:renderer</tt> -- class name, class or instance of a link renderer (default:
-    #   <tt>WillPaginate::LinkRenderer</tt>)
+    # * <tt>:renderer</tt> -- class name, class or instance of a link renderer (default in Rails:
+    #   <tt>WillPaginate::ActionView::LinkRenderer</tt>)
     # * <tt>:page_links</tt> -- when false, only previous/next links are rendered (default: true)
     # * <tt>:container</tt> -- toggles rendering of the DIV container for pagination links, set to
     #   false only when you are rendering your own pagination markup (default: true)
