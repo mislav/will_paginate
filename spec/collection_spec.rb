@@ -71,12 +71,20 @@ describe WillPaginate::Collection do
     end
   end
 
-  it "should show out of bounds when page number is too high" do
-    create(2, 3, 2).should be_out_of_bounds
-  end
-    
-  it "should not show out of bounds when inside collection" do
-    create(1, 3, 2).should_not be_out_of_bounds
+  describe "out of bounds" do
+    it "is out of bounds when page number is too high" do
+      create(2, 3, 2).should be_out_of_bounds
+    end
+
+    it "isn't out of bounds when inside collection" do
+      create(1, 3, 2).should_not be_out_of_bounds
+    end
+
+    it "isn't out of bounds when the collection is empty" do
+      collection = create(1, 3, 0)
+      collection.should_not be_out_of_bounds
+      collection.total_pages.should == 1
+    end
   end
 
   describe "guessing total count" do

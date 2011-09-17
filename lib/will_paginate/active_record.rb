@@ -18,6 +18,8 @@ module WillPaginate
   module ActiveRecord
     # makes a Relation look like WillPaginate::Collection
     module RelationMethods
+      include WillPaginate::CollectionMethods
+
       attr_accessor :current_page
       attr_writer :total_entries, :wp_count_options
 
@@ -90,10 +92,6 @@ module WillPaginate
         else
           super
         end
-      end
-
-      def total_pages
-        (total_entries / limit_value.to_f).ceil
       end
 
       def clone

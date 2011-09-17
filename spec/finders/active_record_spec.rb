@@ -179,6 +179,10 @@ describe WillPaginate::ActiveRecord do
     it "should count with group" do
       Developer.group(:salary).page(1).total_entries.should == 4
     end
+
+    it "should not have zero total_pages when the result set is empty" do
+      Developer.where("1 = 2").page(1).total_pages.should == 1
+    end
   end
   
   it "should not ignore :select parameter when it says DISTINCT" do

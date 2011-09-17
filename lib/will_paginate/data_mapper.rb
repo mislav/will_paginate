@@ -30,6 +30,8 @@ module WillPaginate
     end
 
     module CollectionMethods
+      include WillPaginate::CollectionMethods
+
       attr_accessor :current_page
 
       def paginated?
@@ -56,10 +58,6 @@ module WillPaginate
             new_collection(clean_query).count
           end
         end
-      end
-
-      def total_pages
-        (total_entries / per_page.to_f).ceil
       end
 
       def to_a

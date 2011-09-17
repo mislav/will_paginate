@@ -2,6 +2,38 @@ require 'will_paginate/per_page'
 require 'will_paginate/page_number'
 
 module WillPaginate
+  # Any will_paginate-compatible collection should have these methods:
+  #
+  #   current_page, per_page, offset, total_entries, total_pages
+  #
+  # It can also define some of these optional methods:
+  #
+  #   out_of_bounds?, previous_page, next_page
+  #
+  # This module provides few of these methods.
+  module CollectionMethods
+    def total_pages
+      total_entries.zero? ? 1 : (total_entries / per_page.to_f).ceil
+    end
+
+    # current_page - 1 or nil if there is no previous page
+    def previous_page
+      current_page > 1 ? (current_page - 1) : nil
+    end
+
+    # current_page + 1 or nil if there is no next page
+    def next_page
+      current_page < total_pages ? (current_page + 1) : nil
+    end
+
+    # Helper method that is true when someone tries to fetch a page with a
+    # larger number than the last page. Can be used in combination with flashes
+    # and redirecting.
+    def out_of_bounds?
+      current_page > total_pages
+    end
+  end
+
   # = The key to pagination
   # Arrays returned from paginating finds are, in fact, instances of this little
   # class. You may think of WillPaginate::Collection as an ordinary array with
@@ -18,7 +50,9 @@ module WillPaginate
   #   require 'will_paginate/collection'
   #   # WillPaginate::Collection is now available for use
   class Collection < Array
-    attr_reader :current_page, :per_page, :total_entries, :total_pages
+    include CollectionMethods
+
+    attr_reader :current_page, :per_page, :total_entries
 
     # Arguments to the constructor are the current page number, per-page limit
     # and the total number of entries. The last argument is optional because it
@@ -63,35 +97,16 @@ module WillPaginate
       pager
     end
 
-    # Helper method that is true when someone tries to fetch a page with a
-    # larger number than the last page. Can be used in combination with flashes
-    # and redirecting.
-    def out_of_bounds?
-      current_page > total_pages
-    end
-
     # Current offset of the paginated collection. If we're on the first page,
     # it is always 0. If we're on the 2nd page and there are 30 entries per page,
     # the offset is 30. This property is useful if you want to render ordinals
     # side by side with records in the view: simply start with offset + 1.
     def offset
-      @current_page.to_offset(per_page).to_i
+      current_page.to_offset(per_page).to_i
     end
 
-    # current_page - 1 or nil if there is no previous page
-    def previous_page
-      current_page > 1 ? (current_page - 1) : nil
-    end
-
-    # current_page + 1 or nil if there is no next page
-    def next_page
-      current_page < total_pages ? (current_page + 1) : nil
-    end
-    
-    # sets the <tt>total_entries</tt> property and calculates <tt>total_pages</tt>
     def total_entries=(number)
       @total_entries = number.to_i
-      @total_pages   = (@total_entries / per_page.to_f).ceil
     end
 
     # This is a magic wrapper for the original Array#replace method. It serves

@@ -1,10 +1,13 @@
 require 'sequel'
 require 'sequel/extensions/pagination'
+require 'will_paginate/collection'
 
 module WillPaginate
   # Sequel already supports pagination; we only need to make the
   # resulting dataset look a bit more like WillPaginate::Collection
   module SequelMethods
+    include WillPaginate::CollectionMethods
+
     def total_pages
       page_count
     end

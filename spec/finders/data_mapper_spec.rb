@@ -76,4 +76,8 @@ describe WillPaginate::DataMapper do
     Animal.all(:limit => 2).page(2).per_page.should == 2
   end
 
+  it "has total_pages at 1 for empty collections" do
+    Animal.all(:conditions => ['1=2']).page(1).total_pages.should == 1
+  end
+
 end if datamapper_loaded
