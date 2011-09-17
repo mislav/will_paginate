@@ -36,7 +36,7 @@ module WillPaginate
       "set the 'will_paginate.#{key}' key in your i18n locale instead of editing pagination_options" if defined? Rails
     }
     pagination_options.deprecate_key(:previous_label, :next_label, &label_deprecation)
-    pagination_options.deprecate_key(:renderer) { |key| "pagination_options[#{key.inspect}] shouldn't be set globally" }
+    pagination_options.deprecate_key(:renderer) { |key, _| "pagination_options[#{key.inspect}] shouldn't be set globally" }
 
     include WillPaginate::I18n
 
