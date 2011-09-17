@@ -132,9 +132,9 @@ module WillPaginate
         rel
       end
 
-      def page(num)
+      def page(num = 1)
         rel = scoped.extending(RelationMethods)
-        pagenum = ::WillPaginate::PageNumber(num.nil? ? 1 : num)
+        pagenum = ::WillPaginate::PageNumber(num)
         per_page = rel.limit_value || self.per_page
         rel = rel.offset(pagenum.to_offset(per_page).to_i)
         rel = rel.limit(per_page) unless rel.limit_value
