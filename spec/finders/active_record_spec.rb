@@ -178,11 +178,6 @@ describe WillPaginate::ActiveRecord do
     users = User.select('DISTINCT salary').paginate :page => 2
     users.total_entries.should == 5
   end
-  
-  it "should count with scoped select when :select => DISTINCT" do
-    pending
-    Topic.distinct.paginate :page => 2
-  end
 
   describe "paginate_by_sql" do
     it "should respond" do
