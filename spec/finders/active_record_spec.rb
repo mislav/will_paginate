@@ -91,6 +91,13 @@ describe WillPaginate::ActiveRecord do
       rel = Developer.page(3).limit(3)
       rel.offset.should == 6
     end
+
+    it "keeps pagination data after 'scoped'" do
+      rel = Developer.page(2).scoped
+      rel.per_page.should == 10
+      rel.offset.should == 10
+      rel.current_page.should == 2
+    end
   end
 
   describe "counting" do

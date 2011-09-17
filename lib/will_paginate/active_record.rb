@@ -97,11 +97,12 @@ module WillPaginate
       end
 
       def clone
-        other = super
-        other.current_page = current_page unless other.current_page
-        other.total_entries = nil if defined? @total_entries_queried
-        other.wp_count_options = @wp_count_options if defined? @wp_count_options
-        other
+        copy_will_paginate_data super
+      end
+
+      # workaround for Active Record 3.0
+      def scoped(options = nil)
+        copy_will_paginate_data super
       end
 
       def to_a
@@ -112,6 +113,15 @@ module WillPaginate
             col.total_entries ||= total_entries
           end
         end
+      end
+
+      private
+
+      def copy_will_paginate_data(other)
+        other.current_page = current_page unless other.current_page
+        other.total_entries = nil if defined? @total_entries_queried
+        other.wp_count_options = @wp_count_options if defined? @wp_count_options
+        other
       end
     end
 
