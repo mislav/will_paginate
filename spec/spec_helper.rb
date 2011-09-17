@@ -6,26 +6,18 @@ rescue LoadError
   # no debugger available
 end
 
-module MyExtras
-  protected
-  
-  def include_phrase(string)
-    PhraseMatcher.new(string)
-  end
-
-  def collection(params = {})
-    if params[:total_pages]
-      params[:per_page] = 1
-      params[:total_entries] = params[:total_pages]
-    end
-    WillPaginate::Collection.new(params[:page] || 1, params[:per_page] || 30, params[:total_entries])
-  end
-end
-
 RSpec.configure do |config|
-  # config.include My::Pony, My::Horse, :type => :farm
-  config.include MyExtras
-  # config.predicate_matchers[:swim] = :can_swim?
+  config.include Module.new {
+    protected
+
+    def include_phrase(string)
+      PhraseMatcher.new(string)
+    end
+
+    def have_deprecation(msg)
+      DeprecationMatcher.new(msg)
+    end
+  }
   
   config.mock_with :mocha
 end
@@ -33,7 +25,7 @@ end
 class PhraseMatcher
   def initialize(string)
     @string = string
-    @pattern = /\b#{string}\b/
+    @pattern = /\b#{Regexp.escape string}\b/
   end
 
   def matches?(actual)
@@ -47,5 +39,33 @@ class PhraseMatcher
 
   def negative_failure_message
     "expected #{@actual.inspect} not to contain phrase #{@string.inspect}"
+  end
+end
+
+require 'stringio'
+
+class DeprecationMatcher
+  def initialize(message)
+    @message = message
+  end
+
+  def matches?(block)
+    @actual = hijack_stderr(&block)
+    PhraseMatcher.new("DEPRECATION WARNING: #{@message}").matches?(@actual)
+  end
+
+  def failure_message
+    "expected deprecation warning #{@message.inspect}, got #{@actual.inspect}"
+  end
+
+  private
+
+  def hijack_stderr
+    err = $stderr
+    $stderr = StringIO.new
+    yield
+    $stderr.string.rstrip
+  ensure
+    $stderr = err
   end
 end

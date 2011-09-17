@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'will_paginate/core_ext'
 require 'will_paginate/i18n'
+require 'will_paginate/deprecation'
 
 module WillPaginate
   # = Will Paginate view helpers
@@ -19,7 +20,7 @@ module WillPaginate
     end
 
     # default view options
-    self.pagination_options = {
+    self.pagination_options = Deprecation::Hash.new \
       :class          => 'pagination',
       :previous_label => nil,
       :next_label     => nil,
@@ -30,7 +31,12 @@ module WillPaginate
       :params         => nil,
       :page_links     => true,
       :container      => true
+
+    label_deprecation = Proc.new { |key, value|
+      "set the 'will_paginate.#{key}' key in your i18n locale instead of editing pagination_options" if defined? Rails
     }
+    pagination_options.deprecate_key(:previous_label, :next_label, &label_deprecation)
+    pagination_options.deprecate_key(:renderer) { |key| "pagination_options[#{key.inspect}] shouldn't be set globally" }
 
     include WillPaginate::I18n
 

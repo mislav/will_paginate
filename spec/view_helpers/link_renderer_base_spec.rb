@@ -71,7 +71,15 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
   end
   
   protected
-  
+
+    def collection(params = {})
+      if params[:total_pages]
+        params[:per_page] = 1
+        params[:total_entries] = params[:total_pages]
+      end
+      WillPaginate::Collection.new(params[:page] || 1, params[:per_page] || 30, params[:total_entries])
+    end
+
     def prepare(collection_options, options = {})
       @renderer.prepare(collection(collection_options), options)
     end

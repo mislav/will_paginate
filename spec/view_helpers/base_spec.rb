@@ -33,6 +33,20 @@ describe WillPaginate::ViewHelpers do
       will_paginate(collection).should be_nil
     end
   end
+
+  describe "pagination_options" do
+    let(:pagination_options) { WillPaginate::ViewHelpers.pagination_options }
+
+    it "deprecates setting :renderer" do
+      begin
+        lambda {
+          pagination_options[:renderer] = 'test'
+        }.should have_deprecation("pagination_options[:renderer] shouldn't be set")
+      ensure
+        pagination_options.delete :renderer
+      end
+    end
+  end
   
   describe "page_entries_info" do
     before :all do
