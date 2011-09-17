@@ -320,7 +320,7 @@ describe WillPaginate::ActiveRecord do
 
       lambda {
         # with association-specified order
-        result = dhh.projects.paginate(:page => 1)
+        result = ignore_deprecation { dhh.projects.paginate(:page => 1) }
         result.should == expected_name_ordered
         result.total_entries.should == 2
       }.should run_queries(2)
@@ -411,7 +411,7 @@ describe WillPaginate::ActiveRecord do
     it "should paginate on habtm association" do
       project = projects(:active_record)
       lambda {
-        result = project.developers.poor.paginate :page => 1, :per_page => 1
+        result = ignore_deprecation { project.developers.poor.paginate :page => 1, :per_page => 1 }
         result.size.should == 1
         result.total_entries.should == 1
       }.should run_queries(2)
@@ -461,6 +461,10 @@ describe WillPaginate::ActiveRecord do
   
   protected
   
+    def ignore_deprecation
+      ActiveSupport::Deprecation.silence { yield }
+    end
+
     def run_queries(num)
       QueryCountMatcher.new(num)
     end
