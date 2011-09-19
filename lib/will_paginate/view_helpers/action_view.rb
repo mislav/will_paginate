@@ -113,9 +113,12 @@ module WillPaginate
         add_current_page_param(url_params, page)
 
         if url_params[:scope]
-          return url_params[:scope].url_for(url_params)
+          scope = url_params[:scope]
+          url_params.delete(:scope)
+          url_params.delete(:controller)
+          scope.url_for(url_params)
         else
-          return @template.url_for(url_params)
+          @template.url_for(url_params)
         end
       end
 
