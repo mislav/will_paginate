@@ -167,7 +167,7 @@ module WillPaginate
       # application.
       # 
       def paginate_by_sql(sql, options)
-        pagenum  = options.fetch(:page) { raise ArgumentError, ":page parameter required" }
+        pagenum  = options.fetch(:page) { raise ArgumentError, ":page parameter required" } || 1
         per_page = options[:per_page] || self.per_page
         total    = options[:total_entries]
 

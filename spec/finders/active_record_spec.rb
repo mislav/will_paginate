@@ -212,6 +212,13 @@ describe WillPaginate::ActiveRecord do
       }.should run_queries(1)
     end
 
+    it "defaults to page 1" do
+      sql = "select content from topics"
+      topics = Topic.paginate_by_sql sql, :page => nil, :per_page => 1
+      topics.current_page.should == 1
+      topics.size.should == 1
+    end
+
     it "should strip the order when counting" do
       lambda {
         sql = "select id, title, content from topics order by title"
