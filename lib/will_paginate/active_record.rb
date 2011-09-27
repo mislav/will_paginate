@@ -171,18 +171,27 @@ module WillPaginate
         WillPaginate::Collection.create(pagenum, per_page, total) do |pager|
           query = sanitize_sql(sql.dup)
           original_query = query.dup
+          oracle = self.connection.adapter_name =~ /^(oracle|oci$)/i
+
           # add limit, offset
-          query << " LIMIT #{pager.per_page} OFFSET #{pager.offset}"
+          if oracle
+            query = <<-SQL
+              SELECT * FROM (
+                SELECT rownum rnum, a.* FROM (#{query}) a
+                WHERE rownum <= #{pager.offset + pager.per_page}
+              ) WHERE rnum >= #{pager.offset}
+            SQL
+          else
+            query << " LIMIT #{pager.per_page} OFFSET #{pager.offset}"
+          end
+
           # perfom the find
           pager.replace find_by_sql(query)
 
           unless pager.total_entries
             count_query = original_query.sub /\bORDER\s+BY\s+[\w`,\s.]+$/mi, ''
             count_query = "SELECT COUNT(*) FROM (#{count_query})"
-
-            unless self.connection.adapter_name =~ /^(oracle|oci$)/i
-              count_query << ' AS count_table'
-            end
+            count_query << ' AS count_table' unless oracle
             # perform the count query
             pager.total_entries = count_by_sql(count_query)
           end
