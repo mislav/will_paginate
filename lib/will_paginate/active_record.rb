@@ -73,7 +73,7 @@ module WillPaginate
 
       # workaround for Active Record 3.0
       def size
-        if !loaded? and limit_value
+        if !loaded? and limit_value and group_values.empty?
           [super, limit_value].min
         else
           super
@@ -83,12 +83,9 @@ module WillPaginate
       # overloaded to be pagination-aware
       def empty?
         if !loaded? and offset_value
-          rel_count = count
-          if rel_count.respond_to?(:size) and !rel_count.is_a?(Integer)
-            rel_count.size <= offset_value
-          else
-            rel_count <= offset_value
-          end
+          result = count
+          result = result.size if result.respond_to?(:size) and !result.is_a?(Integer)
+          result <= offset_value
         else
           super
         end

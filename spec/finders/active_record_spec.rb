@@ -146,6 +146,13 @@ describe WillPaginate::ActiveRecord do
       }.should run_queries(1)
     end
 
+    it "supports `size` for grouped queries" do
+      topics = Topic.group(:project_id).paginate :page => 1, :per_page => 3
+      lambda {
+        topics.size.should == {nil=>2, 1=>2}
+      }.should run_queries(1)
+    end
+
     it "overrides total_entries count with a fixed value" do
       lambda {
         topics = Topic.paginate :page => 1, :per_page => 3, :total_entries => 999
