@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.summary = "Pagination plugin for web frameworks and other apps"
   s.description = "will_paginate provides a simple API for performing paginated queries with Active Record, DataMapper and Sequel, and includes helpers for rendering pagination links in Rails, Sinatra and Merb web apps."
   
-  s.authors  = ['Mislav Marohnić']
+  s.authors  = ['Mislav Marohnic']
   s.email    = 'mislav.marohnic@gmail.com'
   s.homepage = 'https://github.com/mislav/will_paginate/wiki'
   
