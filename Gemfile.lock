@@ -25,6 +25,7 @@ GEM
     addressable (2.2.6)
     archive-tar-minitar (0.5.2)
     arel (3.0.2)
+    bson (1.6.4)
     builder (3.0.4)
     columnize (0.3.5)
     data_objects (0.10.7)
@@ -53,6 +54,12 @@ GEM
     linecache19 (0.5.12)
       ruby_core_source (>= 0.1.4)
     mocha (0.9.12)
+    mongo (1.6.2)
+      bson (~> 1.6.2)
+    mongoid (2.4.11)
+      activemodel (~> 3.1)
+      mongo (<= 1.6.2)
+      tzinfo (~> 0.3.22)
     multi_json (1.5.0)
     mysql (2.8.1)
     mysql2 (0.3.11)
@@ -111,6 +118,7 @@ DEPENDENCIES
   dm-migrations
   dm-sqlite-adapter
   mocha (~> 0.9.8)
+  mongoid
   mysql (~> 2.8.1)
   mysql2 (>= 0.3.6)
   pg (~> 0.11)

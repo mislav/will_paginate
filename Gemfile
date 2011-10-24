@@ -15,6 +15,7 @@ gem 'dm-core'
 gem 'dm-aggregates'
 gem 'dm-migrations'
 gem 'dm-sqlite-adapter'
+gem 'mongoid'
 
 group :mysql do
   gem 'mysql', '~> 2.8.1'
