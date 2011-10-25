@@ -21,7 +21,7 @@ module WillPaginate
       attr_reader :current_page, :per_page
 
       def total_entries
-        count
+        @total_entries ||= count
       end
 
       def total_pages

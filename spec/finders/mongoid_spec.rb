@@ -53,6 +53,12 @@ describe "will paginate mongoid" do
         criteria.paginate(:per_page => 3).total_entries.should == 4
       end
 
+      it "should cache total_entries" do
+        criteria.expects(:count).once.returns(123)
+        criteria.paginate
+        2.times { criteria.total_entries.should == 123 }
+      end
+
       it "should calculate total_pages" do
         criteria.paginate(:per_page => 1).total_pages.should == 4
         criteria.paginate(:per_page => 3).total_pages.should == 2
