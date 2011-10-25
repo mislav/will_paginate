@@ -48,15 +48,17 @@ describe "will paginate mongoid" do
     end
 
     describe "collection compatibility" do
-      it "should calculate total_count" do
-        criteria.paginate(:per_page => 1).total_entries.should == 4
-        criteria.paginate(:per_page => 3).total_entries.should == 4
-      end
+      describe "#total_count" do
+        it "should be calculated correctly" do
+          criteria.paginate(:per_page => 1).total_entries.should == 4
+          criteria.paginate(:per_page => 3).total_entries.should == 4
+        end
 
-      it "should cache total_entries" do
-        criteria.expects(:count).once.returns(123)
-        criteria.paginate
-        2.times { criteria.total_entries.should == 123 }
+        it "should be cached" do
+          criteria.expects(:count).once.returns(123)
+          criteria.paginate
+          2.times { criteria.total_entries.should == 123 }
+        end
       end
 
       it "should calculate total_pages" do
