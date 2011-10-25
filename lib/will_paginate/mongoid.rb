@@ -11,6 +11,10 @@ module WillPaginate
         @page_multiplier = current_page - 1
         limit(per_page).skip(@page_multiplier * per_page)
       end
+
+      def page(page)
+        paginate(:page => page)
+      end
     end
 
     module CollectionMethods

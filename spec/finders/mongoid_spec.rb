@@ -8,18 +8,21 @@ class MongoidModel
 end
 
 describe "will paginate mongoid" do
-  let(:criteria) { MongoidModel.criteria }
-
-  it "should have the #paginate method" do
-    criteria.should respond_to(:paginate)
+  before(:all) do
+    MongoidModel.delete_all
+    4.times { MongoidModel.create! }
   end
 
-  describe "pagination" do
-    before(:all) do
-      MongoidModel.delete_all
-      4.times { MongoidModel.create! }
-    end
+  let(:criteria) { MongoidModel.criteria }
 
+  describe "#page" do
+    it "should forward to the paginate method" do
+      criteria.expects(:paginate).with(:page => 2).returns("itself")
+      criteria.page(2).should == "itself"
+    end
+  end
+
+  describe "#paginate" do
     it "should use criteria" do
       criteria.paginate.should be_instance_of(::Mongoid::Criteria)
     end
