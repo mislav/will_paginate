@@ -27,6 +27,25 @@ describe "will paginate mongoid" do
     end
   end
 
+  describe "#per_page" do
+    it "should set the limit if given an argument" do
+      criteria.per_page(10).options[:limit].should == 10
+    end
+
+    it "should return the current limit if no argument is given" do
+      criteria.per_page.should == nil
+      criteria.per_page(10).per_page.should == 10
+    end
+
+    it "should be interchangable with limit" do
+      criteria.limit(15).per_page.should == 15
+    end
+
+    it "should be nil'able" do
+      criteria.per_page(nil).per_page.should be_nil
+    end
+  end
+
   describe "#paginate" do
     it "should use criteria" do
       criteria.paginate.should be_instance_of(::Mongoid::Criteria)
@@ -44,7 +63,11 @@ describe "will paginate mongoid" do
       criteria.paginate(:page => 2, :per_page => 5).options.should include(:skip => 5)
     end
 
-    specify "per_page should default to value configured for WillPaginate" do
+    specify "first fallback value for per_page option is the current limit" do
+      criteria.limit(12).paginate.options.should include(:limit => 12)
+    end
+
+    specify "second fallback value for per_page option is WillPaginate.per_page" do
       criteria.paginate.options.should include(:limit => WillPaginate.per_page)
     end
 
@@ -99,7 +122,7 @@ describe "will paginate mongoid" do
       end
 
       it "should not pollute plain mongoid criterias" do
-        %w(total_entries total_pages per_page current_page).each do |method|
+        %w(total_entries total_pages current_page).each do |method|
           criteria.should_not respond_to(method)
         end
         criteria.offset.should be_nil # this is already a criteria method

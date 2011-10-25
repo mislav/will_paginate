@@ -7,9 +7,13 @@ module WillPaginate
       def paginate(options = {})
         extend CollectionMethods
         @current_page = WillPaginate::PageNumber(options[:page] || @current_page || 1)
-        @per_page = (options[:per_page] || @per_page || WillPaginate.per_page).to_i
         @page_multiplier = current_page - 1
-        limit(per_page).skip(@page_multiplier * per_page)
+        pp = (options[:per_page] || per_page || WillPaginate.per_page).to_i
+        limit(pp).skip(@page_multiplier * pp)
+      end
+
+      def per_page(value = :non_given)
+        value == :non_given ? options[:limit] : limit(value)
       end
 
       def page(page)
@@ -18,14 +22,14 @@ module WillPaginate
     end
 
     module CollectionMethods
-      attr_reader :current_page, :per_page
+      attr_reader :current_page
 
       def total_entries
         @total_entries ||= count
       end
 
       def total_pages
-        (total_entries / @per_page.to_f).ceil
+        (total_entries / per_page.to_f).ceil
       end
 
       def offset
