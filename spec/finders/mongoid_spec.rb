@@ -106,8 +106,8 @@ describe "will paginate mongoid" do
 
       describe "#current_page" do
         it "should return current_page" do
-          criteria.paginate(:page => 1).current_page.should == WillPaginate::PageNumber(1)
-          criteria.paginate(:page => 3).current_page.should == WillPaginate::PageNumber(3)
+          criteria.paginate(:page => 1).current_page.should == 1
+          criteria.paginate(:page => 3).current_page.should == 3
         end
 
         it "should be casted to PageNumber" do
