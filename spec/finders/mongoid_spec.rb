@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'will_paginate/mongoid'
-require File.expand_path('../mongoid_test_connector', __FILE__)
 
+Mongoid.database = Mongo::Connection.new.db('will_paginate_test')
 
 describe "will paginate mongoid" do
   class Car
