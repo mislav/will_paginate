@@ -20,11 +20,20 @@ describe "will paginate mongoid" do
       criteria.expects(:paginate).with(:page => 2).returns("itself")
       criteria.page(2).should == "itself"
     end
+
+    it "should not override per_page if set earlier in the chain" do
+      criteria.paginate(:per_page => 10).page(1).per_page.should == 10
+      criteria.paginate(:per_page => 20).page(1).per_page.should == 20
+    end
   end
 
   describe "#paginate" do
     it "should use criteria" do
       criteria.paginate.should be_instance_of(::Mongoid::Criteria)
+    end
+
+    it "should not override page number if set earlier in the chain" do
+      criteria.page(3).paginate.current_page.should == 3
     end
 
     it "should limit according to per_page parameter" do

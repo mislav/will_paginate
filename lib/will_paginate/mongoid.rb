@@ -6,8 +6,8 @@ module WillPaginate
     module CriteriaMethods
       def paginate(options = {})
         extend CollectionMethods
-        @current_page = WillPaginate::PageNumber(options[:page] || 1)
-        @per_page = (options[:per_page] || WillPaginate.per_page).to_i
+        @current_page = WillPaginate::PageNumber(options[:page] || @current_page || 1)
+        @per_page = (options[:per_page] || @per_page || WillPaginate.per_page).to_i
         @page_multiplier = current_page - 1
         limit(per_page).skip(@page_multiplier * per_page)
       end
