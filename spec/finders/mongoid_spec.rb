@@ -72,9 +72,15 @@ describe "will paginate mongoid" do
         criteria.paginate(:per_page => 5).per_page.should == 5
       end
 
-      it "should return current_page" do
-        criteria.paginate(:page => 1).current_page.should == 1
-        criteria.paginate(:page => 3).current_page.should == 3
+      describe "#current_page" do
+        it "should return current_page" do
+          criteria.paginate(:page => 1).current_page.should == WillPaginate::PageNumber(1)
+          criteria.paginate(:page => 3).current_page.should == WillPaginate::PageNumber(3)
+        end
+
+        it "should be casted to PageNumber" do
+          criteria.paginate(:page => 1).current_page.should be_instance_of(WillPaginate::PageNumber)
+        end
       end
 
       it "should return offset" do
