@@ -138,7 +138,7 @@ module WillPaginate
         i18n_key = :"page_entries_info.single_page#{html_key}"
         keys = [:"#{model_key}.#{i18n_key}", i18n_key]
 
-        will_paginate_translate keys, :count => collection.size, :model => model_name do |_, opts|
+        will_paginate_translate keys, :count => collection.length, :model => model_name do |_, opts|
           case opts[:count]
           when 0; "No #{opts[:model]} found"
           when 1; "Displaying #{b}1#{eb} #{opts[:model]}"
