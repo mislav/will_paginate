@@ -5,6 +5,11 @@ require 'will_paginate/i18n'
 
 module WillPaginate
   class Railtie < Rails::Railtie
+    # Supported from Rails 3.2 forward.
+    if config.action_dispatch.rescue_responses
+      config.action_dispatch.rescue_responses["WillPaginate::InvalidPage"] = :not_found
+    end
+
     initializer "will_paginate" do |app|
       ActiveSupport.on_load :active_record do
         require 'will_paginate/active_record'
@@ -20,9 +25,10 @@ module WillPaginate
 
       self.class.add_locale_path config
 
-      rescue_responses = app.config.action_dispatch.rescue_responses ||
-        ActionDispatch::ShowExceptions.rescue_responses
-      rescue_responses["WillPaginate::InvalidPage"] = :not_found
+      # This is for Rails 3.0 and 3.1.
+      unless app.config.action_dispatch.rescue_responses
+        ActionDispatch::ShowExceptions.rescue_responses["WillPaginate::InvalidPage"] = :not_found
+      end
 
       # Early access to ViewHelpers.pagination_options
       require 'will_paginate/view_helpers'
