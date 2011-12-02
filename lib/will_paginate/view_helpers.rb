@@ -138,6 +138,8 @@ module WillPaginate
         keys = [:"#{model_key}.#{i18n_key}", i18n_key]
         
         count = collection.size
+        
+        # If a group clause was used, count is returned as hash of :group => :count
         count = count.length if count.is_a? Hash
         will_paginate_translate keys, :count => count, :model => model_name do |_, opts|
           case opts[:count]
