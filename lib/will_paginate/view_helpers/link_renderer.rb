@@ -49,7 +49,7 @@ module WillPaginate
       end
       
       def gap
-        text = @template.will_paginate_translate(:page_gap) { '&hellip;' }
+        text = (@options[:previous_label].nil?) ? (@template.will_paginate_translate(:page_gap) { '&hellip;' }) :@options[:previous_label]
         %(<span class="gap">#{text}</span>)
       end
       
