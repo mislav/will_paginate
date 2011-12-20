@@ -65,7 +65,7 @@ module WillPaginate
           rel = self.except(*excluded)
           # TODO: hack. decide whether to keep
           rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
-          rel.count
+          rel.to_sql =~ /DISTINCT .*ON/i ? rel.length : rel.count
         else
           super
         end
