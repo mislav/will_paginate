@@ -25,7 +25,9 @@ module WillPaginate
     end
 
     def self.setup_actioncontroller
-      ActionDispatch::ShowExceptions.send :include, ShowExceptionsPatch
+      ( defined?(ActionDispatch::ExceptionWrapper) ?
+        ActionDispatch::ExceptionWrapper : ActionDispatch::ShowExceptions
+      ).send :include, ShowExceptionsPatch
       ActionController::Base.extend ControllerRescuePatch
     end
 
@@ -39,7 +41,7 @@ module WillPaginate
       extend ActiveSupport::Concern
       included { alias_method_chain :status_code, :paginate }
       private
-      def status_code_with_paginate(exception)
+      def status_code_with_paginate(exception = self.exception)
         if exception.is_a?(WillPaginate::InvalidPage) or
             (exception.respond_to?(:original_exception) &&
               exception.original_exception.is_a?(WillPaginate::InvalidPage))
