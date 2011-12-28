@@ -51,7 +51,7 @@ module WillPaginate
           if loaded? and @array.size < per_page and (current_page == 1 or @array.size > 0)
             offset + @array.size
           else
-            clean_query = query.merge(:order => [])
+            clean_query = query
             # seems like the only way
             clean_query.instance_variable_set('@limit', nil)
             clean_query.instance_variable_set('@offset', 0)
