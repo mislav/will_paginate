@@ -19,9 +19,34 @@ class Animal
   end
 end
 
+class Ownership
+  include DataMapper::Resource
+
+  belongs_to :animal, :key => true
+  belongs_to :human, :key => true
+
+  def self.setup
+  end
+end
+
+class Human
+  include DataMapper::Resource
+
+  property :id, Serial
+  property :name, String
+
+  has n, :ownerships
+  has 1, :pet, :model => 'Animal', :through => :ownerships, :via => :animal
+
+  def self.setup
+  end
+end
+
 # Load fixtures
-Animal.auto_migrate!
-Animal.setup
+[Animal, Ownership, Human].each do |klass|
+  klass.auto_migrate!
+  klass.setup
+end
 
 if 'irb' == $0
   DataMapper.logger.set_log($stdout, :debug)

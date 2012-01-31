@@ -63,9 +63,13 @@ module WillPaginate
       end
 
       def to_a
-        ::WillPaginate::Collection.create(current_page, per_page) do |col|
-          col.replace super
-          col.total_entries ||= total_entries
+        if paginated?
+          ::WillPaginate::Collection.create(current_page, per_page) do |col|
+            col.replace super
+            col.total_entries ||= total_entries
+          end
+        else
+          super
         end
       end
 

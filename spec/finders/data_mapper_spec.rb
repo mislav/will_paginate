@@ -80,4 +80,24 @@ describe WillPaginate::DataMapper do
     Animal.all(:conditions => ['1=2']).page(1).total_pages.should == 1
   end
 
+  it "can iterate and then call WP methods" do
+    animals = Animal.all(:limit => 2).page(1)
+    animals.each { |a| }
+    animals.total_entries.should == 3
+  end
+
+  it "augments to_a to return a WP::Collection" do
+    animals = Animal.all(:limit => 2).page(1)
+    array = animals.to_a
+    array.size.should == 2
+    array.is_a? WillPaginate::Collection
+    array.current_page.should == 1
+    array.per_page.should == 2
+  end
+
+  it "doesn't have a problem assigning has-one-through relationship" do
+    human = Human.create :name => "Mislav"
+    human.pet = Animal.first
+  end
+
 end if datamapper_loaded
