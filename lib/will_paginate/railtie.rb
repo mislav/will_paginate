@@ -41,13 +41,18 @@ module WillPaginate
       extend ActiveSupport::Concern
       included { alias_method_chain :status_code, :paginate }
       private
-      def status_code_with_paginate(exception = self.exception)
+      def status_code_with_paginate(exception = @exception)
         if exception.is_a?(WillPaginate::InvalidPage) or
             (exception.respond_to?(:original_exception) &&
               exception.original_exception.is_a?(WillPaginate::InvalidPage))
           Rack::Utils.status_code(:not_found)
         else
-          status_code_without_paginate(exception)
+          original_method = method(:status_code_without_paginate)
+          if original_method.arity != 0
+            original_method.call(exception)
+          else
+            original_method.call()
+          end
         end
       end
     end
