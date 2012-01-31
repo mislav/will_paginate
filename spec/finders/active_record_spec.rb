@@ -279,7 +279,8 @@ describe WillPaginate::ActiveRecord do
   end
   
   it "should paginate with :conditions" do
-    result = Topic.paginate :page => 1, :conditions => ["created_at > ?", 30.minutes.ago]
+    result = Topic.paginate :page => 1, :order => 'id ASC',
+      :conditions => ["created_at > ?", 30.minutes.ago]
     result.should == topics(:rails, :ar)
     result.total_pages.should == 1
   end
