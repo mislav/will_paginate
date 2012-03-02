@@ -93,6 +93,7 @@ module WillPaginate
           target = url(target)
         end
         attributes[:href] = target
+        attributes = @options[:extra_attributes].merge(attributes) if @options[:extra_attributes]
         tag(:a, text, attributes)
       end
       
