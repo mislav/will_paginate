@@ -117,7 +117,7 @@ module WillPaginate
 
       def merge_get_params(url_params)
         if @template.respond_to? :request and @template.request and @template.request.get?
-          symbolized_update(url_params, @template.params)
+          symbolized_update(url_params, @template.params.except(*@options[:ignore_params]))
         end
         url_params
       end
