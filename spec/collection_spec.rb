@@ -123,6 +123,21 @@ describe WillPaginate::Collection do
     collection.per_page.should == 30
   end
 
+  describe "map" do
+    it "should correctly map the values" do
+      collection = create {|p| p.replace([1,2,3])}
+      collection.map {|v| v*2}.should == [2,4,6]
+    end 
+
+    it "should maintain pager methods" do
+      collection = create(2,5,100) {|p| p.replace([1,2,3])}
+      mapped = collection.map {|v| v*2 }
+      mapped.current_page.should == 2
+      mapped.per_page.should == 5
+      mapped.total_entries.should == 100
+    end
+  end
+
   private
   
     def create(page = 2, limit = 5, total = nil, &block)

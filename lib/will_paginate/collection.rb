@@ -132,5 +132,11 @@ module WillPaginate
 
       result
     end
+
+    def map(&block)
+      self.class.create(current_page, per_page, total_entries) do |pager|
+        pager.replace(super(&block))
+      end
+    end
   end
 end
