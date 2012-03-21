@@ -133,9 +133,19 @@ module WillPaginate
       result
     end
 
+    # We want to return paginated collections when mapped. Unfortunately
+    # when arrays are copied in C code for slices or other operations,
+    # they are initialized using the array initializer, not ours. This
+    # means that current page is lost and creating a new array is impossible.
+    # we treat copied arrays as non-paginated collections and just delegate to super.
+
     def map(&block)
-      self.class.create(current_page, per_page, total_entries) do |pager|
-        pager.replace(super(&block))
+      if current_page.nil?
+        super(&block)
+      else
+        self.class.create(current_page, per_page, total_entries) do |pager|
+          pager.replace(super(&block))
+        end
       end
     end
   end

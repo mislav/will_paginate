@@ -136,6 +136,12 @@ describe WillPaginate::Collection do
       mapped.per_page.should == 5
       mapped.total_entries.should == 100
     end
+
+    it "should not raise an error when the array is copied by C code" do
+      collection = create(2,5,100) {|p| p.replace([1,2,3])}
+      copied = collection[0..1]
+      copied.map {|a| a*2}
+    end
   end
 
   private
