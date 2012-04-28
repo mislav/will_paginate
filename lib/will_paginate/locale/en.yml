@@ -7,11 +7,15 @@ en:
     page_entries_info:
       single_page:
         zero:  "No %{model} found"
-        one:   "Displaying 1 %{model}"
+        one:   "Displaying %{count} %{model}"
+        few:   "Displaying %{count} %{model}"
+        many:  "Displaying %{count} %{model}"
         other: "Displaying all %{count} %{model}"
       single_page_html:
         zero:  "No %{model} found"
-        one:   "Displaying <b>1</b> %{model}"
+        one:   "Displaying <b>%{count}</b> %{model}"
+        few:   "Displaying <b>%{count}</b> %{model}"
+        many:  "Displaying <b>%{count}</b> %{model}"
         other: "Displaying <b>all&nbsp;%{count}</b> %{model}"
 
       multi_page: "Displaying %{model} %{from} - %{to} of %{count} in total"
@@ -22,6 +26,7 @@ en:
     #     zero:  entries
     #     one:   entry
     #     few:   entries
+    #     many:   entries
     #     other: entries
 
     # line_item:
