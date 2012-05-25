@@ -317,6 +317,21 @@ describe WillPaginate::ActiveRecord do
     result.total_entries.should == 4
   end
   
+  describe "when the number of items on the current page is known" do
+    it "should use the regular limit where there are enough items to fill the page" do
+      Topic.expects(:limit).with(10).returns(Topic)
+      Topic.paginate(:page=>1, :per_page=>10, :total_entries=>13)
+    end
+    it "should reduce limit if there's not enough items to fill the page" do
+      Topic.expects(:limit).with(3).returns(Topic)
+      Topic.paginate(:page=>2, :per_page=>10, :total_entries=>13)
+    end
+    it "should set limit=0 when we go past the last page" do
+      Topic.expects(:limit).with(0).returns(Topic)
+      Topic.paginate(:page=>3, :per_page=>10, :total_entries=>13)
+    end
+  end
+
   describe "associations" do
     it "should paginate with include" do
       project = projects(:active_record)
