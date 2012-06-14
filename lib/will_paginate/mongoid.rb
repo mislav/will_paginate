@@ -13,7 +13,11 @@ module WillPaginate
       end
 
       def per_page(value = :non_given)
-        value == :non_given ? options[:limit] : limit(value)
+        if value == :non_given
+          options[:limit] == 0 ? nil : options[:limit] # in new Mongoid versions a nil limit is saved as 0
+        else
+          limit(value)
+        end
       end
 
       def page(page)
