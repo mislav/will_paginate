@@ -13,7 +13,9 @@ module WillPaginate
   # This module provides few of these methods.
   module CollectionMethods
     def total_pages
-      total_entries.zero? ? 1 : (total_entries / per_page.to_f).ceil
+      return  1 if total_entries.zero?
+      return -1 if total_entries < 0
+      (total_entries / per_page.to_f).ceil
     end
 
     # current_page - 1 or nil if there is no previous page
@@ -23,7 +25,7 @@ module WillPaginate
 
     # current_page + 1 or nil if there is no next page
     def next_page
-      current_page < total_pages ? (current_page + 1) : nil
+      ((current_page < total_pages) || (total_pages < 0)) ? (current_page + 1) : nil
     end
 
     # Helper method that is true when someone tries to fetch a page with a
