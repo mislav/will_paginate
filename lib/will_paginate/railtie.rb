@@ -40,7 +40,6 @@ module WillPaginate
     module ShowExceptionsPatch
       extend ActiveSupport::Concern
       included { alias_method_chain :status_code, :paginate }
-      private
       def status_code_with_paginate(exception = @exception)
         if exception.is_a?(WillPaginate::InvalidPage) or
             (exception.respond_to?(:original_exception) &&
