@@ -4,6 +4,7 @@ require 'will_paginate/collection'
 require 'active_record'
 
 module WillPaginate
+
   # = Paginating finders for ActiveRecord models
   # 
   # WillPaginate adds +paginate+, +per_page+ and other methods to

@@ -60,35 +60,8 @@ module WillPaginate
           right = (middle.last + 1)..total_pages
         end
         
-        out = left.to_a + middle.to_a + right.to_a
-        return @options[:bisect] ? windowed_page_numbers_bisected( out ) : out  
+        left.to_a + middle.to_a + right.to_a
       end
-
-    
-    def windowed_page_numbers_bisected(out)
-        bisect_right = ((total_pages + current_page)/2).to_i
-        bisect_left = (current_page/2).to_i
-        inner_window, outer_window = @options[:inner_window].to_i, @options[:outer_window].to_i
-
-        start_at = out.index(current_page)
-        return out unless start_at
-        start_at -= 1 while !out[start_at].is_a?(Symbol) && start_at > 0 
-        window_from = start_at
-
-        start_at = out.index(current_page)
-        start_at += 1 while !out[start_at].is_a?(Symbol) && start_at < out.size 
-        window_to = start_at 
-
-        if !out.include?(bisect_right) && bisect_right < total_pages && bisect_right > 1
-          out[window_to-2] = :gap
-          out[window_to-1] =bisect_right  
-        end 
-        if !out.include?(bisect_left) && bisect_left > 1 
-          out[ window_from + 1 ] = bisect_left
-          out[ window_from + 2 ] = :gap
-        end 
-        return out
-    end 
 
     private
 
