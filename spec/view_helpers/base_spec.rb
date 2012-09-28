@@ -20,7 +20,7 @@ describe WillPaginate::ViewHelpers do
   
   describe "will_paginate" do
 
-    def builder_renderer collection
+    def build_renderer collection
       renderer = mock 'Renderer'
       renderer.expects(:prepare).with(collection, instance_of(Hash), self)
       renderer.expects(:to_html).returns('<PAGES>')
@@ -29,7 +29,7 @@ describe WillPaginate::ViewHelpers do
 
     it "should render" do
       collection = WillPaginate::Collection.new(1, 2, 4)
-      renderer   = builder_renderer collection
+      renderer   = build_renderer collection
       
       will_paginate(collection, :renderer => renderer).should == '<PAGES>'
     end
@@ -41,7 +41,7 @@ describe WillPaginate::ViewHelpers do
 
     it "should render for single-page collections with param always_render" do
       collection = WillPaginate::Collection.new(1, 1, 1)
-      renderer   = builder_renderer collection
+      renderer   = build_renderer collection
 
       will_paginate(collection, :renderer => renderer, :always_render => true).should == '<PAGES>'
     end
