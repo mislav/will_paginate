@@ -19,11 +19,17 @@ describe WillPaginate::ViewHelpers do
   include WillPaginate::ViewHelpers
   
   describe "will_paginate" do
-    it "should render" do
-      collection = WillPaginate::Collection.new(1, 2, 4)
-      renderer   = mock 'Renderer'
+
+    def builder_renderer collection
+      renderer = mock 'Renderer'
       renderer.expects(:prepare).with(collection, instance_of(Hash), self)
       renderer.expects(:to_html).returns('<PAGES>')
+      renderer
+    end
+
+    it "should render" do
+      collection = WillPaginate::Collection.new(1, 2, 4)
+      renderer   = builder_renderer collection
       
       will_paginate(collection, :renderer => renderer).should == '<PAGES>'
     end
@@ -31,6 +37,13 @@ describe WillPaginate::ViewHelpers do
     it "should return nil for single-page collections" do
       collection = mock 'Collection', :total_pages => 1
       will_paginate(collection).should be_nil
+    end
+
+    it "should render for single-page collections with param always_render" do
+      collection = WillPaginate::Collection.new(1, 1, 1)
+      renderer   = builder_renderer collection
+
+      will_paginate(collection, :renderer => renderer, :always_render => true).should == '<PAGES>'
     end
   end
 
