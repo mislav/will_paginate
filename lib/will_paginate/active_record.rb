@@ -137,9 +137,13 @@ module WillPaginate
         rel
       end
 
-      def page(num)
+      def page(num, *args)        
+        default_num = args.first[:default_page] if args.is_a?(Array) and args.first.is_a?(Hash) and args.first[:default_page].is_a?(Integer)
+        default_num ||= 1
+        num = default_num if num.nil? or (num.is_a?(String) and num.to_i == 0)
+
         rel = scoped.extending(RelationMethods)
-        pagenum = ::WillPaginate::PageNumber(num.nil? ? 1 : num)
+        pagenum = ::WillPaginate::PageNumber(num)
         per_page = rel.limit_value || self.per_page
         rel = rel.offset(pagenum.to_offset(per_page).to_i)
         rel = rel.limit(per_page) unless rel.limit_value

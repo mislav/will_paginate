@@ -49,6 +49,14 @@ Post.where(:published => true).paginate(:page => params[:page]).order('id DESC')
 Post.page(params[:page]).order('created_at DESC')
 ```
 
+its now possible that a request e.g. with params ?page=foobar is returning a default_page
+
+``` ruby
+# if params[:page] is 'foobar' the .page method is using the default_page value (1)
+Post.page('foobar', :default_page => 2).order('created_at DESC')
+# this raises no exception 'foobar' is invalid but page is using the default_page value
+```
+
 See [the wiki][wiki] for more documentation. [Ask on the group][group] if you have usage questions. [Report bugs][issues] on GitHub.
 
 Happy paginating.

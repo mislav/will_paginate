@@ -76,10 +76,49 @@ describe WillPaginate::ActiveRecord do
       rel.offset.should == 5
     end
 
-    it "raises on invalid page number" do
-      lambda {
-        Developer.page('foo')
-      }.should raise_error(ArgumentError)
+    it "get page one for invalid strings" do
+      rel = Developer.page('foo')
+      rel.current_page.should == 1
+      rel.per_page.should == 10
+      rel.offset.should == 0
+    end
+
+    it "get default page for invalid strings if default_page" do
+      rel = Developer.page('foo', :default_page => 1)
+      rel.current_page.should == 1
+      rel.per_page.should == 10
+      rel.offset.should == 0
+
+      rel = Developer.page('foo', :default_page => 2)
+      rel.current_page.should == 2
+      rel.per_page.should == 10
+      rel.offset.should == 10
+
+      rel = Developer.page('foo', :default_page => 3)
+      rel.current_page.should == 3
+      rel.per_page.should == 10
+      rel.offset.should == 20
+    end
+
+    it "get page one for invalid args" do
+      rel = Developer.page('foo', :default_page => 'bar')
+      rel.current_page.should == 1
+      rel.per_page.should == 10
+      rel.offset.should == 0
+
+      rel = Developer.page('foo', :foo => :bar)
+      rel.current_page.should == 1
+      rel.per_page.should == 10
+      rel.offset.should == 0
+
+      rel = Developer.page('foo', [:foo])
+      rel.current_page.should == 1
+      rel.per_page.should == 10
+      rel.offset.should == 0
+    end
+
+    it "get RangeError for invalid default_page" do 
+      expect { Developer.page('foo', :default_page => 0)}.to raise_error
     end
 
     it "supports first limit() then page()" do
