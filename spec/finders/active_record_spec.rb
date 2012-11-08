@@ -118,7 +118,7 @@ describe WillPaginate::ActiveRecord do
     end
 
     it "get RangeError for invalid default_page" do 
-      expect { Developer.page('foo', :default_page => 0)}.to raise_error :range_error
+      expect { Developer.page('foo', :default_page => 0)}.to raise_error
     end
 
     it "supports first limit() then page()" do
