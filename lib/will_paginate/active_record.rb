@@ -138,7 +138,17 @@ module WillPaginate
       end
 
       def page(num)
-        rel = scoped.extending(RelationMethods)
+        rel = if ::ActiveRecord::Relation === self
+          self
+        elsif ::ActiveRecord::Scoping::ClassMethods.method_defined? :with_scope
+          # Active Record 3
+          scoped
+        else
+          # Active Record 4
+          all
+        end
+
+        rel = rel.extending(RelationMethods)
         pagenum = ::WillPaginate::PageNumber(num.nil? ? 1 : num)
         per_page = rel.limit_value || self.per_page
         rel = rel.offset(pagenum.to_offset(per_page).to_i)
