@@ -368,7 +368,7 @@ describe WillPaginate::ActiveRecord do
     end
 
     it "should paginate through association extension" do
-      project = Project.find(:first)
+      project = Project.order('id').first
       expected = [replies(:brave)]
 
       lambda {
