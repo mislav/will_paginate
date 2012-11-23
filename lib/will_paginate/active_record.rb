@@ -140,7 +140,7 @@ module WillPaginate
       def page(num)
         rel = if ::ActiveRecord::Relation === self
           self
-        elsif ::ActiveRecord::Scoping::ClassMethods.method_defined? :with_scope
+        elsif !defined?(::ActiveRecord::Scoping) or ::ActiveRecord::Scoping::ClassMethods.method_defined? :with_scope
           # Active Record 3
           scoped
         else
