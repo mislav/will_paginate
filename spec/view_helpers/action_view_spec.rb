@@ -7,12 +7,12 @@ require 'will_paginate/collection'
 Routes = ActionDispatch::Routing::RouteSet.new
 
 Routes.draw do
-  match 'dummy/page/:page' => 'dummy#index'
-  match 'dummy/dots/page.:page' => 'dummy#dots'
-  match 'ibocorp(/:page)' => 'ibocorp#index',
+  get 'dummy/page/:page' => 'dummy#index'
+  get 'dummy/dots/page.:page' => 'dummy#dots'
+  get 'ibocorp(/:page)' => 'ibocorp#index',
         :constraints => { :page => /\d+/ }, :defaults => { :page => 1 }
 
-  match ':controller(/:action(/:id(.:format)))'
+  get ':controller(/:action(/:id(.:format)))'
 end
 
 describe WillPaginate::ActionView do

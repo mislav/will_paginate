@@ -30,7 +30,9 @@ module ActiverecordTestConnector
 
   FIXTURES_PATH = File.expand_path('../../fixtures', __FILE__)
 
-  Fixtures = defined?(ActiveRecord::Fixtures) ? ActiveRecord::Fixtures : ::Fixtures
+  Fixtures = defined?(ActiveRecord::FixtureSet) ? ActiveRecord::FixtureSet :
+             defined?(ActiveRecord::Fixtures) ? ActiveRecord::Fixtures :
+             ::Fixtures
 
   # Set our defaults
   self.connected = false

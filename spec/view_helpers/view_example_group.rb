@@ -1,10 +1,12 @@
 require 'active_support'
+require 'minitest/unit'
 require 'action_dispatch/testing/assertions'
 require 'will_paginate/array'
 
 module ViewExampleGroup
   
   include ActionDispatch::Assertions::SelectorAssertions
+  include MiniTest::Assertions
   
   def assert(value, message)
     raise message unless value
