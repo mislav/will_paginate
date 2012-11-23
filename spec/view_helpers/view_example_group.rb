@@ -1,13 +1,18 @@
 require 'active_support'
-require 'minitest/unit'
+begin
+  require 'minitest/unit'
+rescue LoadError
+  # Fails on Ruby 1.8, but it's OK since we only need MiniTest::Assertions
+  # on Rails 4 which doesn't support 1.8 anyway.
+end
 require 'action_dispatch/testing/assertions'
 require 'will_paginate/array'
 
 module ViewExampleGroup
   
   include ActionDispatch::Assertions::SelectorAssertions
-  include MiniTest::Assertions
-  
+  include MiniTest::Assertions if defined? MiniTest
+
   def assert(value, message)
     raise message unless value
   end
