@@ -39,6 +39,17 @@ module WillPaginate
         end
       end
 
+      # dirty hack to enable `first` after `limit` behavior above
+      def first(*args)
+        if current_page
+          rel = clone
+          rel.current_page = nil
+          rel.first(*args)
+        else
+          super
+        end
+      end
+
       def offset(value = nil)
         if value.nil? then offset_value
         else super(value)

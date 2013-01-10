@@ -92,6 +92,18 @@ describe WillPaginate::ActiveRecord do
       rel.offset.should == 6
     end
 
+    it "supports #first" do
+      rel = Developer.order('id').page(2).per_page(4)
+      rel.first.should == users(:dev_5)
+      rel.first(2).should == users(:dev_5, :dev_6)
+    end
+
+    it "supports #last" do
+      rel = Developer.order('id').page(2).per_page(4)
+      rel.last.should == users(:dev_8)
+      rel.page(3).last.should == users(:poor_jamis)
+    end
+
     it "keeps pagination data after 'scoped'" do
       rel = Developer.page(2).scoped
       rel.per_page.should == 10
