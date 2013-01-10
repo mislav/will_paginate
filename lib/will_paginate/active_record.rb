@@ -65,7 +65,9 @@ module WillPaginate
           rel = self.except(*excluded)
           # TODO: hack. decide whether to keep
           rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
-          rel.count
+          result = rel.count
+          # TODO: hack. handle count result returned by grouped relation
+          result.is_a?(Hash) ? result.values.reduce(&:+) : result
         else
           super
         end
