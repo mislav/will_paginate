@@ -3,7 +3,6 @@ source 'http://rubygems.org'
 rails_version = '~> 3.0.0'
 
 gem 'activerecord',   rails_version
-gem 'activeresource', rails_version
 gem 'actionpack',     rails_version
 
 gem 'rake'
