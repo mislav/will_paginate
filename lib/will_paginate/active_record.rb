@@ -50,6 +50,15 @@ module WillPaginate
         end
       end
 
+      # fix for Rails 3.0
+      def find_last
+        if !loaded? and offset_value || limit_value
+          @last ||= to_a.last
+        else
+          super
+        end
+      end
+
       def offset(value = nil)
         if value.nil? then offset_value
         else super(value)

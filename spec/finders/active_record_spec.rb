@@ -101,6 +101,7 @@ describe WillPaginate::ActiveRecord do
     it "supports #last" do
       rel = Developer.order('id').page(2).per_page(4)
       rel.last.should == users(:dev_8)
+      rel.last(2).should == users(:dev_7, :dev_8)
       rel.page(3).last.should == users(:poor_jamis)
     end
 
