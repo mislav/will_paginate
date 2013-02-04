@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+status=0
+
+run_all(){
+  spec_files="spec"
+  [[ $DB != "sqlite3" ]] && spec_files="spec/finders/active_record_spec.rb"
+  set -x
+  rspec -r fake_rubygems $spec_files
+  set +x
+}
+
+export PATH="${PWD}/bin:$PATH"
+
+for db in sqlite3 mysql mysql2 postgres; do
+  if ! [[ $db = "mysql2" && $BUNDLE_GEMFILE =~ "rails3.0" ]]; then
+    printf "\e[1;33m[DB] ${db}\e[m\n"
+    DB=$db run_all || status=1
+  fi
+done
+
+exit $status
