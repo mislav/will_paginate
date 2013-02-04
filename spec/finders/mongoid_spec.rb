@@ -1,10 +1,18 @@
 require 'spec_helper'
-require 'will_paginate/mongoid'
 
-Mongoid.database = Mongo::Connection.new.db('will_paginate_test')
+begin
+  require 'will_paginate/mongoid'
+rescue LoadError => error
+  warn "Error running Sequel specs: #{error.message}"
+  mongoid_loaded = false
+else
+  Mongoid.database = Mongo::Connection.new.db('will_paginate_test')
 
-class MongoidModel
-  include Mongoid::Document
+  class MongoidModel
+    include Mongoid::Document
+  end
+
+  mongoid_loaded = true
 end
 
 describe WillPaginate::Mongoid do
@@ -129,4 +137,4 @@ describe WillPaginate::Mongoid do
       end
     end
   end
-end
+end if mongoid_loaded
