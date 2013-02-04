@@ -1,5 +1,5 @@
 require 'rspec'
-require File.expand_path('../view_helpers/view_example_group', __FILE__)
+require 'view_helpers/view_example_group'
 begin
   require 'ruby-debug'
 rescue LoadError

@@ -1,6 +1,9 @@
-bundler_args: "--without development"
-script: spec/ci.rb
+bundler_args: "--standalone --binstubs --without development"
+script: script/test_all
 services: mongodb
+before_script:
+  - mysql -e 'create database will_paginate;'
+  - psql -c 'create database will_paginate;' -U postgres
 rvm:
   - 1.8.7
   - 1.9.2

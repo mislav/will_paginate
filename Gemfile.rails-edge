@@ -8,7 +8,6 @@ gem 'actionpack',   :github => 'rails/rails', :branch => 'master'
 
 gem 'thread_safe'
 
-gem 'rake'
 gem 'rspec', '~> 2.6.0'
 gem 'mocha', '~> 0.9.8'
 
