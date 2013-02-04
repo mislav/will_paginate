@@ -1,4 +1,5 @@
 script: spec/ci.rb
+services: mongodb
 rvm:
   - 1.8.7
   - 1.9.2
