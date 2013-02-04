@@ -202,6 +202,7 @@ module WillPaginate
           query = sanitize_sql(sql.dup)
           original_query = query.dup
           oracle = self.connection.adapter_name =~ /^(oracle|oci$)/i
+          adapter = self.connection.adapter_name
 
           # add limit, offset
           if oracle
@@ -211,6 +212,16 @@ module WillPaginate
                 WHERE rownum <= #{pager.offset + pager.per_page}
               ) WHERE rnum >= #{pager.offset}
             SQL
+          elsif adapter == "SQLServer"
+            options_limit = pager.per_page ? "TOP #{pager.per_page}" : ""  
+            options[:order] ||= if order_by = sql.match(/ORDER BY(.*$)/i)  
+                                  order_by[1]  
+                                else  
+                                  sql.match('FROM (.+?)\b')[1] + '.id'  
+                                end  
+            sql.sub!(/ORDER BY.*$/i, '')  
+            sql.sub!(/SELECT/i, "SELECT #{options_limit} * FROM ( SELECT ROW_NUMBER() OVER( ORDER BY #{options[:order] } ) AS row_num, ")  
+            sql << ") AS t WHERE row_num > #{options[:offset]}"
           else
             query << " LIMIT #{pager.per_page} OFFSET #{pager.offset}"
           end
