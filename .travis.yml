@@ -1,3 +1,4 @@
+bundler_args: "--without development"
 script: spec/ci.rb
 rvm:
   - 1.8.7

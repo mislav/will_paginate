@@ -17,7 +17,7 @@ group :mysql do
 end
 gem 'pg', '~> 0.11', :group => :pg
 
-group :debug do
+group :development do
   gem 'ruby-debug', :platforms => :mri_18
-  gem 'ruby-debug19', :platforms => :mri_19
-end unless ENV['TRAVIS']
+  gem 'debugger', :platforms => :mri_19
+end
