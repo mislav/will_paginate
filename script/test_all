@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 status=0
 export PATH="${PWD}/bin:$PATH"
+[ -d bundle ] && export RUBYOPT="-I${PWD}/bundle -rbundler/setup"
 
 for db in sqlite3 mysql mysql2 postgres; do
   if ! [[ $db = "mysql2" && $BUNDLE_GEMFILE =~ "rails3.0" ]]; then
