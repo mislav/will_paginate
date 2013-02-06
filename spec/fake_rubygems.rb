@@ -14,3 +14,5 @@ Kernel.module_eval do
   private :gem
 
 end
+
+$" << "rubygems.rb"
