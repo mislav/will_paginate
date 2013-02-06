@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
-set -x
-
 status=0
+
+run_all(){
+  if [[ $DB = "sqlite3" ]]; then
+    rspec spec
+  else
+    rspec spec/finders/active_record_spec.rb
+  fi
+}
+
 export PATH="${PWD}/bin:$PATH"
-[ -d bundle ] && export RUBYOPT="-I${PWD}/bundle -rbundler/setup ${RUBYOPT}"
 
 for db in sqlite3 mysql mysql2 postgres; do
   if ! [[ $db = "mysql2" && $BUNDLE_GEMFILE =~ "rails3.0" ]]; then
     printf "\e[1;33m[DB] ${db}\e[m\n"
-    DB=$db rake || status=1
+    DB=$db run_all || status=1
   fi
 done
 
