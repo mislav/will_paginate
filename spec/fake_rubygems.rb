@@ -1,8 +1,16 @@
 # Makes the test suite compatible with Bundler standalone mode (used in CI)
 # because Active Record uses `gem` for loading adapters.
 Kernel.module_eval do
+
+  remove_method :gem if 'method' == defined? gem
+
   def gem(*args)
-    warn "warning: gem(#{args.map {|o| o.inspect }.join(', ')}) ignored; called from:"
-    warn "  " << caller[0,5].join("\n  ")
+    return if $VERBOSE.nil?
+    $stderr << "warning: gem(#{args.map {|o| o.inspect }.join(', ')}) ignored"
+    $stderr << "; called from:\n  " << caller[0,5].join("\n  ") if $DEBUG
+    $stderr << "\n"
   end
+
+  private :gem
+
 end

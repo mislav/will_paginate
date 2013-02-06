@@ -4,7 +4,9 @@ status=0
 run_all(){
   spec_files="spec"
   [[ $DB != "sqlite3" ]] && spec_files="spec/finders/active_record_spec.rb"
+  set -x
   rspec -r fake_rubygems $spec_files
+  set +x
 }
 
 export PATH="${PWD}/bin:$PATH"
