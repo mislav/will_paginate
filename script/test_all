@@ -2,11 +2,9 @@
 status=0
 
 run_all(){
-  if [[ $DB = "sqlite3" ]]; then
-    rspec spec
-  else
-    rspec spec/finders/active_record_spec.rb
-  fi
+  spec_files="spec"
+  [[ $DB != "sqlite3" ]] && spec_files="spec/finders/active_record_spec.rb"
+  rspec -r fake_rubygems $spec_files
 }
 
 export PATH="${PWD}/bin:$PATH"
