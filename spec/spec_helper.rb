@@ -6,6 +6,8 @@ rescue LoadError
   # no debugger available
 end
 
+$stderr.puts $LOAD_PATH
+
 RSpec.configure do |config|
   config.include Module.new {
     protected
