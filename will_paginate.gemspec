@@ -7,6 +7,7 @@ Gem::Specification.new do |s|
   s.version = WillPaginate::VERSION::STRING
   
   s.summary = "Pagination plugin for web frameworks and other apps"
+  s.license = "MIT"
   s.description = "will_paginate provides a simple API for performing paginated queries with Active Record, DataMapper and Sequel, and includes helpers for rendering pagination links in Rails, Sinatra and Merb web apps."
   
   s.authors  = ['Mislav Marohnić']
