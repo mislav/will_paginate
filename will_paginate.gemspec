@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.authors  = ['Mislav Marohnić']
   s.email    = 'mislav.marohnic@gmail.com'
   s.homepage = 'https://github.com/mislav/will_paginate/wiki'
+  s.license  = 'MIT'
   
   s.rdoc_options = ['--main', 'README.md', '--charset=UTF-8']
   s.extra_rdoc_files = ['README.md', 'LICENSE']
