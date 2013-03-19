@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'config'
+require 'rbconfig'
 require File.expand_path('../lib/will_paginate/version', __FILE__)
 
 Gem::Specification.new do |s|
