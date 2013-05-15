@@ -80,7 +80,7 @@ module WillPaginate
 
       def count
         if limit_value
-          excluded = [:order, :limit, :offset]
+          excluded = [:order, :limit, :offset, :reorder]
           excluded << :includes unless eager_loading?
           rel = self.except(*excluded)
           # TODO: hack. decide whether to keep

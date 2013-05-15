@@ -200,6 +200,11 @@ describe WillPaginate::ActiveRecord do
       Developer.group(:salary).page(1).total_entries.should == 4
     end
 
+    it "removes :reorder for count with group" do
+      Project.group(:id).reorder(:id).page(1).total_entries
+      $query_sql.last.should_not =~ /\ORDER\b/
+    end
+
     it "should not have zero total_pages when the result set is empty" do
       Developer.where("1 = 2").page(1).total_pages.should == 1
     end
