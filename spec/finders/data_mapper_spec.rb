@@ -90,7 +90,7 @@ describe WillPaginate::DataMapper do
     animals = Animal.all(:limit => 2).page(1)
     array = animals.to_a
     array.size.should == 2
-    array.is_a? WillPaginate::Collection
+    array.should be_kind_of(WillPaginate::Collection)
     array.current_page.should == 1
     array.per_page.should == 2
   end
