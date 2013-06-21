@@ -7,5 +7,6 @@ if [ -z "$1" ]; then
 fi
 
 for gemfile in $(ls Gemfile* | grep -v lock); do
+  printf "\e[31m[%s]\e[0m\n" $gemfile
   BUNDLE_GEMFILE=$gemfile "$@"
 done
