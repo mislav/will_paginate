@@ -7,7 +7,9 @@ class Developer < User
     end
   end
 
-  scope :poor, :conditions => ['salary <= ?', 80000], :order => 'salary'
+  scope :poor, lambda {
+    where(['salary <= ?', 80000]).order('salary')
+  }
 
   def self.per_page() 10 end
 end
