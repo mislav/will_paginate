@@ -73,7 +73,10 @@ module ActiverecordTestConnector
   end
 
   def load_schema
-    ActiveRecord::Base.silence do
+    silencer = ActiveRecord::Base.method(:silence)
+    silence_args = []
+    silence_args << :stdout if silencer.arity != 0
+    silencer.call(*silence_args) do
       ActiveRecord::Migration.verbose = false
       load File.join(FIXTURES_PATH, 'schema.rb')
     end
