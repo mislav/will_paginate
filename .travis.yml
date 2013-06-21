@@ -11,6 +11,7 @@ gemfile:
   - Gemfile
   - Gemfile.rails3.0
   - Gemfile.rails3.1
+  - Gemfile.rails3.2
   - Gemfile.rails-edge
 matrix:
   exclude:
