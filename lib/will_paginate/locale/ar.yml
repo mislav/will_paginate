@@ -1,7 +1,7 @@
 ar:
   will_paginate:
-    previous_label: "التالي &#8594;"
-    next_label: "&#8592; السابق"
+    previous_label: "السابق &#8594;"
+    next_label: "&#8592; التالي"
     page_gap: "&hellip;"
 
     page_entries_info:
