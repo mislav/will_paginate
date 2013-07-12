@@ -5,10 +5,10 @@ require 'active_record'
 
 module WillPaginate
   # = Paginating finders for ActiveRecord models
-  # 
+  #
   # WillPaginate adds +paginate+, +per_page+ and other methods to
   # ActiveRecord::Base class methods and associations.
-  # 
+  #
   # In short, paginating finders are equivalent to ActiveRecord finders; the
   # only difference is that we start with "paginate" instead of "find" and
   # that <tt>:page</tt> is required parameter:
@@ -184,7 +184,7 @@ module WillPaginate
       # +per_page+.
       #
       # Example:
-      # 
+      #
       #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
       #                          :page => params[:page], :per_page => 3
       #
@@ -192,7 +192,7 @@ module WillPaginate
       # supply <tt>:total_entries</tt>. If you experience problems with this
       # generated SQL, you might want to perform the count manually in your
       # application.
-      # 
+      #
       def paginate_by_sql(sql, options)
         pagenum  = options.fetch(:page) { raise ArgumentError, ":page parameter required" } || 1
         per_page = options[:per_page] || self.per_page
@@ -202,7 +202,7 @@ module WillPaginate
           query = sanitize_sql(sql.dup)
           original_query = query.dup
           oracle = self.connection.adapter_name =~ /^(oracle|oci$)/i
-
+		  sqlserver = self.connection.adapter_name =~ /^sqlserver/i
           # add limit, offset
           if oracle
             query = <<-SQL
@@ -211,6 +211,15 @@ module WillPaginate
                 WHERE rownum <= #{pager.offset + pager.per_page}
               ) WHERE rnum >= #{pager.offset}
             SQL
+		  elsif sqlserver
+			  if query =~ /^select/i
+				  query = query.split(' ')[1..-1].join(' ')
+			  end
+			  sql_query = "SELECT"
+				sql_query += " TOP (#{pager.per_page}) " if pager.per_page
+				sql_query += " * FROM ( SELECT ROW_NUMBER() OVER (ORDER BY #{options[:order].map{ |x| "#{x}" }.join(', ')}) AS [__rn], #{query} ) AS [__rnt]"
+				 sql_query += " WHERE __rn > #{pager.offset}" if pager.offset
+				 query = sql_query
           else
             query << " LIMIT #{pager.per_page} OFFSET #{pager.offset}"
           end
