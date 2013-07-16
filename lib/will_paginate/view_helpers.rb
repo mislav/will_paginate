@@ -42,7 +42,7 @@ module WillPaginate
 
     # Returns HTML representing page links for a WillPaginate::Collection-like object.
     # In case there is no more than one page in total, nil is returned.
-    # 
+    #
     # ==== Options
     # * <tt>:class</tt> -- CSS class name for the generated DIV (default: "pagination")
     # * <tt>:previous_label</tt> -- default: "« Previous"
@@ -61,7 +61,7 @@ module WillPaginate
     #
     # All options not recognized by will_paginate will become HTML attributes on the container
     # element for pagination links (the DIV). For example:
-    # 
+    #
     #   <%= will_paginate @posts, :style => 'color:blue' %>
     #
     # will result in:
@@ -92,6 +92,40 @@ module WillPaginate
       # render HTML for pagination
       renderer.prepare collection, options, self
       renderer.to_html
+    end
+
+    # Returns HTML representing link ref tags links for a WillPaginate::Collection-like object.
+    #
+    # A port of something that is already in Kaminari see: https://github.com/amatsuda/kaminari/pull/200/files
+    #
+    # ==== Examples
+    # Basic usage:
+    #
+    #   In head:
+    #   <head>
+    #     <title>My Website</title>
+    #     <%= yield :head %>
+    #   </head>
+    #
+    #   Somewhere in body:
+    #   <% content_for :head do %>
+    #     <%= rel_next_prev_link_tags @items %>
+    #   <% end %>
+    #
+    #   #-> <link rel="next" href="/items/page/3" /><link rel="prev" href="/items/page/1" />
+    #
+    def rel_next_prev_link_tags(collection)
+      current_page = collection.current_page
+      output = ""
+      if current_page == 1
+        output << '<link rel="next" href="' + url_for(:page => (current_page + 1), :only_path => false) + '"/>'
+      elsif current_page + 1 > collection.total_pages
+        output << '<link rel="prev" href="' + url_for(:page => (current_page - 1), :only_path => false) + '"/>'
+      else
+        output << '<link rel="prev" href="' + url_for(:page => (current_page - 1), :only_path => false) + '"/>'
+        output << '<link rel="next" href="' + url_for(:page => (current_page + 1), :only_path => false) + '"/>'
+      end
+      output.html_safe
     end
 
     # Renders a message containing number of displayed vs. total entries.
