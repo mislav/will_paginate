@@ -118,11 +118,10 @@ module WillPaginate
       output = ""
       next_page_tag = '<link rel="next" href="' + url_for(:page => collection.next_page, :only_path => false) + '"/>'
       previous_page_tag = '<link rel="prev" href="' + url_for(:page => collection.previous_page, :only_path => false) + '"/>'
-      if collection.next_page && collection.previous_page
-        output << next_page_tag << previous_page_tag
-      elsif collection.next_page
+      if collection.next_page
         output << next_page_tag
-      elsif collection.previous_page
+      end
+      if collection.previous_page
         output << previous_page_tag
       end
       output.html_safe
