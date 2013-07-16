@@ -279,7 +279,7 @@ describe WillPaginate::ActionView do
     }.should raise_error(ActionView::TemplateError, /@developers/)
   end
 
-  describe '#rel_next_prev_link_tags' do
+  describe '#pagination_link_tags' do
     let(:helper) {
       helper = Object.new
       class << helper
@@ -296,24 +296,21 @@ describe WillPaginate::ActionView do
     let(:page_three) { collection.paginate(page: 3, per_page: 10)}
 
     context 'the first page' do
-      subject { helper.rel_next_prev_link_tags page_one }
-      it { should be_a String }
-      it { should match /rel="next"/ }
+      subject { helper.pagination_link_tags page_one }
+      it { should include('<link rel="next" href="http://example.com/dummy/page/2"/>') }
       it { should_not match /rel="prev"/ }
     end
 
     context 'the middle page' do
-      subject { helper.rel_next_prev_link_tags page_two }
-      it { should be_a String }
-      it { should match /rel="next"/ }
-      it { should match /rel="prev"/ }
+      subject { helper.pagination_link_tags page_two }
+      it { should include('<link rel="prev" href="http://example.com/dummy/page/1"/>') }
+      it { should include('<link rel="next" href="http://example.com/dummy/page/3"/>') }
     end
 
     context 'the last page' do
-      subject { helper.rel_next_prev_link_tags page_three }
-      it { should be_a String }
+      subject { helper.pagination_link_tags page_three }
+      it { should include('<link rel="prev" href="http://example.com/dummy/page/2"/>') }
       it { should_not match /rel="next"/ }
-      it { should match /rel="prev"/ }
     end
   end
 

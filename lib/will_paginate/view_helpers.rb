@@ -109,21 +109,21 @@ module WillPaginate
     #
     #   Somewhere in body:
     #   <% content_for :head do %>
-    #     <%= rel_next_prev_link_tags @items %>
+    #     <%= pagination_link_tags @items %>
     #   <% end %>
     #
-    #   #-> <link rel="next" href="/items/page/3" /><link rel="prev" href="/items/page/1" />
+    #   #-> <link rel="next" href="http://example.com/items/page/3" /><link rel="prev" href="http://example.com/items/page/1" />
     #
-    def rel_next_prev_link_tags(collection)
-      current_page = collection.current_page
+    def pagination_link_tags(collection)
       output = ""
-      if current_page == 1
-        output << '<link rel="next" href="' + url_for(:page => (current_page + 1), :only_path => false) + '"/>'
-      elsif current_page + 1 > collection.total_pages
-        output << '<link rel="prev" href="' + url_for(:page => (current_page - 1), :only_path => false) + '"/>'
-      else
-        output << '<link rel="prev" href="' + url_for(:page => (current_page - 1), :only_path => false) + '"/>'
-        output << '<link rel="next" href="' + url_for(:page => (current_page + 1), :only_path => false) + '"/>'
+      next_page_tag = '<link rel="next" href="' + url_for(:page => collection.next_page, :only_path => false) + '"/>'
+      previous_page_tag = '<link rel="prev" href="' + url_for(:page => collection.previous_page, :only_path => false) + '"/>'
+      if collection.next_page && collection.previous_page
+        output << next_page_tag << previous_page_tag
+      elsif collection.next_page
+        output << next_page_tag
+      elsif collection.previous_page
+        output << previous_page_tag
       end
       output.html_safe
     end
