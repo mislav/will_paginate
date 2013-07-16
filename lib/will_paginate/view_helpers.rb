@@ -115,14 +115,11 @@ module WillPaginate
     #   #-> <link rel="next" href="http://example.com/items/page/3" /><link rel="prev" href="http://example.com/items/page/1" />
     #
     def pagination_link_tags(collection)
-      output = ""
-      if collection.next_page
-        output << '<link rel="next" href="' + url_for(:page => collection.next_page, :only_path => false) + '"/>'
-      end
-      if collection.previous_page
-        output << '<link rel="prev" href="' + url_for(:page => collection.previous_page, :only_path => false) + '"/>'
-      end
-      output.html_safe
+      output = []
+      link = '<link rel="%s" href="%s"/>'
+      output << link % ["prev", url_for(:page => collection.previous_page, :only_path => false)] if collection.previous_page
+      output << link % ["next", url_for(:page => collection.next_page, :only_path => false)] if collection.next_page
+      output.join("\n").html_safe
     end
 
     # Renders a message containing number of displayed vs. total entries.
