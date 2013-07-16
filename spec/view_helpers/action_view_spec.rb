@@ -297,19 +297,19 @@ describe WillPaginate::ActionView do
 
     context 'the first page' do
       subject { helper.pagination_link_tags page_one }
-      it { should include('<link rel="next" href="http://example.com/dummy/page/2"/>') }
+      it { should include('<link rel="next" href="http://example.com/dummy/page/2" />') }
       it { should_not match /rel="prev"/ }
     end
 
     context 'the middle page' do
       subject { helper.pagination_link_tags page_two }
-      it { should include('<link rel="prev" href="http://example.com/dummy/page/1"/>') }
-      it { should include('<link rel="next" href="http://example.com/dummy/page/3"/>') }
+      it { should include('<link rel="prev" href="http://example.com/dummy/page/1" />') }
+      it { should include('<link rel="next" href="http://example.com/dummy/page/3" />') }
     end
 
     context 'the last page' do
       subject { helper.pagination_link_tags page_three }
-      it { should include('<link rel="prev" href="http://example.com/dummy/page/2"/>') }
+      it { should include('<link rel="prev" href="http://example.com/dummy/page/2" />') }
       it { should_not match /rel="next"/ }
     end
   end
