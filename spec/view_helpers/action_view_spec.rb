@@ -312,6 +312,11 @@ describe WillPaginate::ActionView do
       it { should include('<link rel="prev" href="http://example.com/dummy/page/2" />') }
       it { should_not match /rel="next"/ }
     end
+
+    context "with optional parameters for searches" do
+      subject { helper.pagination_link_tags(page_three, { :search => "term", :boolean_param => true }) }
+      it { should include('<link rel="prev" href="http://example.com/dummy/page/2?boolean_param=true&search=term" />') }
+    end
   end
 
   ## i18n
