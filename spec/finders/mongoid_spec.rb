@@ -6,7 +6,7 @@ rescue LoadError => error
   warn "Error running Sequel specs: #{error.message}"
   mongoid_loaded = false
 else
-  Mongoid.database = Mongo::Connection.new.db('will_paginate_test')
+  Mongoid.sessions = {default: {database: 'will_paginate_test', hosts: ["localhost:27017"]}}
 
   class MongoidModel
     include Mongoid::Document
@@ -133,7 +133,7 @@ describe WillPaginate::Mongoid do
         %w(total_entries total_pages current_page).each do |method|
           criteria.should_not respond_to(method)
         end
-        criteria.offset.should be_nil # this is already a criteria method
+        criteria.offset.should be_a(Mongoid::Criteria) # this is already a origin gem method
       end
     end
   end
