@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-
+#rails version 4.0.0
 rails_version = '~> 4.0.0'
 
 gem 'activerecord', rails_version
