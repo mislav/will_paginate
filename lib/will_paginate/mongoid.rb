@@ -4,24 +4,29 @@ require 'will_paginate/collection'
 module WillPaginate
   module Mongoid
     module CriteriaMethods
-      def paginate(options = {})
-        extend CollectionMethods
-        @current_page = WillPaginate::PageNumber(options[:page] || @current_page || 1)
-        @page_multiplier = current_page - 1
-        pp = (options[:per_page] || per_page || WillPaginate.per_page).to_i
-        limit(pp).skip(@page_multiplier * pp)
-      end
+      extend ActiveSupport::Concern
+      included do 
+        class << self
+          def paginate(options = {})
+            extend CollectionMethods
+            @current_page = WillPaginate::PageNumber(options[:page] || @current_page || 1)
+            @page_multiplier = current_page - 1
+            pp = (options[:per_page] || per_page || WillPaginate.per_page).to_i
+            limit(pp).skip(@page_multiplier * pp)
+          end
 
-      def per_page(value = :non_given)
-        if value == :non_given
-          options[:limit] == 0 ? nil : options[:limit] # in new Mongoid versions a nil limit is saved as 0
-        else
-          limit(value)
+          def per_page(value = :non_given)
+            if value == :non_given
+              (respond_to?(:options) && options[:limit] != 0) ? options[:limit] : nil # in new Mongoid versions a nil limit is saved as 0
+            else
+              limit(value)
+            end
+          end
+
+          def page(page)
+            paginate(:page => page)
+          end
         end
-      end
-
-      def page(page)
-        paginate(:page => page)
       end
     end
 
@@ -41,6 +46,7 @@ module WillPaginate
       end
     end
 
+    ::Mongoid::Document.send(:include, CriteriaMethods)
     ::Mongoid::Criteria.send(:include, CriteriaMethods)
   end
 end
