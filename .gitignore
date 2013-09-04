@@ -2,4 +2,4 @@
 doc
 *.gem
 coverage
-ctags
+tags
