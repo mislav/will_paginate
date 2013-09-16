@@ -91,7 +91,9 @@ module WillPaginate
       end
       # render HTML for pagination
       renderer.prepare collection, options, self
-      renderer.to_html
+      output = renderer.to_html
+      output = output.html_safe if output.respond_to?(:html_safe)
+      output
     end
 
     # Renders a message containing number of displayed vs. total entries.

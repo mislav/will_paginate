@@ -30,7 +30,7 @@ module WillPaginate
       options = options.symbolize_keys
       options[:renderer] ||= LinkRenderer
 
-      super(collection, options).try(:html_safe)
+      super(collection, options)
     end
 
     def page_entries_info(collection = nil, options = {}) #:nodoc:
