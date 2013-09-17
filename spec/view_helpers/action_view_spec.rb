@@ -56,6 +56,15 @@ describe WillPaginate::ActionView do
     end
   end
 
+  it "should override existing page param value" do
+    request.params :page => 1
+    paginate do |pagination|
+      assert_select 'a[href]', 3 do |elements|
+        validate_page_numbers [2,3,2], elements
+      end
+    end
+  end
+
   it "should render nothing when there is only 1 page" do
     paginate(:per_page => 30).should be_empty
   end
