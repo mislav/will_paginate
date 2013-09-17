@@ -14,6 +14,7 @@ module ViewExampleGroup
   include MiniTest::Assertions if defined? MiniTest
 
   def assert(value, message)
+    message = message.call if message.respond_to?(:call)
     raise message unless value
   end
   
