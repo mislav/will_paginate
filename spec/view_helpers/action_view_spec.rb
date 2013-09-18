@@ -189,6 +189,15 @@ describe WillPaginate::ActionView do
     paginate
     assert_links_match /foo\[bar\]=baz/
   end
+
+  it "doesn't allow tampering with host, port, protocol" do
+    request.params :host => 'disney.com', :port => '99', :protocol => 'ftp'
+    paginate
+    assert_links_match %r{^/foo/bar}
+    assert_no_links_match /disney/
+    assert_no_links_match /99/
+    assert_no_links_match /ftp/
+  end
   
   it "should not preserve parameters on POST" do
     request.post
@@ -328,16 +337,16 @@ describe WillPaginate::ActionView do
       include Routes.url_helpers
       include WillPaginate::ActionView
     end
-    helper.default_url_options[:host] = 'example.com'
-    helper.default_url_options[:controller] = 'dummy'
-    # helper.default_url_options[:only_path] = true
+    helper.default_url_options.update \
+      :only_path => true,
+      :controller => 'dummy'
 
     collection = WillPaginate::Collection.new(2, 1, 3)
     @render_output = helper.will_paginate(collection)
 
     assert_select 'a[href]', 4 do |links|
       urls = links.map {|l| l['href'] }.uniq
-      urls.should == ['http://example.com/dummy/page/1', 'http://example.com/dummy/page/3']
+      urls.should == ['/dummy/page/1', '/dummy/page/3']
     end
   end
 
