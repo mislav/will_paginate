@@ -241,7 +241,14 @@ class ViewTest < WillPaginate::ViewTestCase
     paginate
     assert_links_match /foo%5Bbar%5D=baz/
   end
-  
+
+  def test_will_paginate_prevents_host_and_protocol_tampering
+    @request.params :host => 'disney.com', :protocol => 'javascript'
+    paginate
+    assert_no_links_match /disney/
+    assert_no_links_match /javascript/
+  end
+
   def test_will_paginate_doesnt_preserve_parameters_on_post
     @request.post
     @request.params :foo => 'bar'
