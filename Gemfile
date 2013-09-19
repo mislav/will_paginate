@@ -15,7 +15,7 @@ group :pg do
   gem 'pg',       :platforms => :ruby_19
 end
 
-group :debug do
+group :development do
   gem 'ruby-debug', :platforms => :mri_18
   gem 'debugger', :platforms => [:mri_19, :mri_20]
-end unless ENV['TRAVIS']
+end
