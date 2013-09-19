@@ -17,5 +17,5 @@ end
 
 group :debug do
   gem 'ruby-debug', :platforms => :mri_18
-  gem 'ruby-debug19', :platforms => :mri_19
+  gem 'debugger', :platforms => [:mri_19, :mri_20]
 end unless ENV['TRAVIS']
