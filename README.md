@@ -24,6 +24,10 @@ Post.paginate(:page => params[:page], :per_page => 30)
 ## render page links in the view:
 <%= will_paginate @posts %>
 ```
+## setting custom lable for page entries info:
+<%= page_entries_info (@posts,{:label => "Listing"}) %>
+
+
 
 And that's it! You're done. You just need to add some CSS styles to [make those pagination links prettier][css].
 
