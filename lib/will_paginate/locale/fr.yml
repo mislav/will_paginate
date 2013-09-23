@@ -1,0 +1,18 @@
+fr:
+  will_paginate:
+    previous_label: "&#8592; Précédent"
+    next_label: "Suivant &#8594;"
+    page_gap: "&hellip;"
+
+    page_entries_info:
+      single_page:
+        zero:  "Pas de %{model} trouvé(e)"
+        one:   "Affichage d'un %{model}"
+        other: "Affichage des %{count} %{model}"
+      single_page_html:
+        zero:  "Pas de %{model} trouvé(e)"
+        one:   "Affichage d'<b>un</b> %{model}"
+        other: "Affichage <b>des&nbsp;%{count}</b> %{model}"
+
+      multi_page: "Affichage %{model} %{from} - %{to} sur un total de %{count}"
+      multi_page_html: "Affichage %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> sur un total de <b>%{count}</b>"
