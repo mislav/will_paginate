@@ -5,7 +5,7 @@ will_paginate is a pagination library that integrates with Ruby on Rails, Sinatr
 Installation:
 
 ``` ruby
-## Gemfile for Rails 3, Sinatra, and Merb
+## Gemfile for Rails 3, Rails 4, Sinatra, and Merb
 gem 'will_paginate', '~> 3.0'
 ```
 
