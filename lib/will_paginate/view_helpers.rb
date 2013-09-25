@@ -107,7 +107,7 @@ module WillPaginate
     # The default output contains HTML. Use ":html => false" for plain text.
     def page_entries_info(collection, options = {})
       model = options[:model]
-      label = options[:label]
+      label = options.include?(:label) ? options[:label] : "Displaying"
       model = collection.first.class unless model or collection.empty?
       model ||= 'entry'
       model_key = if model.respond_to? :model_name
@@ -157,7 +157,7 @@ module WillPaginate
           :from => collection.offset + 1, :to => collection.offset + collection.length
         }
         will_paginate_translate keys, params do |_, opts|
-          %{#{opts[:label]} %s #{b}%d#{sp}-#{sp}%d#{eb} of #{b}%d#{eb} in total} %
+          %{#{label}%s %s #{b}%d#{sp}-#{sp}%d#{eb} of #{b}%d#{eb} in total} %
             [opts[:label], opts[:model], opts[:from], opts[:to], opts[:count] ]
         end
       end
