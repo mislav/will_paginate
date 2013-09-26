@@ -107,7 +107,7 @@ module WillPaginate
     # The default output contains HTML. Use ":html => false" for plain text.
     def page_entries_info(collection, options = {})
       model = options[:model]
-      label = options.include?(:label) ? options[:label] : "Displaying"
+      label = options.include?(:label) ? options[:label] : ""
       model = collection.first.class unless model or collection.empty?
       model ||= 'entry'
       model_key = if model.respond_to? :model_name
