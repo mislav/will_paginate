@@ -93,6 +93,7 @@ module WillPaginate
           target = url(target)
         end
         attributes[:href] = target
+        attributes.merge!(@options[:'data-remote']) if @options[:'data-remote']
         tag(:a, text, attributes)
       end
       
