@@ -21,11 +21,15 @@ module WillPaginate
         options  = options.dup
         pagenum  = options.fetch(:page) { raise ArgumentError, ":page parameter required" }
         per_page = options.delete(:per_page) || self.per_page
+        total    = options.delete(:total_entries)
 
         options.delete(:page)
         options[:limit] = per_page.to_i
 
-        all(options).page(pagenum)
+
+        col = all(options).page(pagenum)
+        col.total_entries = total.to_i unless total.nil? || (total.kind_of?(String) && total.strip.empty?)
+        col
       end
     end
 
@@ -33,6 +37,7 @@ module WillPaginate
       include WillPaginate::CollectionMethods
 
       attr_accessor :current_page
+      attr_writer :total_entries
 
       def paginated?
         !current_page.nil?
