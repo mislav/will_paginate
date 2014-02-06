@@ -80,6 +80,19 @@ describe WillPaginate::DataMapper do
     Animal.all(:conditions => ['1=2']).page(1).total_pages.should == 1
   end
 
+  it "overrides total_entries count with a fixed value" do
+    lambda {
+      animals = Animal.paginate :page => 1, :per_page => 3, :total_entries => 999
+      animals.total_entries.should == 999
+    }.should run_queries(0)
+  end
+
+  it "supports a non-int for total_entries" do
+    topics = Animal.paginate :page => 1, :per_page => 3, :total_entries => "999"
+    topics.total_entries.should == 999
+  end
+
+
   it "can iterate and then call WP methods" do
     animals = Animal.all(:limit => 2).page(1)
     animals.each { |a| }
