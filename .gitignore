@@ -1,4 +1,5 @@
 .bundle
 doc
+*.lock
 *.gem
 coverage
