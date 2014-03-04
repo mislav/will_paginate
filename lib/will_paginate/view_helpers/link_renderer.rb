@@ -97,11 +97,10 @@ module WillPaginate
       end
       
       def tag(name, value, attributes = {})
-        string_attributes = attributes.inject('') do |attrs, pair|
+        string_attributes = attributes.each_with_object('') do |pair, attrs|
           unless pair.last.nil?
             attrs << %( #{pair.first}="#{CGI::escapeHTML(pair.last.to_s)}")
           end
-          attrs
         end
         "<#{name}#{string_attributes}>#{value}</#{name}>"
       end
