@@ -112,7 +112,7 @@ module WillPaginate
         url_params = @base_url_params.dup
         add_current_page_param(url_params, page)
 
-        @template.url_for(url_params)
+        url_with_special_params(url_params)
       end
 
       def merge_get_params(url_params)
@@ -140,6 +140,16 @@ module WillPaginate
 
       def parse_query_parameters(params)
         Rack::Utils.parse_nested_query(params)
+      end
+
+      def url_with_special_params(url_params)
+        special_params = ''
+        [:host, :port, :protocol].each do |param|
+          value = url_params[param]
+          special_params << "&#{param}=#{value}" if value
+          url_params.delete(param)
+        end
+        @template.url_for(url_params) + special_params
       end
     end
 

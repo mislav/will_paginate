@@ -192,7 +192,14 @@ describe WillPaginate::ActionView do
     paginate({}, :params => { :foo => 'bar' })
     assert_links_match /foo=bar/
   end
-  
+
+  it "should handle port, protocol and host query parameters" do
+    paginate({}, :params => { :host => 'dummy', :port => '1234', :protocol => 'whatever' })
+    assert_links_match /host=dummy/
+    assert_links_match /port=1234/
+    assert_links_match /protocol=whatever/
+  end
+
   it "should add anchor parameter" do
     paginate({}, :params => { :anchor => 'anchor' })
     assert_links_match /#anchor$/
