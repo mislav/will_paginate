@@ -6,6 +6,8 @@ rescue LoadError
   # no debugger available
 end
 
+Dir[File.expand_path('../matchers/*_matcher.rb', __FILE__)].each { |matcher| require matcher }
+
 RSpec.configure do |config|
   config.include Module.new {
     protected
@@ -21,52 +23,4 @@ RSpec.configure do |config|
   
   config.mock_with :mocha
   config.backtrace_clean_patterns << /view_example_group/
-end
-
-class PhraseMatcher
-  def initialize(string)
-    @string = string
-    @pattern = /\b#{Regexp.escape string}\b/
-  end
-
-  def matches?(actual)
-    @actual = actual.to_s
-    @actual =~ @pattern
-  end
-
-  def failure_message
-    "expected #{@actual.inspect} to contain phrase #{@string.inspect}"
-  end
-
-  def negative_failure_message
-    "expected #{@actual.inspect} not to contain phrase #{@string.inspect}"
-  end
-end
-
-require 'stringio'
-
-class DeprecationMatcher
-  def initialize(message)
-    @message = message
-  end
-
-  def matches?(block)
-    @actual = hijack_stderr(&block)
-    PhraseMatcher.new("DEPRECATION WARNING: #{@message}").matches?(@actual)
-  end
-
-  def failure_message
-    "expected deprecation warning #{@message.inspect}, got #{@actual.inspect}"
-  end
-
-  private
-
-  def hijack_stderr
-    err = $stderr
-    $stderr = StringIO.new
-    yield
-    $stderr.string.rstrip
-  ensure
-    $stderr = err
-  end
 end
