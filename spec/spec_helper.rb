@@ -28,10 +28,6 @@ RSpec.configure do |config|
       ActiveSupport::Deprecation.silence { yield }
     end
 
-    def run_queries(num)
-      QueryCountMatcher.new(num)
-    end
-
     def show_queries(&block)
       counter = QueryCountMatcher.new(nil)
       counter.run block
