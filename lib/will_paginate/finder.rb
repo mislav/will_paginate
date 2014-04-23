@@ -164,6 +164,10 @@ module WillPaginate
       
       def method_missing_with_paginate(method, *args) #:nodoc:
         # did somebody tried to paginate? if not, let them be
+        if method == :respond_to_missing?
+          return false
+        end
+
         unless method.to_s.index('paginate') == 0
           if block_given?
             return method_missing_without_paginate(method, *args) { |*a| yield(*a) }
