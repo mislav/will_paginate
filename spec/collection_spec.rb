@@ -22,7 +22,7 @@ describe WillPaginate::Collection do
   it "should be empty if out of bounds" do
     @simple.paginate(:page => 2, :per_page => 5).should be_empty
   end
-  
+
   it "should default to 1 as current page and 30 per-page" do
     result = (1..50).to_a.paginate
     result.current_page.should == 1
@@ -51,19 +51,45 @@ describe WillPaginate::Collection do
     collection.should_not be_out_of_bounds
   end
 
+  describe "first/last pages" do
+    context "first page" do
+      it "should return true when on the first page" do
+        collection = create(1, 1, 3)
+        collection.first_page?.should be_true
+      end
+
+      it "should return false when not on the first page" do
+        collection = create(2, 1, 3)
+        collection.first_page?.should_not be_true
+      end
+    end
+
+    context "last page" do
+      it "should return true when on the last page" do
+        collection = create(3, 1, 3)
+        collection.last_page?.should be_true
+      end
+
+      it "should be false when not on the last page" do
+        collection = create(2, 1, 3)
+        collection.last_page?.should_not be_true
+      end
+    end
+  end
+
   describe "previous/next pages" do
     it "should have previous_page nil when on first page" do
       collection = create(1, 1, 3)
       collection.previous_page.should be_nil
       collection.next_page.should == 2
     end
-    
+
     it "should have both prev/next pages" do
       collection = create(2, 1, 3)
       collection.previous_page.should == 1
       collection.next_page.should == 3
     end
-    
+
     it "should have next_page nil when on last page" do
       collection = create(3, 1, 3)
       collection.previous_page.should == 2
@@ -92,22 +118,22 @@ describe WillPaginate::Collection do
       collection = create { |p| p.replace array }
       collection.total_entries.should == 8
     end
-    
+
     it "should allow explicit total count to override guessed" do
       collection = create(2, 5, 10) { |p| p.replace array }
       collection.total_entries.should == 10
     end
-    
+
     it "should not be able to guess when collection is same as limit" do
       collection = create { |p| p.replace array(5) }
       collection.total_entries.should be_nil
     end
-    
+
     it "should not be able to guess when collection is empty" do
       collection = create { |p| p.replace array(0) }
       collection.total_entries.should be_nil
     end
-    
+
     it "should be able to guess when collection is empty and this is the first page" do
       collection = create(1) { |p| p.replace array(0) }
       collection.total_entries.should == 0
@@ -124,7 +150,7 @@ describe WillPaginate::Collection do
   end
 
   private
-  
+
     def create(page = 2, limit = 5, total = nil, &block)
       if block_given?
         described_class.create(page, limit, total, &block)
