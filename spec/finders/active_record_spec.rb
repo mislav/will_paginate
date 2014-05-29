@@ -205,6 +205,11 @@ describe WillPaginate::ActiveRecord do
       $query_sql.last.should_not =~ /\ORDER\b/
     end
 
+    it "accepts arguments for #count" do
+      Project.page(1).count(distinct: true)
+      $query_sql.last.should =~ /COUNT\(DISTINCT/
+    end
+
     it "should not have zero total_pages when the result set is empty" do
       Developer.where("1 = 2").page(1).total_pages.should == 1
     end

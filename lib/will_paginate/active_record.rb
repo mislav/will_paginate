@@ -78,14 +78,14 @@ module WillPaginate
         end
       end
 
-      def count
+      def count(*args)
         if limit_value
           excluded = [:order, :limit, :offset, :reorder]
           excluded << :includes unless eager_loading?
           rel = self.except(*excluded)
           # TODO: hack. decide whether to keep
           rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
-          rel.count
+          rel.count(*args)
         else
           super
         end
