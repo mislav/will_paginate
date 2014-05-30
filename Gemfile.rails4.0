@@ -1,10 +1,9 @@
 source 'https://rubygems.org'
 
-rails_version = '~> 4.1.1'
+rails_version = '~> 4.0.5'
 
 gem 'activerecord', rails_version
 gem 'actionpack',   rails_version
-gem 'actionview',   rails_version
 
 gem 'rspec', '~> 2.6.0'
 gem 'mocha', '~> 0.9.8'
