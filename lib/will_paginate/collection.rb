@@ -4,11 +4,11 @@ require 'will_paginate/page_number'
 module WillPaginate
   # Any will_paginate-compatible collection should have these methods:
   #
-  #   current_page, per_page, offset, total_entries, total_pages
+  #   current_page, per_page, offset, total_entries
   #
   # It can also define some of these optional methods:
   #
-  #   out_of_bounds?, previous_page, next_page
+  #   out_of_bounds?, previous_page, next_page, total_pages
   #
   # This module provides few of these methods.
   module CollectionMethods
