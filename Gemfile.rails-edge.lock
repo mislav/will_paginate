@@ -45,7 +45,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    arel (4.0.0)
+    arel (4.0.2)
     atomic (1.1.9)
     builder (3.1.4)
     columnize (0.3.6)
