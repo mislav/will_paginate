@@ -1,6 +1,6 @@
 require 'active_support'
 begin
-  require 'minitest/unit'
+  require 'minitest/autorun'
 rescue LoadError
   # Fails on Ruby 1.8, but it's OK since we only need MiniTest::Assertions
   # on Rails 4 which doesn't support 1.8 anyway.
