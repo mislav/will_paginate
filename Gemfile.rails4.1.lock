@@ -17,6 +17,7 @@ GEM
       activemodel (= 4.1.1)
       activesupport (= 4.1.1)
       arel (~> 5.0.0)
+    activerecord-deprecated_finders (1.0.3)
     activesupport (4.1.1)
       i18n (~> 0.6, >= 0.6.9)
       json (~> 1.7, >= 1.7.7)
@@ -63,6 +64,7 @@ PLATFORMS
 DEPENDENCIES
   actionpack (~> 4.1.1)
   activerecord (~> 4.1.1)
+  activerecord-deprecated_finders
   debugger
   mocha (~> 0.9.8)
   mysql (~> 2.9)
