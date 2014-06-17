@@ -10,6 +10,4 @@ class Project < ActiveRecord::Base
       scoped.where(['replies.created_at > ?', 15.minutes.ago])
     end
   end
-
-  has_many :unique_replies, :through => :topics, :source => :replies, :uniq => true
 end
