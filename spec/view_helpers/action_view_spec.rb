@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'active_support/rescuable' # needed for Ruby 1.9.1
 require 'action_controller'
+require 'action_view'
 require 'will_paginate/view_helpers/action_view'
 require 'will_paginate/collection'
 
@@ -396,6 +397,7 @@ end
 
 class DummyRequest
   attr_accessor :symbolized_path_parameters
+  alias :path_parameters :symbolized_path_parameters
   
   def initialize
     @get = true
