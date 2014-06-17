@@ -9,7 +9,7 @@ ignore_sql = /
     ^(
       PRAGMA | SHOW\ max_identifier_length |
       SELECT\ (currval|CAST|@@IDENTITY|@@ROWCOUNT) |
-      SHOW\ (FIELDS|TABLES)
+      SHOW\ ((FULL\ )?FIELDS|TABLES)
     )\b |
     \bFROM\ (sqlite_master|pg_tables|pg_attribute)\b
   /x
