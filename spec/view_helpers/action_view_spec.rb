@@ -312,13 +312,12 @@ describe WillPaginate::ActionView do
   end
 
   it "renders using ActionView helpers on a custom object" do
-    helper = Object.new
-    class << helper
+    helper = Class.new {
       attr_reader :controller
       include ActionView::Helpers::UrlHelper
       include Routes.url_helpers
       include WillPaginate::ActionView
-    end
+    }.new
     helper.default_url_options[:controller] = 'dummy'
 
     collection = WillPaginate::Collection.new(2, 1, 3)
@@ -331,12 +330,11 @@ describe WillPaginate::ActionView do
   end
 
   it "renders using ActionDispatch helper on a custom object" do
-    helper = Object.new
-    class << helper
+    helper = Class.new {
       include ActionDispatch::Routing::UrlFor
       include Routes.url_helpers
       include WillPaginate::ActionView
-    end
+    }.new
     helper.default_url_options.update \
       :only_path => true,
       :controller => 'dummy'
