@@ -1,5 +1,5 @@
 class Reply < ActiveRecord::Base
-  belongs_to :topic, :include => [:replies]
+  belongs_to :topic
 
   scope :recent, lambda {
     where(['replies.created_at > ?', 15.minutes.ago]).

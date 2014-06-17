@@ -31,18 +31,18 @@ describe WillPaginate::ActionView do
     @request = @controller.request
     @template = '<%= will_paginate collection, options %>'
   end
-  
+
   attr_reader :assigns, :controller, :request
-  
+
   def render(locals)
     @view = ActionView::Base.new([], @assigns, @controller)
     @view.request = @request
     @view.singleton_class.send(:include, @controller._routes.url_helpers)
     @view.render(:inline => @template, :locals => locals)
   end
-  
+
   ## basic pagination ##
-  
+
   it "should render" do
     paginate do |pagination|
       assert_select 'a[href]', 3 do |elements|
@@ -97,11 +97,11 @@ describe WillPaginate::ActionView do
   it "should paginate using a custom renderer instance" do
     renderer = WillPaginate::ActionView::LinkRenderer.new
     def renderer.gap() '<span class="my-gap">~~</span>' end
-    
+
     paginate({ :per_page => 2 }, :inner_window => 0, :outer_window => 0, :renderer => renderer) do
       assert_select 'span.my-gap', '~~'
     end
-    
+
     renderer = AdditionalLinkAttributesRenderer.new(:title => 'rendered')
     paginate({}, :renderer => renderer) do
       assert_select 'a[title=rendered]', 3
@@ -126,20 +126,20 @@ describe WillPaginate::ActionView do
     HTML
     expected.strip!.gsub!(/\s{2,}/, ' ')
     expected_dom = HTML::Document.new(expected).root
-    
+
     html_document.root.should == expected_dom
   end
-  
+
   it "should output escaped URLs" do
     paginate({:page => 1, :per_page => 1, :total_entries => 2},
              :page_links => false, :params => { :tag => '<br>' })
-    
+
     assert_select 'a[href]', 1 do |links|
       query = links.first['href'].split('?', 2)[1]
       query.split('&amp;').sort.should == %w(page=2 tag=%3Cbr%3E)
     end
   end
-  
+
   ## advanced options for pagination ##
 
   it "should be able to render without container" do
@@ -157,14 +157,14 @@ describe WillPaginate::ActionView do
   end
 
   ## other helpers ##
-  
+
   it "should render a paginated section" do
     @template = <<-ERB
       <%= paginated_section collection, options do %>
         <%= content_tag :div, '', :id => "developers" %>
       <% end %>
     ERB
-    
+
     paginate
     assert_select 'div.pagination', 2
     assert_select 'div.pagination + div#developers', 1
@@ -181,9 +181,9 @@ describe WillPaginate::ActionView do
     assert_select 'div.pagination', 0
     assert_select 'div#developers', 1
   end
-  
+
   ## parameter handling in page links ##
-  
+
   it "should preserve parameters on GET" do
     request.params :foo => { :bar => 'baz' }
     paginate
@@ -198,46 +198,46 @@ describe WillPaginate::ActionView do
     assert_no_links_match /99/
     assert_no_links_match /ftp/
   end
-  
+
   it "should not preserve parameters on POST" do
     request.post
     request.params :foo => 'bar'
     paginate
     assert_no_links_match /foo=bar/
   end
-  
+
   it "should add additional parameters to links" do
     paginate({}, :params => { :foo => 'bar' })
     assert_links_match /foo=bar/
   end
-  
+
   it "should add anchor parameter" do
     paginate({}, :params => { :anchor => 'anchor' })
     assert_links_match /#anchor$/
   end
-  
+
   it "should remove arbitrary parameters" do
     request.params :foo => 'bar'
     paginate({}, :params => { :foo => nil })
     assert_no_links_match /foo=bar/
   end
-    
+
   it "should override default route parameters" do
     paginate({}, :params => { :controller => 'baz', :action => 'list' })
     assert_links_match %r{\Wbaz/list\W}
   end
-  
+
   it "should paginate with custom page parameter" do
     paginate({ :page => 2 }, :param_name => :developers_page) do
       assert_select 'a[href]', 4 do |elements|
         validate_page_numbers [1,1,3,3], elements, :developers_page
       end
-    end    
+    end
   end
-  
+
   it "should paginate with complex custom page parameter" do
     request.params :developers => { :page => 2 }
-    
+
     paginate({ :page => 2 }, :param_name => 'developers[page]') do
       assert_select 'a[href]', 4 do |links|
         assert_links_match /\?developers\[page\]=\d+$/, links
@@ -280,18 +280,18 @@ describe WillPaginate::ActionView do
   it "should be able to guess the collection name" do
     collection = mock
     collection.expects(:total_pages).returns(1)
-    
+
     @template = '<%= will_paginate options %>'
     controller.controller_name = 'developers'
     assigns['developers'] = collection
-    
+
     paginate(nil)
   end
-  
+
   it "should fail if the inferred collection is nil" do
     @template = '<%= will_paginate options %>'
     controller.controller_name = 'developers'
-    
+
     lambda {
       paginate(nil)
     }.should raise_error(ActionView::TemplateError, /@developers/)
@@ -370,10 +370,10 @@ end
 class DummyController
   attr_reader :request
   attr_accessor :controller_name
-  
+
   include ActionController::UrlFor
   include Routes.url_helpers
-  
+
   def initialize
     @request = DummyRequest.new
   end
@@ -396,13 +396,13 @@ end
 
 class DummyRequest
   attr_accessor :symbolized_path_parameters
-  
+
   def initialize
     @get = true
     @params = {}
     @symbolized_path_parameters = { :controller => 'foo', :action => 'bar' }
   end
-  
+
   def get?
     @get
   end
@@ -414,7 +414,7 @@ class DummyRequest
   def relative_url_root
     ''
   end
-  
+
   def script_name
     ''
   end
@@ -423,7 +423,7 @@ class DummyRequest
     @params.update(more) if more
     @params
   end
-  
+
   def host_with_port
     'example.com'
   end
@@ -432,7 +432,7 @@ class DummyRequest
   def optional_port
     ''
   end
-  
+
   def protocol
     'http:'
   end
