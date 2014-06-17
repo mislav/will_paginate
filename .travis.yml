@@ -30,3 +30,7 @@ matrix:
       gemfile: Gemfile
     - rvm: 1.9.2
       gemfile: Gemfile.rails4.0
+    - rvm: 2.1.2
+      gemfile: Gemfile.rails3.0
+    - rvm: 2.1.2
+      gemfile: Gemfile.rails3.1
