@@ -370,8 +370,10 @@ describe WillPaginate::ActiveRecord do
 
       lambda {
         # with association-specified order
-        result = ignore_deprecation { dhh.projects.paginate(:page => 1) }
-        result.should == expected_name_ordered
+        result = ignore_deprecation {
+          dhh.projects.includes(:topics).paginate(:page => 1, :order => 'projects.name')
+        }
+        result.to_a.should == expected_name_ordered
         result.total_entries.should == 2
       }.should run_queries(2)
 
