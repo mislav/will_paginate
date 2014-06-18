@@ -21,6 +21,8 @@ GEM
       activesupport (= 3.0.19)
       arel (~> 2.0.10)
       tzinfo (~> 0.3.23)
+    activerecord-mysql2-adapter (0.0.3)
+      mysql2
     activesupport (3.0.19)
     arel (2.0.10)
     builder (2.1.2)
@@ -40,6 +42,7 @@ GEM
       rbx-require-relative (> 0.0.4)
     mocha (0.9.12)
     mysql (2.8.1)
+    mysql2 (0.3.16)
     pg (0.11.0)
     rack (1.2.6)
     rack-mount (0.6.14)
@@ -69,6 +72,7 @@ PLATFORMS
 DEPENDENCIES
   actionpack (~> 3.0.0)
   activerecord (~> 3.0.0)
+  activerecord-mysql2-adapter
   debugger
   mocha (~> 0.9.8)
   mysql (~> 2.8.1)
