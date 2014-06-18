@@ -191,6 +191,7 @@ describe WillPaginate::ActiveRecord do
     it "keeps :include for count when they are referenced in :conditions" do
       developers = Developer.paginate(:page => 1, :per_page => 1).includes(:projects)
       with_condition = developers.where('projects.id > 1')
+      with_condition = with_condition.references(:projects) if with_condition.respond_to?(:references)
       with_condition.total_entries.should == 1
 
       $query_sql.last.should =~ /\bJOIN\b/
@@ -304,13 +305,16 @@ describe WillPaginate::ActiveRecord do
   end
 
   it "should paginate with :include and :conditions" do
-    result = Topic.paginate \
+    klass = Topic
+    klass = klass.references(:replies) if klass.respond_to?(:references)
+
+    result = klass.paginate \
       :page     => 1, 
       :include  => :replies,  
       :conditions => "replies.content LIKE 'Bird%' ", 
       :per_page => 10
 
-    expected = Topic.find :all, 
+    expected = klass.find :all,
       :include => 'replies', 
       :conditions => "replies.content LIKE 'Bird%' ", 
       :limit   => 10
@@ -339,13 +343,19 @@ describe WillPaginate::ActiveRecord do
     it "should paginate with include" do
       project = projects(:active_record)
 
-      result = project.topics.paginate \
+      topics = project.topics
+      topics = topics.references(:replies) if topics.respond_to?(:references)
+
+      result = topics.paginate \
         :page       => 1, 
         :include    => :replies,  
         :conditions => ["replies.content LIKE ?", 'Nice%'],
         :per_page   => 10
 
-      expected = Topic.find :all, 
+      topics = Topic
+      topics = topics.references(:replies) if topics.respond_to?(:references)
+
+      expected = topics.find :all,
         :include    => 'replies', 
         :conditions => ["project_id = ? AND replies.content LIKE ?", project.id, 'Nice%'],
         :limit      => 10
