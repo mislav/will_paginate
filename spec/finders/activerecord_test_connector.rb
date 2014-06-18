@@ -69,7 +69,7 @@ module ActiverecordTestConnector
     puts "using #{configuration['adapter']} adapter"
     
     ActiveRecord::Base.configurations = { db => configuration }
-    ActiveRecord::Base.establish_connection(db)
+    ActiveRecord::Base.establish_connection(db.to_sym)
     ActiveRecord::Base.default_timezone = :utc
   end
 
