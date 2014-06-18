@@ -1,9 +1,13 @@
 require 'active_support'
+require 'stringio'
 begin
+  $stderr = StringIO.new
   require 'minitest/unit'
 rescue LoadError
   # Fails on Ruby 1.8, but it's OK since we only need MiniTest::Assertions
   # on Rails 4 which doesn't support 1.8 anyway.
+ensure
+  $stderr = STDERR
 end
 require 'action_dispatch/testing/assertions'
 require 'will_paginate/array'
