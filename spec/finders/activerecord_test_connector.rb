@@ -1,6 +1,7 @@
 require 'active_record'
 require 'active_record/fixtures'
 require 'active_support/multibyte' # needed for Ruby 1.9.1
+require 'stringio'
 
 $query_count = 0
 $query_sql = []
@@ -68,17 +69,17 @@ module ActiverecordTestConnector
     puts "using #{configuration['adapter']} adapter"
     
     ActiveRecord::Base.configurations = { db => configuration }
-    ActiveRecord::Base.establish_connection(db)
+    ActiveRecord::Base.establish_connection(db.to_sym)
     ActiveRecord::Base.default_timezone = :utc
   end
 
   def load_schema
-    silencer = ActiveRecord::Base.method(:silence)
-    silence_args = []
-    silence_args << :stdout if silencer.arity != 0
-    silencer.call(*silence_args) do
+    begin
+      $stdout = StringIO.new
       ActiveRecord::Migration.verbose = false
       load File.join(FIXTURES_PATH, 'schema.rb')
+    ensure
+      $stdout = STDOUT
     end
   end
   

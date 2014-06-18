@@ -1,8 +1,9 @@
 class Developer < User
-  has_and_belongs_to_many :projects, :include => :topics, :order => 'projects.name', :join_table => 'developers_projects'
+  has_and_belongs_to_many :projects, :order => 'projects.name', :join_table => 'developers_projects'
 
   def self.with_poor_ones(&block)
-    with_scope :find => { :conditions => ['salary <= ?', 80000], :order => 'salary' } do
+    options = { :conditions => ['salary <= ?', 80000], :order => 'salary' }
+    with_scope({ :find => options }, :overwrite) do
       yield
     end
   end
