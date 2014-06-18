@@ -100,7 +100,7 @@ class FinderTest < ActiveRecordTestCase
   end
   
   def test_paginate_with_conditions
-    entries = Topic.paginate :page => 1, :conditions => ["created_at > ?", 30.minutes.ago]
+    entries = Topic.paginate :page => 1, :conditions => ["created_at > ?", 30.minutes.ago], :order => :id
     expected = [topics(:rails), topics(:ar)]
     assert_equal expected, entries.to_a
     assert_equal 1, entries.total_pages
@@ -190,7 +190,7 @@ class FinderTest < ActiveRecordTestCase
   end
 
   def test_paginate_association_extension
-    project = Project.find(:first)
+    project = Project.find(:first, :order => :id)
     
     assert_queries(2) do
       entries = project.replies.paginate_recent :page => 1
@@ -241,7 +241,7 @@ class FinderTest < ActiveRecordTestCase
     assert_equal entries, Developer.paginate_by_salary(100000, :page => 1, :per_page => 5)
 
     # dynamic finder + conditions
-    entries = Developer.paginate_by_salary(100000, :page => 1,
+    entries = Developer.paginate_by_salary(100000, :page => 1, :order => :id,
                                            :conditions => ['id > ?', 6])
     assert_equal 4, entries.total_entries
     assert_equal (7..10).to_a, entries.map(&:id)
