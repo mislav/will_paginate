@@ -92,7 +92,7 @@ module WillPaginate
           rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
           rel.count(*args)
         else
-          super
+          super(*args)
         end
       end
 
