@@ -60,7 +60,7 @@ GEM
     minitest (5.3.4)
     mocha (0.9.12)
     mysql (2.9.1)
-    mysql2 (0.3.11)
+    mysql2 (0.3.16)
     pg (0.15.1)
     rack (1.5.2)
     rack-test (0.6.2)
@@ -95,7 +95,7 @@ DEPENDENCIES
   debugger
   mocha (~> 0.9.8)
   mysql (~> 2.9)
-  mysql2 (~> 0.3.10)
+  mysql2 (~> 0.3.13)
   pg (~> 0.11)
   rspec (~> 2.6.0)
   ruby-debug
