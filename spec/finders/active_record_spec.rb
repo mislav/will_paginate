@@ -200,6 +200,10 @@ describe WillPaginate::ActiveRecord do
     it "should count with group" do
       Developer.group(:salary).page(1).total_entries.should == 4
     end
+    
+    it "should count with select" do
+      Topic.select('title, content').page(1).total_entries.should == 4
+    end
 
     it "removes :reorder for count with group" do
       Project.group(:id).reorder(:id).page(1).total_entries
