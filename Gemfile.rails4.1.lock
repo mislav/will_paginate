@@ -1,24 +1,24 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (4.1.1)
-      actionview (= 4.1.1)
-      activesupport (= 4.1.1)
+    actionpack (4.1.2)
+      actionview (= 4.1.2)
+      activesupport (= 4.1.2)
       rack (~> 1.5.2)
       rack-test (~> 0.6.2)
-    actionview (4.1.1)
-      activesupport (= 4.1.1)
+    actionview (4.1.2)
+      activesupport (= 4.1.2)
       builder (~> 3.1)
       erubis (~> 2.7.0)
-    activemodel (4.1.1)
-      activesupport (= 4.1.1)
+    activemodel (4.1.2)
+      activesupport (= 4.1.2)
       builder (~> 3.1)
-    activerecord (4.1.1)
-      activemodel (= 4.1.1)
-      activesupport (= 4.1.1)
+    activerecord (4.1.2)
+      activemodel (= 4.1.2)
+      activesupport (= 4.1.2)
       arel (~> 5.0.0)
     activerecord-deprecated_finders (1.0.3)
-    activesupport (4.1.1)
+    activesupport (4.1.2)
       i18n (~> 0.6, >= 0.6.9)
       json (~> 1.7, >= 1.7.7)
       minitest (~> 5.1)
@@ -37,7 +37,7 @@ GEM
     erubis (2.7.0)
     i18n (0.6.9)
     json (1.8.1)
-    minitest (5.3.4)
+    minitest (5.3.5)
     mocha (0.9.12)
     mysql (2.9.1)
     mysql2 (0.3.16)
@@ -62,8 +62,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  actionpack (~> 4.1.1)
-  activerecord (~> 4.1.1)
+  actionpack (~> 4.1.2)
+  activerecord (~> 4.1.2)
   activerecord-deprecated_finders
   debugger
   mocha (~> 0.9.8)
