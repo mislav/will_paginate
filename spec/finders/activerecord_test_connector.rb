@@ -2,6 +2,7 @@ require 'active_record'
 require 'active_record/fixtures'
 require 'active_support/multibyte' # needed for Ruby 1.9.1
 require 'stringio'
+require 'erb'
 
 $query_count = 0
 $query_sql = []
@@ -60,8 +61,9 @@ module ActiverecordTestConnector
 
   def setup_connection
     db = ENV['DB'].blank?? 'sqlite3' : ENV['DB']
-    
-    configurations = YAML.load_file(File.expand_path('../../database.yml', __FILE__))
+
+    erb = ERB.new(File.read(File.expand_path('../../database.yml', __FILE__)))
+    configurations = YAML.load(erb.result)
     raise "no configuration for '#{db}'" unless configurations.key? db
     configuration = configurations[db]
     
