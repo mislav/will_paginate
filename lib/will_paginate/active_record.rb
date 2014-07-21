@@ -92,10 +92,11 @@ module WillPaginate
           rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
           
           column_name = (select_for_count(rel) || :all)
-          if rel.count(column_name).is_a? Hash
+          data_length = rel.count(column_name)
+          if data_length.is_a? Hash
             rel.length
           else
-            rel.count(column_name)
+            data_length
           end
         else
           super(*args)
