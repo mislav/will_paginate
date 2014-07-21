@@ -93,7 +93,7 @@ module WillPaginate
           
           column_name = (select_for_count(rel) || :all)
           if rel.count(column_name).is_a? Hash
-            rel.size
+            rel.length
           else
             rel.count(column_name)
           end
