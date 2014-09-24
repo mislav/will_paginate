@@ -116,7 +116,7 @@ module WillPaginate
 
       def symbolized_update(target, other)
         other.each do |key, value|
-          key = key.to_sym
+          key = key.to_s.to_sym
           existing = target[key]
           
           if value.is_a?(Hash) and (existing.is_a?(Hash) or existing.nil?)
