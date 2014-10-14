@@ -30,7 +30,7 @@ module WillPaginate
 
       def per_page(value = nil)
         if value.nil? then limit_value
-        else limit(value)
+        else limit(value.to_i)
         end
       end
 
