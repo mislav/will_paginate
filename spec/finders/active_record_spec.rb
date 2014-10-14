@@ -66,7 +66,7 @@ describe WillPaginate::ActiveRecord do
     end
     
     it "casts values to int in relations" do
-      rel = Topic.first.replies.page("1").per_page("3")
+      rel = Topic.find(1).replies.page("1").per_page("3")
       rel.current_page.should == 1
       rel.per_page.should == 3
       lambda {
