@@ -1,7 +1,7 @@
 id:
   will_paginate:
-    previous_label: "&#8592; Sebelum"
-    next_label: "Berikut &#8594;"
+    previous_label: "&#8592; Sebelumnya"
+    next_label: "Berikutnya &#8594;"
     page_gap: "&hellip;"
 
     page_entries_info:
