@@ -10,10 +10,10 @@ end
 
 module WillPaginate
   # = Paginating finders for ActiveRecord models
-  # 
+  #
   # WillPaginate adds +paginate+, +per_page+ and other methods to
   # ActiveRecord::Base class methods and associations.
-  # 
+  #
   # In short, paginating finders are equivalent to ActiveRecord finders; the
   # only difference is that we start with "paginate" instead of "find" and
   # that <tt>:page</tt> is required parameter:
@@ -90,7 +90,7 @@ module WillPaginate
           rel = self.except(*excluded)
           # TODO: hack. decide whether to keep
           rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
-          
+
           column_name = (select_for_count(rel) || :all)
           rel.count(column_name)
         else
@@ -145,7 +145,7 @@ module WillPaginate
         other.wp_count_options = @wp_count_options if defined? @wp_count_options
         other
       end
-      
+
       def select_for_count(rel)
         if rel.select_values.present?
           select = rel.select_values.join(", ")
@@ -198,7 +198,7 @@ module WillPaginate
       # +per_page+.
       #
       # Example:
-      # 
+      #
       #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
       #                          :page => params[:page], :per_page => 3
       #
@@ -206,7 +206,7 @@ module WillPaginate
       # supply <tt>:total_entries</tt>. If you experience problems with this
       # generated SQL, you might want to perform the count manually in your
       # application.
-      # 
+      #
       def paginate_by_sql(sql, options)
         pagenum  = options.fetch(:page) { raise ArgumentError, ":page parameter required" } || 1
         per_page = options[:per_page] || self.per_page
@@ -222,8 +222,7 @@ module WillPaginate
             query = <<-SQL
               SELECT * FROM (
                 SELECT rownum rnum, a.* FROM (#{query}) a
-                WHERE rownum <= #{pager.offset + pager.per_page}
-              ) WHERE rnum >= #{pager.offset}
+              ) WHERE rnum >= #{pager.offset} AND rnum <= #{pager.offset + pager.per_page}
             SQL
           else
             query << " LIMIT #{pager.per_page} OFFSET #{pager.offset}"
