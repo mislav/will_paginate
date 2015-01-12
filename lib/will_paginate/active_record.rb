@@ -129,6 +129,18 @@ module WillPaginate
         end
       end
 
+      def pluck(*column_names)
+        results = super(*column_names)
+        if current_page.nil?
+          results
+        else
+          ::WillPaginate::Collection.create(current_page, limit_value) do |col|
+            col.replace results
+            col.total_entries ||= total_entries
+          end
+        end
+      end
+
       private
 
       def copy_will_paginate_data(other)

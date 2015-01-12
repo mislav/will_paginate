@@ -21,7 +21,15 @@ describe WillPaginate::ActiveRecord do
       users.length.should == 5
     }.should run_queries(2)
   end
-  
+
+  it "should paginate with pluck" do
+    lambda {
+      users = User.paginate(:page => 1, :per_page => 5).pluck(:id)
+      users.length.should == 5
+      users.per_page.should == 5
+    }.should run_queries(2)
+  end
+
   it "should fail when encountering unknown params" do
     lambda {
       User.paginate :foo => 'bar', :page => 1, :per_page => 4
