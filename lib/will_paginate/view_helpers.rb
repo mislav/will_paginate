@@ -30,7 +30,10 @@ module WillPaginate
       :param_name     => :page,
       :params         => nil,
       :page_links     => true,
-      :container      => true
+      :container      => true,
+      :previous_class => 'previous_page',
+      :next_class     => 'next_page',
+      :current_class  => 'current'
 
     label_deprecation = Proc.new { |key, value|
       "set the 'will_paginate.#{key}' key in your i18n locale instead of editing pagination_options" if defined? Rails
