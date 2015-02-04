@@ -300,19 +300,19 @@ describe WillPaginate::ActionView do
 
   describe '#pagination_link_tags' do
     let(:helper) {
-      helper = Object.new
-      class << helper
-        include ActionDispatch::Routing::UrlFor
+      helper = Class.new {
+        attr_reader :controller
+        include ActionView::Helpers::UrlHelper
         include Routes.url_helpers
         include WillPaginate::ActionView
-      end
-      helper.default_url_options[:host] = 'example.com'
+      }.new
       helper.default_url_options[:controller] = 'dummy'
-      helper}
+      helper.default_url_options[:host] = 'example.com'
+      helper }
     let(:collection) { (1..30).to_a }
-    let(:page_one) { collection.paginate(page: 1, per_page: 10)}
-    let(:page_two) { collection.paginate(page: 2, per_page: 10)}
-    let(:page_three) { collection.paginate(page: 3, per_page: 10)}
+    let(:page_one) { collection.paginate(:page => 1, :per_page => 10)}
+    let(:page_two) { collection.paginate(:page => 2, :per_page =>10)}
+    let(:page_three) { collection.paginate(:page => 3, :per_page => 10)}
 
     context 'the first page' do
       subject { helper.pagination_link_tags page_one }
