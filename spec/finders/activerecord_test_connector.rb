@@ -1,6 +1,8 @@
 require 'active_record'
 require 'active_record/fixtures'
 require 'active_support/multibyte' # needed for Ruby 1.9.1
+require 'stringio'
+require 'erb'
 
 $query_count = 0
 $query_sql = []
@@ -9,7 +11,7 @@ ignore_sql = /
     ^(
       PRAGMA | SHOW\ max_identifier_length |
       SELECT\ (currval|CAST|@@IDENTITY|@@ROWCOUNT) |
-      SHOW\ (FIELDS|TABLES)
+      SHOW\ ((FULL\ )?FIELDS|TABLES)
     )\b |
     \bFROM\ (sqlite_master|pg_tables|pg_attribute)\b
   /x
@@ -59,8 +61,9 @@ module ActiverecordTestConnector
 
   def setup_connection
     db = ENV['DB'].blank?? 'sqlite3' : ENV['DB']
-    
-    configurations = YAML.load_file(File.expand_path('../../database.yml', __FILE__))
+
+    erb = ERB.new(File.read(File.expand_path('../../database.yml', __FILE__)))
+    configurations = YAML.load(erb.result)
     raise "no configuration for '#{db}'" unless configurations.key? db
     configuration = configurations[db]
     
@@ -68,17 +71,17 @@ module ActiverecordTestConnector
     puts "using #{configuration['adapter']} adapter"
     
     ActiveRecord::Base.configurations = { db => configuration }
-    ActiveRecord::Base.establish_connection(db)
+    ActiveRecord::Base.establish_connection(db.to_sym)
     ActiveRecord::Base.default_timezone = :utc
   end
 
   def load_schema
-    silencer = ActiveRecord::Base.method(:silence)
-    silence_args = []
-    silence_args << :stdout if silencer.arity != 0
-    silencer.call(*silence_args) do
+    begin
+      $stdout = StringIO.new
       ActiveRecord::Migration.verbose = false
       load File.join(FIXTURES_PATH, 'schema.rb')
+    ensure
+      $stdout = STDOUT
     end
   end
   

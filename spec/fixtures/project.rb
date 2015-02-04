@@ -7,9 +7,7 @@ class Project < ActiveRecord::Base
   
   has_many :replies, :through => :topics do
     def only_recent(params = {})
-      scoped.where(['replies.created_at > ?', 15.minutes.ago])
+      where(['replies.created_at > ?', 15.minutes.ago])
     end
   end
-
-  has_many :unique_replies, :through => :topics, :source => :replies, :uniq => true
 end

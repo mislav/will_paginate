@@ -8,15 +8,18 @@ mysql:
   database: will_paginate
   username: 
   encoding: utf8
+  socket: <%= ENV["BOXEN_MYSQL_SOCKET"] %>
 
 mysql2:
   adapter: mysql2
   database: will_paginate
   username: 
   encoding: utf8
+  socket: <%= ENV["BOXEN_MYSQL_SOCKET"] %>
 
 postgres:
   adapter: postgresql
   database: will_paginate
-  username: postgres
+  username: <%= "postgres" if ENV["TRAVIS"] %>
   min_messages: warning
+  port: <%= ENV["BOXEN_POSTGRESQL_PORT"] %>

@@ -1,9 +1,10 @@
 source 'https://rubygems.org'
 
-rails_version = '~> 4.0.0'
+rails_version = '~> 4.1.2'
 
 gem 'activerecord', rails_version
 gem 'actionpack',   rails_version
+gem 'activerecord-deprecated_finders'
 
 gem 'rspec', '~> 2.6.0'
 gem 'mocha', '~> 0.9.8'
@@ -17,6 +18,5 @@ end
 gem 'pg', '~> 0.11', :group => :pg
 
 group :development do
-  gem 'ruby-debug', :platforms => :mri_18
   gem 'debugger', :platforms => :mri_19
 end

@@ -191,6 +191,7 @@ describe WillPaginate::ActiveRecord do
     it "keeps :include for count when they are referenced in :conditions" do
       developers = Developer.paginate(:page => 1, :per_page => 1).includes(:projects)
       with_condition = developers.where('projects.id > 1')
+      with_condition = with_condition.references(:projects) if with_condition.respond_to?(:references)
       with_condition.total_entries.should == 1
 
       $query_sql.last.should =~ /\bJOIN\b/
@@ -198,6 +199,10 @@ describe WillPaginate::ActiveRecord do
 
     it "should count with group" do
       Developer.group(:salary).page(1).total_entries.should == 4
+    end
+    
+    it "should count with select" do
+      Topic.select('title, content').page(1).total_entries.should == 4
     end
 
     it "removes :reorder for count with group" do
@@ -304,13 +309,16 @@ describe WillPaginate::ActiveRecord do
   end
 
   it "should paginate with :include and :conditions" do
-    result = Topic.paginate \
+    klass = Topic
+    klass = klass.references(:replies) if klass.respond_to?(:references)
+
+    result = klass.paginate \
       :page     => 1, 
       :include  => :replies,  
       :conditions => "replies.content LIKE 'Bird%' ", 
       :per_page => 10
 
-    expected = Topic.find :all, 
+    expected = klass.find :all,
       :include => 'replies', 
       :conditions => "replies.content LIKE 'Bird%' ", 
       :limit   => 10
@@ -339,13 +347,19 @@ describe WillPaginate::ActiveRecord do
     it "should paginate with include" do
       project = projects(:active_record)
 
-      result = project.topics.paginate \
+      topics = project.topics
+      topics = topics.references(:replies) if topics.respond_to?(:references)
+
+      result = topics.paginate \
         :page       => 1, 
         :include    => :replies,  
         :conditions => ["replies.content LIKE ?", 'Nice%'],
         :per_page   => 10
 
-      expected = Topic.find :all, 
+      topics = Topic
+      topics = topics.references(:replies) if topics.respond_to?(:references)
+
+      expected = topics.find :all,
         :include    => 'replies', 
         :conditions => ["project_id = ? AND replies.content LIKE ?", project.id, 'Nice%'],
         :limit      => 10
@@ -360,8 +374,10 @@ describe WillPaginate::ActiveRecord do
 
       lambda {
         # with association-specified order
-        result = ignore_deprecation { dhh.projects.paginate(:page => 1) }
-        result.should == expected_name_ordered
+        result = ignore_deprecation {
+          dhh.projects.includes(:topics).paginate(:page => 1, :order => 'projects.name')
+        }
+        result.to_a.should == expected_name_ordered
         result.total_entries.should == 2
       }.should run_queries(2)
 
@@ -498,64 +514,4 @@ describe WillPaginate::ActiveRecord do
       Project.page(307445734561825862)
     }.should raise_error(WillPaginate::InvalidPage, "invalid offset: 9223372036854775830")
   end
-  
-  protected
-  
-    def ignore_deprecation
-      ActiveSupport::Deprecation.silence { yield }
-    end
-
-    def run_queries(num)
-      QueryCountMatcher.new(num)
-    end
-
-    def show_queries(&block)
-      counter = QueryCountMatcher.new(nil)
-      counter.run block
-    ensure
-      queries = counter.performed_queries
-      if queries.any?
-        puts queries
-      else
-        puts "no queries"
-      end
-    end
-
-end
-
-class QueryCountMatcher
-  def initialize(num)
-    @expected_count = num
-  end
-
-  def matches?(block)
-    run(block)
-
-    if @expected_count.respond_to? :include?
-      @expected_count.include? @count
-    else
-      @count == @expected_count
-    end
-  end
-
-  def run(block)
-    $query_count = 0
-    $query_sql = []
-    block.call
-  ensure
-    @queries = $query_sql.dup
-    @count = $query_count
-  end
-
-  def performed_queries
-    @queries
-  end
-
-  def failure_message
-    "expected #{@expected_count} queries, got #{@count}\n#{@queries.join("\n")}"
-  end
-
-  def negative_failure_message
-    "expected query count not to be #{@expected_count}"
-  end
-end
+ end

@@ -2,6 +2,11 @@ require 'will_paginate/per_page'
 require 'will_paginate/page_number'
 require 'will_paginate/collection'
 require 'active_record'
+begin
+  require 'active_record/deprecated_finders'
+rescue LoadError
+  # only for Rails 4.1
+end
 
 module WillPaginate
   # = Paginating finders for ActiveRecord models
@@ -78,16 +83,18 @@ module WillPaginate
         end
       end
 
-      def count
+      def count(*args)
         if limit_value
           excluded = [:order, :limit, :offset, :reorder]
           excluded << :includes unless eager_loading?
           rel = self.except(*excluded)
           # TODO: hack. decide whether to keep
           rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
-          rel.count
+          
+          column_name = (select_for_count(rel) || :all)
+          rel.count(column_name)
         else
-          super
+          super(*args)
         end
       end
 
@@ -137,6 +144,13 @@ module WillPaginate
         other.total_entries = nil if defined? @total_entries_queried
         other.wp_count_options = @wp_count_options if defined? @wp_count_options
         other
+      end
+      
+      def select_for_count(rel)
+        if rel.select_values.present?
+          select = rel.select_values.join(", ")
+          select if select !~ /[,*]/
+        end
       end
     end
 

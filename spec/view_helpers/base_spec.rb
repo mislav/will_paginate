@@ -32,6 +32,18 @@ describe WillPaginate::ViewHelpers do
       collection = mock 'Collection', :total_pages => 1
       will_paginate(collection).should be_nil
     end
+
+    it "should call html_safe on result" do
+      collection = WillPaginate::Collection.new(1, 2, 4)
+
+      html = mock 'HTML'
+      html.expects(:html_safe).returns(html)
+      renderer = mock 'Renderer'
+      renderer.stubs(:prepare)
+      renderer.expects(:to_html).returns(html)
+
+      will_paginate(collection, :renderer => renderer).should eql(html)
+    end
   end
 
   describe "pagination_options" do
