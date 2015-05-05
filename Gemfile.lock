@@ -1,3 +1,8 @@
+PATH
+  remote: .
+  specs:
+    will_paginate (3.0.4)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -24,33 +29,29 @@ GEM
       tzinfo (~> 0.3.37)
     arel (4.0.2)
     builder (3.1.4)
-    columnize (0.3.5)
-    debugger (1.2.2)
-      columnize (>= 0.3.1)
-      debugger-linecache (~> 1.1.1)
-      debugger-ruby_core_source (~> 1.1.5)
-    debugger-linecache (1.1.2)
-      debugger-ruby_core_source (>= 1.1.1)
-    debugger-ruby_core_source (1.1.5)
+    bump (0.5.2)
     diff-lcs (1.1.3)
     erubis (2.7.0)
     i18n (0.6.9)
-    linecache (0.46)
-      rbx-require-relative (> 0.0.4)
+    mini_portile (0.6.2)
     minitest (4.7.5)
     mocha (0.9.12)
     multi_json (1.10.1)
     mysql (2.9.0)
     mysql2 (0.3.11)
+    nokogiri (1.6.6.2.1)
+      mini_portile (~> 0.6.0)
     pg (0.12.0)
       rake-compiler (~> 0.7)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
+    rails-dom-testing (1.0.0)
+      activesupport
+      nokogiri (~> 1.6.0)
     rake (0.9.2.2)
     rake-compiler (0.7.9)
       rake
-    rbx-require-relative (0.0.5)
     rspec (2.6.0)
       rspec-core (~> 2.6.0)
       rspec-expectations (~> 2.6.0)
@@ -59,14 +60,10 @@ GEM
     rspec-expectations (2.6.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.6.0)
-    ruby-debug (0.10.4)
-      columnize (>= 0.1)
-      ruby-debug-base (~> 0.10.4.0)
-    ruby-debug-base (0.10.4)
-      linecache (>= 0.3)
     sqlite3 (1.3.6)
     thread_safe (0.3.4)
     tzinfo (0.3.39)
+    wwtd (0.9.1)
 
 PLATFORMS
   ruby
@@ -74,11 +71,13 @@ PLATFORMS
 DEPENDENCIES
   actionpack (~> 4.0.0)
   activerecord (~> 4.0.0)
-  debugger
+  bump
   mocha (~> 0.9.8)
   mysql (~> 2.9)
   mysql2 (~> 0.3.10)
   pg (~> 0.11)
+  rails-dom-testing
   rspec (~> 2.6.0)
-  ruby-debug
   sqlite3 (~> 1.3.6)
+  will_paginate!
+  wwtd

@@ -1,0 +1,8 @@
+source 'https://rubygems.org'
+
+gemspec path: '../'
+
+gem 'activerecord-deprecated_finders'
+gem 'arel', github: 'rails/arel', branch: 'master'
+gem 'activerecord', :github => 'rails/rails', :branch => 'master'
+gem 'actionpack',   :github => 'rails/rails', :branch => 'master'
