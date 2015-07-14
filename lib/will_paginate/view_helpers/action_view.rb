@@ -89,7 +89,7 @@ module WillPaginate
     protected
 
     def infer_collection_from_controller
-      collection_name = "@#{controller.controller_name}"
+      collection_name = "@#{controller.class.name.gsub(/Controller$/, '').underscore.tr('/', '_')}"
       collection = instance_variable_get(collection_name)
       raise ArgumentError, "The #{collection_name} variable appears to be empty. Did you " +
         "forget to pass the collection object for will_paginate?" if collection.nil?
