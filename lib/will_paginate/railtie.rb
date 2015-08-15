@@ -32,7 +32,7 @@ module WillPaginate
     end
 
     def self.add_locale_path(config)
-      config.i18n.railties_load_path.unshift(*WillPaginate::I18n.load_path)
+      config.i18n.load_path.unshift(*WillPaginate::I18n.load_path)
     end
 
     # Extending the exception handler middleware so it properly detects
