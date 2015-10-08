@@ -71,6 +71,13 @@ describe WillPaginate::Collection do
     end
   end
 
+  describe "num_page is zero" do
+    it "should have total_pages 1 when num_page is zero" do
+      collection = create(1,0,1)
+      collection.total_pages.should == 1
+    end
+  end
+
   describe "out of bounds" do
     it "is out of bounds when page number is too high" do
       create(2, 3, 2).should be_out_of_bounds
