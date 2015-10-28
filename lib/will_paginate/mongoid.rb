@@ -41,6 +41,26 @@ module WillPaginate
       end
     end
 
+
+
+    module DocumentMethods
+      extend ActiveSupport::Concern
+
+      included do 
+        class << self
+          def paginate(options = {})
+            scoped.paginate(options)
+          end
+
+
+          def page(page)
+            scoped.page(page)
+          end
+        end
+      end
+    end
+
     ::Mongoid::Criteria.send(:include, CriteriaMethods)
+    ::Mongoid::Document.send(:include, DocumentMethods)
   end
 end
