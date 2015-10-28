@@ -9,18 +9,16 @@ rescue LoadError
 ensure
   $stderr = STDERR
 end
-require 'action_dispatch/testing/assertions'
+require 'rails-dom-testing'
 require 'will_paginate/array'
 
 module ViewExampleGroup
-  
-  include ActionDispatch::Assertions::SelectorAssertions
   include MiniTest::Assertions if defined? MiniTest
 
   def assert(value, message)
     raise message unless value
   end
-  
+
   def paginate(collection = {}, options = {}, &block)
     if collection.instance_of? Hash
       page_options = { :page => 1, :total_entries => 11, :per_page => 4 }.merge(collection)
@@ -31,26 +29,26 @@ module ViewExampleGroup
 
     @render_output = render(locals)
     @html_document = nil
-    
+
     if block_given?
       classname = options[:class] || WillPaginate::ViewHelpers.pagination_options[:class]
       assert_select("div.#{classname}", 1, 'no main DIV', &block)
     end
-    
+
     @render_output
   end
-  
+
   def html_document
     @html_document ||= HTML::Document.new(@render_output, true, false)
   end
-  
+
   def response_from_page_or_rjs
     html_document.root
   end
-  
+
   def validate_page_numbers(expected, links, param_name = :page)
     param_pattern = /\W#{Regexp.escape(param_name.to_s)}=([^&]*)/
-    
+
     links.map { |el|
       unescape_href(el) =~ param_pattern
       $1 ? $1.to_i : $1
@@ -63,7 +61,7 @@ module ViewExampleGroup
     end
 
     pages = [] if numbers
-    
+
     links.each do |el|
       href = unescape_href(el)
       href.should =~ pattern
@@ -87,7 +85,7 @@ module ViewExampleGroup
   def unescape_href(el)
     CGI.unescape CGI.unescapeHTML(el['href'])
   end
-  
+
   def build_message(message, pattern, *args)
     built_message = pattern.dup
     for value in args
@@ -95,7 +93,7 @@ module ViewExampleGroup
     end
     built_message
   end
-  
+
 end
 
 RSpec.configure do |config|
@@ -110,7 +108,7 @@ module HTML
       children.map(&:inner_text).join('')
     end
   end
-  
+
   Text.class_eval do
     def inner_text
       self.to_s

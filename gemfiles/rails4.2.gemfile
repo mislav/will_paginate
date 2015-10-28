@@ -1,0 +1,8 @@
+source 'http://rubygems.org'
+
+gemspec path: '../'
+
+rails_version = '~> 4.2.1'
+
+gem 'activerecord', rails_version
+gem 'actionpack',   rails_version
