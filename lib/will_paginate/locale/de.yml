@@ -1,0 +1,27 @@
+de:
+  will_paginate:
+    previous_label: "&#8592; zur&uuml;ck"
+    next_label: "weiter &#8594;"
+    page_gap: "&hellip;"
+
+    page_entries_info:
+      single_page:
+        zero:  "Keine %{model} gefunden"
+        one:   "Zeige 1 %{model}"
+        other: "Zeige alle %{count} %{model}"
+      single_page_html:
+        zero:  "Keine %{model} gefunden"
+        one:   "Zeige <b>1</b> %{model}"
+        other: "Zeige <b>alle&nbsp;%{count}</b> %{model}"
+
+      multi_page: "Zeige %{from} - %{to} von insgesamt %{count} %{model}"
+      multi_page_html: "Zeige <b>%{from}&nbsp;-&nbsp;%{to}</b> von insgesamt <b>%{count}</b> %{model}"
+
+    # models:
+    #    entry:
+    #      zero: 'Eintr&auml;ge'
+    #      one: 'Eintrag'
+    #      few: 'Eintr&auml;ge'
+    #      other: 'Eintr&auml;ge'
+
+    # for more information see https://github.com/mislav/will_paginate/wiki/I18n
