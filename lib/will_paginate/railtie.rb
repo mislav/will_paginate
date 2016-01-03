@@ -39,7 +39,10 @@ module WillPaginate
     # WillPaginate::InvalidPage regardless of it being a tag module.
     module ShowExceptionsPatch
       extend ActiveSupport::Concern
-      included { alias_method_chain :status_code, :paginate }
+      included do
+        alias_method :status_code_without_paginate, :status_code
+        alias_method :status_code, :status_code_with_paginate
+      end
       def status_code_with_paginate(exception = @exception)
         if exception.is_a?(WillPaginate::InvalidPage) or
             (exception.respond_to?(:original_exception) &&
