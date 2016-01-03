@@ -2,11 +2,6 @@ require 'will_paginate/per_page'
 require 'will_paginate/page_number'
 require 'will_paginate/collection'
 require 'active_record'
-begin
-  require 'active_record/deprecated_finders'
-rescue LoadError
-  # only for Rails 4.1
-end
 
 module WillPaginate
   # = Paginating finders for ActiveRecord models
@@ -26,7 +21,7 @@ module WillPaginate
       include WillPaginate::CollectionMethods
 
       attr_accessor :current_page
-      attr_writer :total_entries, :wp_count_options
+      attr_writer :total_entries
 
       def per_page(value = nil)
         if value.nil? then limit_value
@@ -88,9 +83,6 @@ module WillPaginate
           excluded = [:order, :limit, :offset, :reorder]
           excluded << :includes unless eager_loading?
           rel = self.except(*excluded)
-          # TODO: hack. decide whether to keep
-          rel = rel.apply_finder_options(@wp_count_options) if defined? @wp_count_options
-          
           column_name = (select_for_count(rel) || :all)
           rel.count(column_name)
         else
@@ -142,7 +134,6 @@ module WillPaginate
       def copy_will_paginate_data(other)
         other.current_page = current_page unless other.current_page
         other.total_entries = nil if defined? @total_entries_queried
-        other.wp_count_options = @wp_count_options if defined? @wp_count_options
         other
       end
       
@@ -158,15 +149,15 @@ module WillPaginate
       def paginate(options)
         options  = options.dup
         pagenum  = options.fetch(:page) { raise ArgumentError, ":page parameter required" }
+        options.delete(:page)
         per_page = options.delete(:per_page) || self.per_page
         total    = options.delete(:total_entries)
 
-        count_options = options.delete(:count)
-        options.delete(:page)
+        if options.any?
+          raise ArgumentError, "unsupported parameters: %p" % options.keys
+        end
 
         rel = limit(per_page.to_i).page(pagenum)
-        rel = rel.apply_finder_options(options) if options.any?
-        rel.wp_count_options = count_options    if count_options
         rel.total_entries = total.to_i          unless total.blank?
         rel
       end

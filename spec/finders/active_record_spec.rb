@@ -104,13 +104,6 @@ describe WillPaginate::ActiveRecord do
       rel.last(2).should == users(:dev_7, :dev_8)
       rel.page(3).last.should == users(:poor_jamis)
     end
-
-    it "keeps pagination data after 'scoped'" do
-      rel = Developer.page(2).scoped
-      rel.per_page.should == 10
-      rel.offset.should == 10
-      rel.current_page.should == 2
-    end
   end
 
   describe "counting" do
@@ -134,15 +127,6 @@ describe WillPaginate::ActiveRecord do
         topics.total_entries.should == 4
         topics.where('1 = 1').total_entries.should == 4
       }.should run_queries(2)
-    end
-
-    it "remembers custom count options in sub-relations" do
-      topics = Topic.paginate :page => 1, :per_page => 3, :count => {:conditions => "title LIKE '%futurama%'"}
-      topics.total_entries.should == 1
-      topics.length.should == 3
-      lambda {
-        topics.order('id').total_entries.should == 1
-      }.should run_queries(1)
     end
 
     it "supports empty? method" do
@@ -250,10 +234,11 @@ describe WillPaginate::ActiveRecord do
     end
 
     it "should strip the order when counting" do
+      expected = topics(:ar)
       lambda {
         sql = "select id, title, content from topics order by topics.title"
         topics = Topic.paginate_by_sql sql, :page => 1, :per_page => 2
-        topics.first.should == topics(:ar)
+        topics.first.should == expected
       }.should run_queries(2)
 
       $query_sql.last.should include('COUNT')
@@ -295,78 +280,7 @@ describe WillPaginate::ActiveRecord do
     }.should run_queries(2)
   end
   
-  it "should paginate with :order" do
-    result = Topic.paginate :page => 1, :order => 'created_at DESC'
-    result.should == topics(:futurama, :harvey_birdman, :rails, :ar).reverse
-    result.total_pages.should == 1
-  end
-  
-  it "should paginate with :conditions" do
-    result = Topic.paginate :page => 1, :order => 'id ASC',
-      :conditions => ["created_at > ?", 30.minutes.ago]
-    result.should == topics(:rails, :ar)
-    result.total_pages.should == 1
-  end
-
-  it "should paginate with :include and :conditions" do
-    klass = Topic
-    klass = klass.references(:replies) if klass.respond_to?(:references)
-
-    result = klass.paginate \
-      :page     => 1, 
-      :include  => :replies,  
-      :conditions => "replies.content LIKE 'Bird%' ", 
-      :per_page => 10
-
-    expected = klass.find :all,
-      :include => 'replies', 
-      :conditions => "replies.content LIKE 'Bird%' ", 
-      :limit   => 10
-
-    result.should == expected
-    result.total_entries.should == 1
-  end
-
-  it "should paginate with :include and :order" do
-    result = nil
-    lambda {
-      result = Topic.paginate(:page => 1, :include => :replies, :per_page => 10,
-        :order => 'replies.created_at asc, topics.created_at asc').to_a
-    }.should run_queries(2)
-
-    expected = Topic.find :all, 
-      :include => 'replies', 
-      :order   => 'replies.created_at asc, topics.created_at asc', 
-      :limit   => 10
-
-    result.should == expected
-    result.total_entries.should == 4
-  end
-  
   describe "associations" do
-    it "should paginate with include" do
-      project = projects(:active_record)
-
-      topics = project.topics
-      topics = topics.references(:replies) if topics.respond_to?(:references)
-
-      result = topics.paginate \
-        :page       => 1, 
-        :include    => :replies,  
-        :conditions => ["replies.content LIKE ?", 'Nice%'],
-        :per_page   => 10
-
-      topics = Topic
-      topics = topics.references(:replies) if topics.respond_to?(:references)
-
-      expected = topics.find :all,
-        :include    => 'replies', 
-        :conditions => ["project_id = ? AND replies.content LIKE ?", project.id, 'Nice%'],
-        :limit      => 10
-
-      result.should == expected
-    end
-
     it "should paginate" do
       dhh = users(:david)
       expected_name_ordered = projects(:action_controller, :active_record)
@@ -375,7 +289,7 @@ describe WillPaginate::ActiveRecord do
       lambda {
         # with association-specified order
         result = ignore_deprecation {
-          dhh.projects.includes(:topics).paginate(:page => 1, :order => 'projects.name')
+          dhh.projects.includes(:topics).order('projects.name').paginate(:page => 1)
         }
         result.to_a.should == expected_name_ordered
         result.total_entries.should == 2
@@ -387,7 +301,7 @@ describe WillPaginate::ActiveRecord do
       result.total_entries.should == 2
 
       lambda {
-        dhh.projects.find(:all, :order => 'projects.id', :limit => 4)
+        dhh.projects.order('projects.id').limit(4).all
       }.should_not raise_error
       
       result = dhh.projects.paginate(:page => 1, :per_page => 4).reorder('projects.id')
@@ -417,7 +331,7 @@ describe WillPaginate::ActiveRecord do
     join_sql = 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id'
 
     lambda {
-      result = Developer.paginate(:page => 1, :joins => join_sql, :conditions => 'project_id = 1')
+      result = Developer.where('developers_projects.project_id = 1').joins(join_sql).paginate(:page => 1)
       result.to_a # trigger loading of records
       result.size.should == 2
       developer_names = result.map(&:name)
@@ -427,8 +341,7 @@ describe WillPaginate::ActiveRecord do
 
     lambda {
       expected = result.to_a
-      result = Developer.paginate(:page => 1, :joins => join_sql,
-        :conditions => 'project_id = 1', :count => { :select => "users.id" }).to_a
+      result = Developer.where('developers_projects.project_id = 1').joins(join_sql).paginate(:page => 1)
       result.should == expected
       result.total_entries.should == 2
     }.should run_queries(1)
@@ -437,8 +350,8 @@ describe WillPaginate::ActiveRecord do
   it "should paginate with group" do
     result = nil
     lambda {
-      result = Developer.paginate(:page => 1, :per_page => 10,
-        :group => 'salary', :select => 'salary', :order => 'salary').to_a
+      result = Developer.select('salary').order('salary').group('salary').
+        paginate(:page => 1, :per_page => 10).to_a
     }.should run_queries(1)
 
     expected = users(:david, :jamis, :dev_10, :poor_jamis).map(&:salary).sort
@@ -449,12 +362,6 @@ describe WillPaginate::ActiveRecord do
     lambda {
       Developer.paginate_by_salary(100000, :page => 1, :per_page => 5)
     }.should raise_error(NoMethodError)
-  end
-
-  it "should paginate with_scope" do
-    result = Developer.with_poor_ones { Developer.paginate :page => 1 }
-    result.size.should == 2
-    result.total_entries.should == 2
   end
 
   describe "scopes" do
@@ -496,12 +403,6 @@ describe WillPaginate::ActiveRecord do
     end
   end
 
-  it "should paginate with :readonly option" do
-    lambda {
-      Developer.paginate :readonly => true, :page => 1
-    }.should_not raise_error
-  end
-  
   it "should not paginate an array of IDs" do
     lambda {
       Developer.paginate((1..8).to_a, :per_page => 3, :page => 2, :order => 'id')
