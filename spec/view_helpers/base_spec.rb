@@ -10,6 +10,7 @@ describe WillPaginate::ViewHelpers do
   before(:all) do
     # make sure default translations aren't loaded
     I18n.load_path.clear
+    I18n.enforce_available_locales = false
   end
 
   before(:each) do
