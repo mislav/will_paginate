@@ -5,8 +5,7 @@ status=0
 
 export PATH="${PWD}/bin:$PATH"
 
-rails_version="$(bundle show actionpack)"
-rails_version="${rails_version##*-}"
+rails_version="$(ruby -rubygems -e 'require "bundler"; puts Bundler.load.specs.find {|s| s.name == "activerecord" }.version')"
 
 for db in sqlite3 mysql mysql2 postgres; do
   [[ "$rails_version" = 3.0 && $db = "mysql2" ]] && continue
