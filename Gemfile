@@ -9,6 +9,12 @@ gem 'rspec', '~> 2.6.0'
 gem 'mocha', '~> 0.9.8'
 
 gem 'sqlite3', '~> 1.3.6'
+gem 'sequel', '~> 3.8'
+gem 'dm-core'
+gem 'dm-aggregates'
+gem 'dm-migrations'
+gem 'dm-sqlite-adapter'
+gem 'mongoid'
 
 group :mysql do
   gem 'mysql', '~> 2.9'
