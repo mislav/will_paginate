@@ -9,7 +9,7 @@ $query_sql = []
 
 ignore_sql = /
     ^(
-      PRAGMA | SHOW\ max_identifier_length |
+      PRAGMA | SHOW\ (max_identifier_length|search_path) |
       SELECT\ (currval|CAST|@@IDENTITY|@@ROWCOUNT) |
       SHOW\ ((FULL\ )?FIELDS|TABLES)
     )\b |
