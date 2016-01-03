@@ -2,3 +2,6 @@
 doc
 *.gem
 coverage
+/bin
+vendor/bundle
+tags
