@@ -1,5 +1,5 @@
 class Developer < User
-  has_and_belongs_to_many :projects, :order => 'projects.name', :join_table => 'developers_projects'
+  has_and_belongs_to_many :projects, :join_table => 'developers_projects'
 
   def self.with_poor_ones(&block)
     options = { :conditions => ['salary <= ?', 80000], :order => 'salary' }

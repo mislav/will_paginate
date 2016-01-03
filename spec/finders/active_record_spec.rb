@@ -387,7 +387,7 @@ describe WillPaginate::ActiveRecord do
       result.total_entries.should == 2
 
       lambda {
-        dhh.projects.find(:all, :order => 'projects.id', :limit => 4)
+        dhh.projects.order('projects.id').limit(4).to_a
       }.should_not raise_error
       
       result = dhh.projects.paginate(:page => 1, :per_page => 4).reorder('projects.id')
