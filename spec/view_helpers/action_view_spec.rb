@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'spec_helper'
 require 'active_support/rescuable' # needed for Ruby 1.9.1
 require 'action_controller'
