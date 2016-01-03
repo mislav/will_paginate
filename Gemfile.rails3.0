@@ -4,6 +4,7 @@ rails_version = '~> 3.0.0'
 
 gem 'activerecord',   rails_version
 gem 'actionpack',     rails_version
+gem 'i18n',           '< 0.7'
 
 gem 'rspec', '~> 2.6.0'
 gem 'mocha', '~> 0.9.8'
@@ -14,7 +15,7 @@ group :mysql do
   gem 'mysql', '~> 2.9.1'
   gem 'activerecord-mysql2-adapter'
 end
-gem 'pg', '~> 0.11', :group => :pg
+gem 'pg', '< 0.18', :group => :pg
 
 group :development do
   gem 'ruby-debug', :platforms => :mri_18

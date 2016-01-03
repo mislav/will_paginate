@@ -5,14 +5,18 @@ status=0
 
 export PATH="${PWD}/bin:$PATH"
 
+rails_version="$(bundle show actionpack)"
+rails_version="${rails_version##*-}"
+
 for db in sqlite3 mysql mysql2 postgres; do
-  if ! [[ $db = "mysql2" && $BUNDLE_GEMFILE =~ "rails3.0" ]]; then
-    printf "\e[1;33m[DB] ${db}\e[m\n"
-    spec_files="spec"
-    [[ $db != "sqlite3" ]] && spec_files="spec/finders/active_record_spec.rb"
-    echo "rspec $spec_files"
-    DB=$db rspec -r fake_rubygems $spec_files || status="$?"
-  fi
+  [[ "$rails_version" = 3.0 && $db = "mysql2" ]] && continue
+  [[ "$rails_version" > 5.0 && $db = "mysql" ]] && continue
+
+  printf "\e[1;33m[DB] %s\e[m\n" "$db"
+  spec_files="spec"
+  [[ $db != "sqlite3" ]] && spec_files="spec/finders/active_record_spec.rb"
+  echo "rspec $spec_files"
+  DB="$db" rspec -r fake_rubygems "$spec_files" || status="$?"
 done
 
 exit $status
