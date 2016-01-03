@@ -1,3 +1,4 @@
+sudo: false
 bundler_args: "--standalone --binstubs --without development"
 script: script/test_all
 services: mongodb
