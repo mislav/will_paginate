@@ -119,7 +119,8 @@ describe WillPaginate::Mongoid do
         end
 
         it "should be casted to PageNumber" do
-          criteria.paginate(:page => 1).current_page.should be_instance_of(WillPaginate::PageNumber)
+          page = criteria.paginate(:page => 1).current_page
+          (page.instance_of? WillPaginate::PageNumber).should be
         end
       end
 
