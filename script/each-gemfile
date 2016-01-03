@@ -2,7 +2,7 @@
 set -e
 
 if [ -z "$1" ]; then
-  echo "Usage: script/each-bundle COMMAND [<ARGS>]" >&2
+  echo "Usage: script/each-gemfile COMMAND [<ARGS>]" >&2
   exit 1
 fi
 
