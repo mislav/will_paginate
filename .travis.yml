@@ -17,6 +17,7 @@ gemfile:
   - Gemfile.rails3.2
   - Gemfile.rails4.1
   - Gemfile.rails4.2
+  - Gemfile.rails5.0
   - Gemfile.rails-edge
 matrix:
   exclude:
@@ -28,3 +29,5 @@ matrix:
       gemfile: Gemfile.rails4.1
     - rvm: 1.8.7
       gemfile: Gemfile.rails4.2
+    - rvm: 1.8.7
+      gemfile: Gemfile.rails5.0

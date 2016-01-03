@@ -1,0 +1,22 @@
+source 'https://rubygems.org'
+
+rails_version = '~> 5.0.0.beta1'
+
+gem 'activerecord', rails_version
+gem 'actionpack',   rails_version
+gem 'rails-dom-testing'
+
+gem 'rspec', '~> 2.6.0'
+gem 'mocha', '~> 0.9.8'
+
+gem 'sqlite3', '~> 1.3.6'
+
+group :mysql do
+  gem 'mysql', '~> 2.9'
+  gem 'mysql2', '~> 0.3.10'
+end
+gem 'pg', '~> 0.11', :group => :pg
+
+group :development do
+  gem 'debugger', :platforms => :mri_19
+end

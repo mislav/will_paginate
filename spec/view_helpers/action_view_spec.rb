@@ -382,7 +382,7 @@ class DummyController
   include Routes.url_helpers
   
   def initialize
-    @request = DummyRequest.new
+    @request = DummyRequest.new(self)
   end
 
   def params
@@ -405,12 +405,17 @@ class DummyRequest
   attr_accessor :symbolized_path_parameters
   alias :path_parameters :symbolized_path_parameters
   
-  def initialize
+  def initialize(controller)
+    @controller = controller
     @get = true
     @params = {}
     @symbolized_path_parameters = { :controller => 'foo', :action => 'bar' }
   end
-  
+
+  def routes
+    @controller._routes
+  end
+
   def get?
     @get
   end
