@@ -9,12 +9,21 @@ rescue LoadError
 ensure
   $stderr = STDERR
 end
-require 'action_dispatch/testing/assertions'
+
+begin
+  require 'rails/dom/testing/assertions'
+rescue LoadError
+  require 'action_dispatch/testing/assertions'
+end
 require 'will_paginate/array'
 
 module ViewExampleGroup
   
-  include ActionDispatch::Assertions::SelectorAssertions
+  if defined?(Rails::Dom::Testing::Assertions)
+    include Rails::Dom::Testing::Assertions::SelectorAssertions
+  else
+    include ActionDispatch::Assertions::SelectorAssertions
+  end
   include MiniTest::Assertions if defined? MiniTest
 
   def assert(value, message)
@@ -39,11 +48,23 @@ module ViewExampleGroup
     
     @render_output
   end
-  
-  def html_document
-    @html_document ||= HTML::Document.new(@render_output, true, false)
+
+  def parse_html_document(html)
+    @html_document ||= if defined?(Rails::Dom::Testing::Assertions)
+      Nokogiri::HTML::Document.parse(html)
+    else
+      HTML::Document.new(html, true, false)
+    end
   end
-  
+
+  def html_document
+    @html_document ||= parse_html_document(@render_output)
+  end
+
+  def document_root_element
+    html_document.root
+  end
+
   def response_from_page_or_rjs
     html_document.root
   end
