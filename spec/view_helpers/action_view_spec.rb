@@ -21,6 +21,7 @@ describe WillPaginate::ActionView do
 
   before(:all) do
     I18n.load_path.concat WillPaginate::I18n.load_path
+    I18n.enforce_available_locales = false
   end
 
   before(:each) do
