@@ -1,3 +1,3 @@
 class Admin < User
-  has_many :companies, :finder_sql => 'SELECT * FROM companies'
+  has_many :companies
 end

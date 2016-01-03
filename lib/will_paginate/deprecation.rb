@@ -10,7 +10,7 @@ module WillPaginate::Deprecation
     private
 
     def rails_logger
-      defined?(Rails) && Rails.logger
+      defined?(Rails.logger) && Rails.logger
     end
 
     def origin_of_call(stack)

@@ -1,5 +1,5 @@
 class Project < ActiveRecord::Base
-  has_and_belongs_to_many :developers, :uniq => true, :join_table => 'developers_projects'
+  has_and_belongs_to_many :developers, :join_table => 'developers_projects'
   
   has_many :topics
     # :finder_sql  => 'SELECT * FROM topics WHERE (topics.project_id = #{id})',

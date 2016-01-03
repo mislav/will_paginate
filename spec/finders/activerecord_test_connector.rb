@@ -4,12 +4,23 @@ require 'active_support/multibyte' # needed for Ruby 1.9.1
 require 'stringio'
 require 'erb'
 
+# https://travis-ci.org/mislav/will_paginate/jobs/99999001
+require 'active_support/core_ext/string/conversions'
+class String
+  alias to_datetime_without_patch to_datetime
+  def to_datetime
+    to_datetime_without_patch
+  rescue ArgumentError
+    return nil
+  end
+end
+
 $query_count = 0
 $query_sql = []
 
 ignore_sql = /
     ^(
-      PRAGMA | SHOW\ max_identifier_length |
+      PRAGMA | SHOW\ (max_identifier_length|search_path) |
       SELECT\ (currval|CAST|@@IDENTITY|@@ROWCOUNT) |
       SHOW\ ((FULL\ )?FIELDS|TABLES)
     )\b |

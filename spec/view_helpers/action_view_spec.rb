@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'spec_helper'
 require 'active_support/rescuable' # needed for Ruby 1.9.1
 require 'action_controller'
@@ -20,6 +21,7 @@ describe WillPaginate::ActionView do
 
   before(:all) do
     I18n.load_path.concat WillPaginate::I18n.load_path
+    I18n.enforce_available_locales = false
   end
 
   before(:each) do
@@ -48,12 +50,14 @@ describe WillPaginate::ActionView do
     paginate do |pagination|
       assert_select 'a[href]', 3 do |elements|
         validate_page_numbers [2,3,2], elements
-        assert_select elements.last, ':last-child', "Next &#8594;"
+        text(elements[2]).should == 'Next →'
       end
-      assert_select 'span', 1
-      assert_select 'span.disabled:first-child', '&#8592; Previous'
+      assert_select 'span', 1 do |spans|
+        spans[0]['class'].should == 'previous_page disabled'
+        text(spans[0]).should == '← Previous'
+      end
       assert_select 'em.current', '1'
-      pagination.first.inner_text.should == '&#8592; Previous 1 2 3 Next &#8594;'
+      text(pagination[0]).should == '← Previous 1 2 3 Next →'
     end
   end
 
@@ -75,15 +79,12 @@ describe WillPaginate::ActionView do
       assert_select 'a[href]', 4 do |elements|
         validate_page_numbers [1,1,3,3], elements
         # test rel attribute values:
-        assert_select elements[1], 'a', '1' do |link|
-          link.first['rel'].should == 'prev start'
-        end
-        assert_select elements.first, 'a', "Prev" do |link|
-          link.first['rel'].should == 'prev start'
-        end
-        assert_select elements.last, 'a', "Next" do |link|
-          link.first['rel'].should == 'next'
-        end
+        text(elements[0]).should == 'Prev'
+        elements[0]['rel'].should == 'prev start'
+        text(elements[1]).should == '1'
+        elements[1]['rel'].should == 'prev start'
+        text(elements[3]).should == 'Next'
+        elements[3]['rel'].should == 'next'
       end
       assert_select '.current', '2'
     end
@@ -126,8 +127,8 @@ describe WillPaginate::ActionView do
       <a href="/foo/bar?page=2" class="next_page" rel="next">Next &#8594;</a></div>
     HTML
     expected.strip!.gsub!(/\s{2,}/, ' ')
-    expected_dom = HTML::Document.new(expected).root
-    
+    expected_dom = parse_html_document(expected).root
+
     html_document.root.should == expected_dom
   end
   
@@ -137,7 +138,8 @@ describe WillPaginate::ActionView do
     
     assert_select 'a[href]', 1 do |links|
       query = links.first['href'].split('?', 2)[1]
-      query.split('&amp;').sort.should == %w(page=2 tag=%3Cbr%3E)
+      parts = query.gsub('&amp;', '&').split('&').sort
+      parts.should == %w(page=2 tag=%3Cbr%3E)
     end
   end
   
@@ -355,6 +357,11 @@ describe WillPaginate::ActionView do
     I18n.available_locales # triggers loading existing translations
     I18n.backend.store_translations(:en, data)
   end
+
+  # Normalizes differences between HTML::Document and Nokogiri::HTML
+  def text(node)
+    node.inner_text.gsub('&#8594;', '→').gsub('&#8592;', '←')
+  end
 end
 
 class AdditionalLinkAttributesRenderer < WillPaginate::ActionView::LinkRenderer
@@ -376,7 +383,7 @@ class DummyController
   include Routes.url_helpers
   
   def initialize
-    @request = DummyRequest.new
+    @request = DummyRequest.new(self)
   end
 
   def params
@@ -399,12 +406,17 @@ class DummyRequest
   attr_accessor :symbolized_path_parameters
   alias :path_parameters :symbolized_path_parameters
   
-  def initialize
+  def initialize(controller)
+    @controller = controller
     @get = true
     @params = {}
     @symbolized_path_parameters = { :controller => 'foo', :action => 'bar' }
   end
-  
+
+  def routes
+    @controller._routes
+  end
+
   def get?
     @get
   end
