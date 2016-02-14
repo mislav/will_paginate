@@ -6,3 +6,4 @@ coverage
 /bin
 vendor/bundle
 tags
+.ruby-version
