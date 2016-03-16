@@ -110,7 +110,6 @@ module WillPaginate
         case page
         when @collection.current_page - 1; 'prev'
         when @collection.current_page + 1; 'next'
-        when 1; 'start'
         end
       end
 
