@@ -80,9 +80,9 @@ describe WillPaginate::ActionView do
         validate_page_numbers [1,1,3,3], elements
         # test rel attribute values:
         text(elements[0]).should == 'Prev'
-        elements[0]['rel'].should == 'prev start'
+        elements[0]['rel'].should == 'prev'
         text(elements[1]).should == '1'
-        elements[1]['rel'].should == 'prev start'
+        elements[1]['rel'].should == 'prev'
         text(elements[3]).should == 'Next'
         elements[3]['rel'].should == 'next'
       end
