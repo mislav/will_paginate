@@ -26,6 +26,7 @@ module WillPaginate
       :next_label     => nil,
       :inner_window   => 4, # links around the current page
       :outer_window   => 1, # links around beginning and end
+      :last_page      => true,
       :link_separator => ' ', # single space is friendly to spiders and non-graphic browsers
       :param_name     => :page,
       :params         => nil,
@@ -42,13 +43,14 @@ module WillPaginate
 
     # Returns HTML representing page links for a WillPaginate::Collection-like object.
     # In case there is no more than one page in total, nil is returned.
-    # 
+    #
     # ==== Options
     # * <tt>:class</tt> -- CSS class name for the generated DIV (default: "pagination")
     # * <tt>:previous_label</tt> -- default: "« Previous"
     # * <tt>:next_label</tt> -- default: "Next »"
     # * <tt>:inner_window</tt> -- how many links are shown around the current page (default: 4)
     # * <tt>:outer_window</tt> -- how many links are around the first and the last page (default: 1)
+    # * <tt>:last_page</tt> -- when false, the last page link is not rendered (default: true)
     # * <tt>:link_separator</tt> -- string separator for page HTML elements (default: single space)
     # * <tt>:param_name</tt> -- parameter name for page number in URLs (default: <tt>:page</tt>)
     # * <tt>:params</tt> -- additional parameters when generating pagination links
