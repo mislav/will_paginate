@@ -21,16 +21,18 @@ module WillPaginate
 
     # default view options
     self.pagination_options = Deprecation::Hash.new \
-      :class          => 'pagination',
-      :previous_label => nil,
-      :next_label     => nil,
-      :inner_window   => 4, # links around the current page
-      :outer_window   => 1, # links around beginning and end
-      :link_separator => ' ', # single space is friendly to spiders and non-graphic browsers
-      :param_name     => :page,
-      :params         => nil,
-      :page_links     => true,
-      :container      => true
+      :class            => 'pagination',
+      :previous_label   => nil,
+      :next_label       => nil,
+      :inner_window     => 4, # links around the current page
+      :outer_window     => 1, # links around beginning and end
+      :fixed_page_links => false, # if set to true, the number of link items
+                                  # displayed will be constant
+      :link_separator   => ' ', # single space is friendly to spiders and non-graphic browsers
+      :param_name       => :page,
+      :params           => nil,
+      :page_links       => true,
+      :container        => true
 
     label_deprecation = Proc.new { |key, value|
       "set the 'will_paginate.#{key}' key in your i18n locale instead of editing pagination_options" if defined? Rails

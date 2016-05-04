@@ -63,6 +63,57 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
       prepare({ :page => 10, :total_pages => 10 }, :inner_window => 2, :outer_window => 1)
       showing_pages 1, 2, :gap, 6, 7, 8, 9, 10
     end
+
+    context "with a fixed number of visible page links" do
+      it "should adjust upper limit if lower is out of bounds" do
+        prepare({ :page => 1, :total_pages => 10 }, :fixed_page_links => true, :inner_window => 2, :outer_window => 1)
+        showing_pages 1..10
+      end
+      
+      it "should adjust lower limit if upper is out of bounds" do
+        prepare({ :page => 10, :total_pages => 10 }, :fixed_page_links => true, :inner_window => 2, :outer_window => 1)
+        showing_pages 1..10
+      end
+
+      context "with a large number of pages" do
+        it "should adjust upper limit if lower is out of bounds" do
+          prepare({ :page => 1, :total_pages => 21 }, :fixed_page_links => true, :inner_window => 4, :outer_window => 1)
+          showing_pages 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, :gap, 20, 21
+        end
+
+        it "should adjust upper limit if lower is out of bounds" do
+          prepare({ :page => 5, :total_pages => 21 }, :fixed_page_links => true, :inner_window => 4, :outer_window => 1)
+          showing_pages 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, :gap, 20, 21
+        end
+
+        it "should adjust upper limit if lower is out of bounds" do
+          prepare({ :page => 6, :total_pages => 21 }, :fixed_page_links => true, :inner_window => 4, :outer_window => 1)
+          showing_pages 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, :gap, 20, 21
+        end
+
+        it "should adjust upper limit if lower is out of bounds" do
+          prepare({ :page => 7, :total_pages => 21 }, :fixed_page_links => true, :inner_window => 4, :outer_window => 1)
+          showing_pages 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, :gap, 20, 21
+        end
+
+        it "should adjust lower limit if upper is out of bounds" do
+          prepare({ :page => 17, :total_pages => 21 }, :fixed_page_links => true, :inner_window => 4, :outer_window => 1)
+          showing_pages 1, 2, :gap, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
+        end
+
+        it "should adjust lower limit if upper is out of bounds" do
+          prepare({ :page => 21, :total_pages => 21 }, :fixed_page_links => true, :inner_window => 4, :outer_window => 1)
+          showing_pages 1, 2, :gap, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
+        end
+      end
+
+      context "with a small number of pages" do
+        it "should show all of the pages" do
+          prepare({ :page => 2, :total_pages => 5 }, :fixed_page_links => true, :inner_window => 4, :outer_window => 2)
+          showing_pages 1..5
+        end
+      end
+    end
     
     def showing_pages(*pages)
       pages = pages.first.to_a if Array === pages.first or Range === pages.first

@@ -31,12 +31,29 @@ module WillPaginate
         window_to = current_page + inner_window
         
         # adjust lower or upper limit if other is out of bounds
-        if window_to > total_pages
+
+        # if <tt>:fixed_page_links</tt> is set, out of bounds means 
+        # window_to + outer_window + 2 > total_pages or
+        # window_from - outer_window - 2 < 1
+        window_to_bound   = @options[:fixed_page_links] ? window_to + outer_window + 2 : window_to
+        window_from_bound = @options[:fixed_page_links] ? window_from - outer_window - 2 : window_from
+
+        if window_to_bound > total_pages
           window_from -= window_to - total_pages
+
+          # allow for the outer_window size, the first link and a possible gap
+          # to ensure items.length is always the same, regardless of whether
+          # current_page is near the middle or near an edge
+          window_from -= outer_window + 2 if @options[:fixed_page_links]
+
           window_to = total_pages
         end
-        if window_from < 1
+        if window_from_bound < 1
           window_to += 1 - window_from
+
+          # allow for the outer_window size, the last link and a possible gap
+          window_to += outer_window + 2 if @options[:fixed_page_links]
+
           window_from = 1
           window_to = total_pages if window_to > total_pages
         end
