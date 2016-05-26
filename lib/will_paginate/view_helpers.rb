@@ -39,10 +39,11 @@ module WillPaginate
     pagination_options.deprecate_key(:renderer) { |key, _| "pagination_options[#{key.inspect}] shouldn't be set globally" }
 
     include WillPaginate::I18n
+    extend ActionView::Helpers::NumberHelper
 
     # Returns HTML representing page links for a WillPaginate::Collection-like object.
     # In case there is no more than one page in total, nil is returned.
-    # 
+    #
     # ==== Options
     # * <tt>:class</tt> -- CSS class name for the generated DIV (default: "pagination")
     # * <tt>:previous_label</tt> -- default: "« Previous"
@@ -61,7 +62,7 @@ module WillPaginate
     #
     # All options not recognized by will_paginate will become HTML attributes on the container
     # element for pagination links (the DIV). For example:
-    # 
+    #
     #   <%= will_paginate @posts, :style => 'color:blue' %>
     #
     # will result in:
@@ -121,6 +122,8 @@ module WillPaginate
         sp = ' '
       end
 
+      delimiter = options.fetch(:delimiter, '')
+
       model_count = collection.total_pages > 1 ? 5 : collection.size
       defaults = ["models.#{model_key}"]
       defaults << Proc.new { |_, opts|
@@ -153,8 +156,13 @@ module WillPaginate
           :from => collection.offset + 1, :to => collection.offset + collection.length
         }
         will_paginate_translate keys, params do |_, opts|
-          %{Displaying %s #{b}%d#{sp}-#{sp}%d#{eb} of #{b}%d#{eb} in total} %
-            [ opts[:model], opts[:from], opts[:to], opts[:count] ]
+          %{Displaying %s #{b}%s#{sp}-#{sp}%s#{eb} of #{b}%s#{eb} in total} %
+            [
+              opts[:model],
+              number_with_delimiter(opts[:from],  delimiter: delimiter),
+              number_with_delimiter(opts[:to],    delimiter: delimiter),
+              number_with_delimiter(opts[:count], delimiter: delimiter),
+            ]
         end
       end
     end
