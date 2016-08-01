@@ -70,10 +70,12 @@ module WillPaginate
     #
     def will_paginate(collection, options = {})
       # early exit if there is nothing to render
-      return nil unless collection.total_pages > 1
+      return nil if collection.total_pages == 0 ||
+                    (collection.current_page == 1 && collection.length < collection.per_page)
 
       options = WillPaginate::ViewHelpers.pagination_options.merge(options)
 
+      options[:page_links] = false if collection.total_pages < 0
       options[:previous_label] ||= will_paginate_translate(:previous_label) { '&#8592; Previous' }
       options[:next_label]     ||= will_paginate_translate(:next_label) { 'Next &#8594;' }
 
