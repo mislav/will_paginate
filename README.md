@@ -25,6 +25,21 @@ Post.paginate(:page => params[:page], :per_page => 30)
 <%= will_paginate @posts %>
 ```
 
+## Pagination Using ajax
+
+Add the following javascipt code to the page:
+
+```  javascript
+   $(function() {
+    $(".pagination").on("click", 'a',function() {
+      $(".pagination").html("Page is loading...");
+      $.getScript(this.href);
+      return false;
+    });
+  });
+
+```
+
 And that's it! You're done. You just need to add some CSS styles to [make those pagination links prettier][css].
 
 You can customize the default "per_page" value:
