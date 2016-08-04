@@ -136,7 +136,19 @@ module WillPaginate
       }
       model_name = will_paginate_translate defaults, :count => model_count
 
-      if collection.total_pages < 2
+      if collection.total_pages < 0
+        i18n_key = :"page_entries_info.without_pages#{html_key}"
+        keys = [:"#{model_key}.#{i18n_key}", i18n_key]
+        params = {
+          :model => model_name,
+          :from => collection.offset + 1,
+          :to => collection.offset + collection.length
+        }
+        will_paginate_translate keys, params do |_, opts|
+          %{Displaying %s #{b}%d#{sp}-#{sp}%d#{eb}} %
+            [ opts[:model], opts[:from], opts[:to] ]
+        end
+      elsif collection.total_pages < 2
         i18n_key = :"page_entries_info.single_page#{html_key}"
         keys = [:"#{model_key}.#{i18n_key}", i18n_key]
 

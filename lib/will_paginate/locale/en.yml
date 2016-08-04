@@ -17,6 +17,9 @@ en:
       multi_page: "Displaying %{model} %{from} - %{to} of %{count} in total"
       multi_page_html: "Displaying %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> of <b>%{count}</b> in total"
 
+      without_pages: "Displaying %{model} %{from} - %{to}"
+      without_pages_html: "Displaying %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b>"
+
     # models:
     #   entry:
     #     zero:  entries
