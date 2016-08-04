@@ -69,6 +69,12 @@ describe WillPaginate::Collection do
       collection.previous_page.should == 2
       collection.next_page.should be_nil
     end
+
+    it "should have next_page nil when on last page" do
+      collection = create(3, 1, -1)
+      collection.previous_page.should == 2
+      collection.next_page.should be_nil
+    end
   end
 
   describe "out of bounds" do

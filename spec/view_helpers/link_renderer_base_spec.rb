@@ -36,6 +36,11 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
     prepare({ :total_pages => 1 }, :page_links => true)
     @renderer.pagination.should == [:previous_page, 1, :next_page]
   end
+
+  it "should not have pages for uncounted pagination" do
+    prepare({ :total_pages => -1 }, :page_links => true)
+    @renderer.pagination.should == [:previous_page, :next_page]
+  end
   
   describe "visible page numbers" do
     it "should calculate windowed visible links" do

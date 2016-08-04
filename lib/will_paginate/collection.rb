@@ -25,7 +25,11 @@ module WillPaginate
 
     # current_page + 1 or nil if there is no next page
     def next_page
-      ((current_page < total_pages) || (total_pages < 0)) ? (current_page + 1) : nil
+      if (current_page < total_pages) || (total_pages < 0 && length >= per_page)
+        current_page + 1
+      else
+        nil
+      end
     end
 
     # Helper method that is true when someone tries to fetch a page with a

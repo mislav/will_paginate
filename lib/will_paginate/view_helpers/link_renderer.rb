@@ -54,14 +54,12 @@ module WillPaginate
       end
       
       def previous_page
-        num = @collection.current_page > 1 && @collection.current_page - 1
+        num = @collection.previous_page
         previous_or_next_page(num, @options[:previous_label], 'previous_page')
       end
       
       def next_page
-        num = ((@collection.current_page < @collection.total_pages) ||
-               (@collection.total_pages < 0 && @collection.length >= @collection.per_page)) &&
-              @collection.current_page + 1
+        num = @collection.next_page
         previous_or_next_page(num, @options[:next_label], 'next_page')
       end
       

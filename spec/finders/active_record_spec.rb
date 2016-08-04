@@ -159,6 +159,11 @@ describe WillPaginate::ActiveRecord do
       }.should run_queries(0)
     end
 
+    it "supports a negative total_entries for uncounted paging" do
+      topics = Topic.paginate :page => 1, :per_page => 3, :total_entries => -1
+      topics.total_entries.should == -1
+    end
+
     it "supports a non-int for total_entries" do
       topics = Topic.paginate :page => 1, :per_page => 3, :total_entries => "999"
       topics.total_entries.should == 999
