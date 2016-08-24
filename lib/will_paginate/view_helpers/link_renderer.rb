@@ -119,7 +119,7 @@ module WillPaginate
           key = key.to_sym
           existing = target[key]
           
-          if value.is_a?(Hash) and (existing.is_a?(Hash) or existing.nil?)
+          if (value.is_a?(Hash) || value.is_a?(ActionController::Parameters)) and (existing.is_a?(Hash) or existing.nil?)
             symbolized_update(existing || (target[key] = {}), value)
           else
             target[key] = value
