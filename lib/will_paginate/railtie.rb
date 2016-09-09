@@ -18,7 +18,7 @@ module WillPaginate
         require 'will_paginate/view_helpers/action_view'
       end
 
-      self.class.add_locale_path config
+      #self.class.add_locale_path config
 
       # early access to ViewHelpers.pagination_options
       require 'will_paginate/view_helpers'
@@ -31,9 +31,9 @@ module WillPaginate
       ActionController::Base.extend ControllerRescuePatch
     end
 
-    def self.add_locale_path(config)
-      config.i18n.load_path.concat(WillPaginate::I18n.load_path)
-    end
+    #def self.add_locale_path(config)
+    #  config.i18n.load_path.concat(WillPaginate::I18n.load_path)
+    #end
 
     # Extending the exception handler middleware so it properly detects
     # WillPaginate::InvalidPage regardless of it being a tag module.
@@ -68,4 +68,8 @@ module WillPaginate
       end
     end
   end
+end
+
+ActiveSupport.on_load :i18n do
+  WillPaginate::I18n.load_path.each { |path| I18n.load_path << path }
 end
