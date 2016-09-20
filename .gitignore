@@ -1,4 +1,9 @@
+Gemfile*.lock
 .bundle
 doc
 *.gem
 coverage
+/bin
+vendor/bundle
+tags
+.ruby-version
