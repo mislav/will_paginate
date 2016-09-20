@@ -250,7 +250,7 @@ describe WillPaginate::ActionView do
   end
 
   it "should paginate with custom route page parameter" do
-    request.symbolized_path_parameters.update :controller => 'dummy', :action => nil
+    request.symbolized_path_parameters.update :controller => 'dummy', :action => 'index'
     paginate :per_page => 2 do
       assert_select 'a[href]', 6 do |links|
         assert_links_match %r{/page/(\d+)$}, links, [2, 3, 4, 5, 6, 2]
@@ -268,7 +268,7 @@ describe WillPaginate::ActionView do
   end
 
   it "should paginate with custom route and first page number implicit" do
-    request.symbolized_path_parameters.update :controller => 'ibocorp', :action => nil
+    request.symbolized_path_parameters.update :controller => 'ibocorp', :action => 'index'
     paginate :page => 2, :per_page => 2 do
       assert_select 'a[href]', 7 do |links|
         assert_links_match %r{/ibocorp(?:/(\d+))?$}, links, [nil, nil, 3, 4, 5, 6, 3]

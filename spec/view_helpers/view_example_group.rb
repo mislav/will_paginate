@@ -143,4 +143,4 @@ module HTML
       childless?? '' : super
     end
   end
-end
+end if defined?(HTML)
