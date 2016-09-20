@@ -1,5 +1,6 @@
 sudo: false
 bundler_args: "--standalone --binstubs --without development"
+cache: bundler
 script: script/test_all
 services: mongodb
 before_script:
