@@ -201,6 +201,13 @@ describe WillPaginate::ActionView do
     assert_no_links_match /99/
     assert_no_links_match /ftp/
   end
+
+  it "doesn't allow tampering with script_name" do
+    request.params :script_name => 'p0wned'
+    paginate
+    assert_links_match %r{^/foo/bar}
+    assert_no_links_match /p0wned/
+  end
   
   it "should not preserve parameters on POST" do
     request.post

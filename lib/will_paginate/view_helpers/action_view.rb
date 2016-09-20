@@ -99,6 +99,8 @@ module WillPaginate
     class LinkRenderer < ViewHelpers::LinkRenderer
       protected
 
+      GET_PARAMS_BLACKLIST = [:script_name]
+
       def default_url_params
         {}
       end
@@ -118,7 +120,7 @@ module WillPaginate
 
       def merge_get_params(url_params)
         if @template.respond_to? :request and @template.request and @template.request.get?
-          symbolized_update(url_params, @template.params)
+          symbolized_update(url_params, @template.params, GET_PARAMS_BLACKLIST)
         end
         url_params
       end
