@@ -203,7 +203,7 @@ describe WillPaginate::ActionView do
   end
 
   it "doesn't allow tampering with script_name" do
-    request.params :script_name => 'p0wned'
+    request.params :script_name => 'p0wned', :original_script_name => 'p0wned'
     paginate
     assert_links_match %r{^/foo/bar}
     assert_no_links_match /p0wned/
