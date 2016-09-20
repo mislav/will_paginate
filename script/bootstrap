@@ -1,4 +1,5 @@
 #!/bin/bash
+# vi:ft=sh:
 set -e
 
 brew bundle
@@ -11,4 +12,4 @@ done
 mysql -u root -e 'CREATE DATABASE IF NOT EXISTS will_paginate;'
 psql --dbname will_paginate -c '' 2>/dev/null || createdb will_paginate
 
-bundle install --path "${PWD}/vendor/bundle"
+bundle install --binstubs --path "${PWD}/vendor/bundle"
