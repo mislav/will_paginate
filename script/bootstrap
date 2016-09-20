@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+brew bundle
+
+while [ ! -e /tmp/mysql.sock ] && [ ! -e /var/run/mysql5/mysqld.sock ]; do
+  echo "Waiting for mysql to start up ..." >&2
+  sleep 1
+done
+
+mysql -u root -e 'CREATE DATABASE IF NOT EXISTS will_paginate;'
+psql --dbname will_paginate -c '' 2>/dev/null || createdb will_paginate
+
+bundle install --path "${PWD}/vendor/bundle"
