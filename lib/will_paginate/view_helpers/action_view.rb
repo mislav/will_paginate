@@ -99,7 +99,7 @@ module WillPaginate
     class LinkRenderer < ViewHelpers::LinkRenderer
       protected
 
-      GET_PARAMS_BLACKLIST = [:script_name]
+      GET_PARAMS_BLACKLIST = [:script_name, :original_script_name]
 
       def default_url_params
         {}
