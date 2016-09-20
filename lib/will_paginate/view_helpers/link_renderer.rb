@@ -114,11 +114,12 @@ module WillPaginate
         end
       end
 
-      def symbolized_update(target, other)
+      def symbolized_update(target, other, blacklist = nil)
         other.each do |key, value|
           key = key.to_sym
           existing = target[key]
-          
+          next if blacklist && blacklist.include?(key)
+
           if value.is_a?(Hash) and (existing.is_a?(Hash) or existing.nil?)
             symbolized_update(existing || (target[key] = {}), value)
           else
