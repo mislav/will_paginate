@@ -65,5 +65,5 @@ module WillPaginate
 end
 
 ActiveSupport.on_load :i18n do
-  WillPaginate::I18n.load_path.each { |path| I18n.load_path << path }
+  I18n.load_path.concat(WillPaginate::I18n.load_path)
 end
