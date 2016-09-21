@@ -116,7 +116,7 @@ module WillPaginate
 
       def symbolized_update(target, other, blacklist = nil)
         other.each do |key, value|
-          key = key.to_sym
+          key = key.to_s.to_sym
           existing = target[key]
           next if blacklist && blacklist.include?(key)
 
