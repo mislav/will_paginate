@@ -416,7 +416,7 @@ class DummyRequest
   def initialize(controller)
     @controller = controller
     @get = true
-    @params = {}
+    @params = {}.with_indifferent_access
     @symbolized_path_parameters = { :controller => 'foo', :action => 'bar' }
   end
 
@@ -442,7 +442,11 @@ class DummyRequest
 
   def params(more = nil)
     @params.update(more) if more
-    @params
+    if defined?(ActionController::Parameters)
+      ActionController::Parameters.new(@params)
+    else
+      @params
+    end
   end
   
   def host_with_port
@@ -457,4 +461,8 @@ class DummyRequest
   def protocol
     'http:'
   end
+end
+
+if defined?(ActionController::Parameters)
+  ActionController::Parameters.permit_all_parameters = false
 end
