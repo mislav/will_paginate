@@ -18,8 +18,6 @@ module WillPaginate
         require 'will_paginate/view_helpers/action_view'
       end
 
-      self.class.add_locale_path config
-
       # early access to ViewHelpers.pagination_options
       require 'will_paginate/view_helpers'
     end
@@ -29,10 +27,6 @@ module WillPaginate
         ActionDispatch::ExceptionWrapper : ActionDispatch::ShowExceptions
       ).send :include, ShowExceptionsPatch
       ActionController::Base.extend ControllerRescuePatch
-    end
-
-    def self.add_locale_path(config)
-      config.i18n.load_path.unshift(*WillPaginate::I18n.load_path)
     end
 
     # Extending the exception handler middleware so it properly detects
@@ -68,4 +62,8 @@ module WillPaginate
       end
     end
   end
+end
+
+ActiveSupport.on_load :i18n do
+  I18n.load_path.concat(WillPaginate::I18n.load_path)
 end
