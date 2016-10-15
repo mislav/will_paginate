@@ -108,9 +108,8 @@ module WillPaginate
 
       def rel_value(page)
         case page
-        when @collection.current_page - 1; 'prev' + (page == 1 ? ' start' : '')
+        when @collection.current_page - 1; 'prev'
         when @collection.current_page + 1; 'next'
-        when 1; 'start'
         end
       end
 
