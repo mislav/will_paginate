@@ -75,7 +75,8 @@ describe WillPaginate::ActionView do
   end
 
   it "should paginate with options" do
-    paginate({ :page => 2 }, :class => 'will_paginate', :previous_label => 'Prev', :next_label => 'Next') do
+    paginate({ :page => 2 }, :class => 'will_paginate', :previous_label => 'Prev', :next_label => 'Next',
+            :previous_class => 'previous btn', :next_class => 'next btn', :current_class => 'current btn') do
       assert_select 'a[href]', 4 do |elements|
         validate_page_numbers [1,1,3,3], elements
         # test rel attribute values:
@@ -86,7 +87,9 @@ describe WillPaginate::ActionView do
         text(elements[3]).should == 'Next'
         elements[3]['rel'].should == 'next'
       end
-      assert_select '.current', '2'
+      assert_select '.current.btn', '2'
+      assert_select '.previous.btn', 'Prev'
+      assert_select '.next.btn', 'Next'
     end
   end
 
