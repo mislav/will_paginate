@@ -7,29 +7,28 @@ GEM
     activerecord (2.3.18)
       activesupport (= 2.3.18)
     activesupport (2.3.18)
-    columnize (0.3.4)
-    debugger (1.6.0)
+    columnize (0.9.0)
+    debugger (1.6.8)
       columnize (>= 0.3.1)
       debugger-linecache (~> 1.2.0)
-      debugger-ruby_core_source (~> 1.2.1)
+      debugger-ruby_core_source (~> 1.3.5)
     debugger-linecache (1.2.0)
-    debugger-ruby_core_source (1.2.2)
-    linecache (0.46)
-      rbx-require-relative (> 0.0.4)
+    debugger-ruby_core_source (1.3.8)
+    linecache (1.3.1)
     mocha (0.9.7)
       rake
-    mysql (2.8.1)
-    pg (0.11.0)
-    postgres (0.7.9.2008.01.28)
+    mysql (2.9.1)
+    pg (0.17.1)
+    postgres (0.8.1)
+      pg (~> 0)
     rack (1.1.6)
     rake (0.8.7)
-    rbx-require-relative (0.0.5)
     ruby-debug (0.10.4)
       columnize (>= 0.1)
       ruby-debug-base (~> 0.10.4.0)
     ruby-debug-base (0.10.4)
       linecache (>= 0.3)
-    sqlite3-ruby (1.3.1)
+    sqlite3 (1.3.12)
 
 PLATFORMS
   ruby
@@ -39,9 +38,12 @@ DEPENDENCIES
   activerecord (~> 2.3.6)
   debugger
   mocha (= 0.9.7)
-  mysql
-  pg
+  mysql (~> 2.9)
+  pg (~> 0.17.0)
   postgres
   rake (~> 0.8.7)
   ruby-debug
-  sqlite3-ruby (= 1.3.1)
+  sqlite3 (~> 1.3.6)
+
+BUNDLED WITH
+   1.13.1

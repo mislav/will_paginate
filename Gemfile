@@ -7,12 +7,12 @@ gem 'activerecord', rails_version
 
 gem 'rake', '~> 0.8.7'
 gem 'mocha', '0.9.7'
-gem 'sqlite3-ruby', '1.3.1'
-gem 'mysql', :group => :mysql
+gem 'sqlite3', '~> 1.3.6'
+gem 'mysql', '~> 2.9', :group => :mysql
 
 group :pg do
   gem 'postgres', :platforms => :ruby_18
-  gem 'pg',       :platforms => :ruby_19
+  gem 'pg', '~> 0.17.0', :platforms => :ruby_19
 end
 
 group :development do
