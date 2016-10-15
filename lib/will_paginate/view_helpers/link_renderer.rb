@@ -41,10 +41,10 @@ module WillPaginate
     protected
     
       def page_number(page)
-        unless page == current_page
-          link(page, page, :rel => rel_value(page))
-        else
+        if page == current_page
           tag(:em, page, :class => 'current')
+        else
+          link(page, page, :rel => rel_value(page))
         end
       end
       
