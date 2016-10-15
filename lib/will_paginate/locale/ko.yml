@@ -1,0 +1,18 @@
+en:
+  will_paginate:
+    previous_label: "&#8592; 이전"
+    next_label: "다음 &#8594;"
+    page_gap: "&hellip;"
+
+    page_entries_info:
+      single_page:
+        zero:  "%{model} 없음"
+        one:   "1개의 %{model}"
+        other: "모두 %{count}개의 %{model}"
+      single_page_html:
+        zero:  "%{model} 없음"
+        one:   "<b>1개의</b> %{model}"
+        other: "<b>모두&nbsp;%{count}개의</b> %{model}"
+
+      multi_page: "총 %{count} 중 %{from} - %{to} 까지의 %{model}"
+      multi_page_html: "총<b>%{count}</b> <b>%{from}&nbsp;-&nbsp;%{to}</b> 까지의 %{model}"
