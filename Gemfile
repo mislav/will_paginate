@@ -19,7 +19,7 @@ group :mysql do
   gem 'mysql', '~> 2.9'
   gem 'mysql2', '~> 0.3.10'
 end
-gem 'pg', '~> 0.11', :group => :pg
+gem 'pg', '~> 0.18.4', :group => :pg
 
 group :development do
   gem 'ruby-debug', :platforms => :mri_18
