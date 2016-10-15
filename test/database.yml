@@ -12,5 +12,5 @@ mysql:
 postgres:
   adapter: postgresql
   database: will_paginate
-  username: postgres
+  username: 
   min_messages: warning

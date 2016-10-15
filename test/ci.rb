@@ -45,6 +45,10 @@ gemfiles.each do |gemfile|
       next if 'mysql' == db and !run_mysql
       announce "Rails #{version}", "with #{db}"
       ENV['DB'] = db
+      if db == 'postgres' && !ENV['TRAVIS']
+        system "psql -c 'drop database will_paginate;' &>/dev/null"
+        system "psql -c 'create database will_paginate;' >/dev/null"
+      end
       failed = true unless system %(bundle exec rake)
     end
   else
