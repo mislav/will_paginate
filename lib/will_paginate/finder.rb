@@ -161,7 +161,11 @@ module WillPaginate
       end
 
     protected
-      
+
+      def respond_to_missing?(method, include_private = false)
+        method.to_s.index('paginate') == 0 || super
+      end
+
       def method_missing_with_paginate(method, *args) #:nodoc:
         # did somebody tried to paginate? if not, let them be
         unless method.to_s.index('paginate') == 0
