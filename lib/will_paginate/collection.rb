@@ -32,6 +32,17 @@ module WillPaginate
     def out_of_bounds?
       current_page > total_pages
     end
+
+    def api_pagination
+      # Helper method to eturn pagination options as a JSON object
+      # usefull on API responses
+      {
+        current_page: current_page,
+        per_page: per_page,
+        total_entries: total_entries,
+        total_pages: total_pages
+      }
+    end
   end
 
   # = The key to pagination
@@ -42,7 +53,7 @@ module WillPaginate
   #
   # WillPaginate::Collection also assists in rolling out your own pagination
   # solutions: see +create+.
-  # 
+  #
   # If you are writing a library that provides a collection which you would like
   # to conform to this API, you don't have to copy these methods over; simply
   # make your plugin/gem dependant on this library and do:
@@ -123,7 +134,7 @@ module WillPaginate
     # in +create+.
     def replace(array)
       result = super
-      
+
       # The collection is shorter then page limit? Rejoice, because
       # then we know that we are on the last page!
       if total_entries.nil? and length < per_page and (current_page == 1 or length > 0)
