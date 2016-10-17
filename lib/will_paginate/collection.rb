@@ -37,10 +37,10 @@ module WillPaginate
       # Helper method to eturn pagination options as a JSON object
       # usefull on API responses
       {
-        current_page: current_page,
-        per_page: per_page,
-        total_entries: total_entries,
-        total_pages: total_pages
+        :current_page => current_page,
+        :per_page => per_page,
+        :total_entries => total_entries,
+        :total_pages => total_pages
       }
     end
   end
