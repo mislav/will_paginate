@@ -1,5 +1,6 @@
 # You will paginate!
 module WillPaginate
+  require 'will_paginate/array'
 end
 
 if defined?(Rails::Railtie)
