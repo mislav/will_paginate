@@ -15,20 +15,21 @@ describe WillPaginate::ViewHelpers do
 
   before(:each) do
     I18n.reload!
+    @custome_label =  "Listing"
   end
 
   include WillPaginate::ViewHelpers
-  
+
   describe "will_paginate" do
     it "should render" do
       collection = WillPaginate::Collection.new(1, 2, 4)
       renderer   = mock 'Renderer'
       renderer.expects(:prepare).with(collection, instance_of(Hash), self)
       renderer.expects(:to_html).returns('<PAGES>')
-      
+
       will_paginate(collection, :renderer => renderer).should == '<PAGES>'
     end
-    
+
     it "should return nil for single-page collections" do
       collection = mock 'Collection', :total_pages => 1
       will_paginate(collection).should be_nil
@@ -60,7 +61,7 @@ describe WillPaginate::ViewHelpers do
       end
     end
   end
-  
+
   describe "page_entries_info" do
     before :all do
       @array = ('a'..'z').to_a
@@ -72,14 +73,15 @@ describe WillPaginate::ViewHelpers do
     end
 
     it "should display middle results and total count" do
-      info(:page => 2, :per_page => 5).should == "Displaying strings 6 - 10 of 26 in total"
+      collection = {:page => 2, :per_page => 5}
+      info(collection).should == " strings 6 - 10 of 26 in total"
     end
 
     it "uses translation if available" do
       translation :will_paginate => {
-        :page_entries_info => {:multi_page => 'Showing %{from} - %{to}'}
+        :page_entries_info => {:multi_page => '%{from} - %{to}'}
       }
-      info(:page => 2, :per_page => 5).should == "Showing 6 - 10"
+      info(:page => 2, :per_page => 5).should == "6 - 10"
     end
 
     it "uses specific translation if available" do
@@ -92,7 +94,7 @@ describe WillPaginate::ViewHelpers do
 
     it "should output HTML by default" do
       info({ :page => 2, :per_page => 5 }, :html => true).should ==
-        "Displaying strings <b>6&nbsp;-&nbsp;10</b> of <b>26</b> in total"
+        " strings <b>6&nbsp;-&nbsp;10</b> of <b>26</b> in total"
     end
 
     it "should display shortened end results" do
@@ -107,10 +109,10 @@ describe WillPaginate::ViewHelpers do
     end
 
     it "should adjust output for single-page collections" do
-      info(('a'..'d').to_a.paginate(:page => 1, :per_page => 5)).should == "Displaying all 4 strings"
-      info(['a'].paginate(:page => 1, :per_page => 5)).should == "Displaying 1 string"
+      info(('a'..'d').to_a.paginate(:page => 1, :per_page => 5),:label=> @custome_label).should == "#{@custome_label} all 4 strings"
+      info(['a'].paginate(:page => 1, :per_page => 5),:label=> @custome_label).should == "#{@custome_label} 1 string"
     end
-  
+
     it "should display 'no entries found' for empty collections" do
       info([].paginate(:page => 1, :per_page => 5)).should == "No entries found"
     end
@@ -121,7 +123,7 @@ describe WillPaginate::ViewHelpers do
       model = stub('Class', :model_name => name)
       collection = [1].paginate(:page => 1)
 
-      info(collection, :model => model).should == "Displaying 1 flower"
+      info(collection, :model => model,:label=> @custome_label).should == "#{@custome_label} 1 flower"
     end
 
     it "uses custom translation instead of model_name.human" do
@@ -131,7 +133,7 @@ describe WillPaginate::ViewHelpers do
       translation :will_paginate => {:models => {:flower_key => 'tulip'}}
       collection = [1].paginate(:page => 1)
 
-      info(collection, :model => model).should == "Displaying 1 tulip"
+      info(collection, :model => model,:label=> @custome_label).should == "#{@custome_label} 1 tulip"
     end
 
     private

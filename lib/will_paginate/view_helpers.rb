@@ -42,7 +42,7 @@ module WillPaginate
 
     # Returns HTML representing page links for a WillPaginate::Collection-like object.
     # In case there is no more than one page in total, nil is returned.
-    # 
+    #
     # ==== Options
     # * <tt>:class</tt> -- CSS class name for the generated DIV (default: "pagination")
     # * <tt>:previous_label</tt> -- default: "« Previous"
@@ -61,7 +61,7 @@ module WillPaginate
     #
     # All options not recognized by will_paginate will become HTML attributes on the container
     # element for pagination links (the DIV). For example:
-    # 
+    #
     #   <%= will_paginate @posts, :style => 'color:blue' %>
     #
     # will result in:
@@ -98,12 +98,16 @@ module WillPaginate
 
     # Renders a message containing number of displayed vs. total entries.
     #
-    #   <%= page_entries_info @posts %>
+    #   <%= page_entries_info @posts,:label => 'Listing' %>
+    #   #-> Listing posts 6 - 12 of 26 in total
+    #
+    #   <%= page_entries_info @posts,:label => 'Displaying' %>
     #   #-> Displaying posts 6 - 12 of 26 in total
     #
     # The default output contains HTML. Use ":html => false" for plain text.
     def page_entries_info(collection, options = {})
       model = options[:model]
+      label = options.include?(:label) ? options[:label] : ""
       model = collection.first.class unless model or collection.empty?
       model ||= 'entry'
       model_key = if model.respond_to? :model_name
@@ -138,23 +142,23 @@ module WillPaginate
         i18n_key = :"page_entries_info.single_page#{html_key}"
         keys = [:"#{model_key}.#{i18n_key}", i18n_key]
 
-        will_paginate_translate keys, :count => collection.total_entries, :model => model_name do |_, opts|
+        will_paginate_translate keys, :count => collection.total_entries, :model => model_name, :label => label do |_, opts|
           case opts[:count]
           when 0; "No #{opts[:model]} found"
-          when 1; "Displaying #{b}1#{eb} #{opts[:model]}"
-          else    "Displaying #{b}all#{sp}#{opts[:count]}#{eb} #{opts[:model]}"
+          when 1; "#{opts[:label]} #{b}1#{eb} #{opts[:model]}"
+          else    "#{opts[:label]} #{b}all#{sp}#{opts[:count]}#{eb} #{opts[:model]}"
           end
         end
       else
         i18n_key = :"page_entries_info.multi_page#{html_key}"
         keys = [:"#{model_key}.#{i18n_key}", i18n_key]
         params = {
-          :model => model_name, :count => collection.total_entries,
+          :label=> label, :model => model_name, :count => collection.total_entries,
           :from => collection.offset + 1, :to => collection.offset + collection.length
         }
         will_paginate_translate keys, params do |_, opts|
-          %{Displaying %s #{b}%d#{sp}-#{sp}%d#{eb} of #{b}%d#{eb} in total} %
-            [ opts[:model], opts[:from], opts[:to], opts[:count] ]
+          %{#{label}%s %s #{b}%d#{sp}-#{sp}%d#{eb} of #{b}%d#{eb} in total} %
+            [opts[:label], opts[:model], opts[:from], opts[:to], opts[:count] ]
         end
       end
     end
