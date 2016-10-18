@@ -76,10 +76,11 @@ describe WillPaginate::ActiveRecord do
       rel.offset.should == 5
     end
 
-    it "raises on invalid page number" do
-      lambda {
-        Developer.page('foo')
-      }.should raise_error(ArgumentError)
+    it "get page one for invalid strings" do
+      rel = Developer.page('foo')
+      rel.current_page.should == 1
+      rel.per_page.should == 10
+      rel.offset.should == 0
     end
 
     it "supports first limit() then page()" do
