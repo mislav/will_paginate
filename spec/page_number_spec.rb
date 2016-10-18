@@ -39,6 +39,11 @@ describe WillPaginate::PageNumber do
       (Numeric === num).should be
       (Fixnum === num).should be
     end
+
+    context 'with string starting with a number' do
+      subject { described_class.new("12\"", 'page') }
+      it { should eq(12) }
+    end
   end
 
   describe "invalid" do
