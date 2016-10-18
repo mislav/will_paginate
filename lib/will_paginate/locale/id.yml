@@ -1,0 +1,18 @@
+id:
+  will_paginate:
+    previous_label: "&#8592; Sebelumnya"
+    next_label: "Berikutnya &#8594;"
+    page_gap: "&hellip;"
+
+    page_entries_info:
+      single_page:
+        zero:  "%{model} tidak ditemukan"
+        one:   "Menampilkan 1 %{model}"
+        other: "Menampilkan semua %{count} %{model}"
+      single_page_html:
+        zero:  "%{model} tidak ditemukan"
+        one:   "Menampilkan <b>1</b> %{model}"
+        other: "Menampilkan <b>semua&nbsp;%{count}</b> %{model}"
+
+      multi_page: "Menampilkan %{model} %{from} - %{to} dari total %{count}"
+      multi_page_html: "Menampilkan %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> dari total <b>%{count}</b>"
