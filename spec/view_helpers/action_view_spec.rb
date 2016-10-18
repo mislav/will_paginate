@@ -74,6 +74,10 @@ describe WillPaginate::ActionView do
     paginate(:per_page => 30).should be_empty
   end
 
+  it "should render something when there is only 1 page if display_if_single_page option sent in" do 
+    paginate({:per_page => 30}, :display_if_single_page => true ).should_not be_empty
+  end
+
   it "should paginate with options" do
     paginate({ :page => 2 }, :class => 'will_paginate', :previous_label => 'Prev', :next_label => 'Next') do
       assert_select 'a[href]', 4 do |elements|

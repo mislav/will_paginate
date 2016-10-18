@@ -58,6 +58,8 @@ module WillPaginate
     # * <tt>:page_links</tt> -- when false, only previous/next links are rendered (default: true)
     # * <tt>:container</tt> -- toggles rendering of the DIV container for pagination links, set to
     #   false only when you are rendering your own pagination markup (default: true)
+    # * <tt>:display_if_single_page</tt> -- determines if output should be rendered
+    # if there is only one page of results.  default: false
     #
     # All options not recognized by will_paginate will become HTML attributes on the container
     # element for pagination links (the DIV). For example:
@@ -70,7 +72,13 @@ module WillPaginate
     #
     def will_paginate(collection, options = {})
       # early exit if there is nothing to render
-      return nil unless collection.total_pages > 1
+      if collection.total_pages <= 1
+        unless (options[:display_if_single_page] == true &&
+                collection.total_pages == 1 && 
+                collection.count > 0)
+          return nil
+        end
+      end
 
       options = WillPaginate::ViewHelpers.pagination_options.merge(options)
 
