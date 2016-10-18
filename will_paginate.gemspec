@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.summary = "Pagination plugin for web frameworks and other apps"
   s.description = "will_paginate provides a simple API for performing paginated queries with Active Record, DataMapper and Sequel, and includes helpers for rendering pagination links in Rails, Sinatra and Merb web apps."
   
-  s.authors  = ['Mislav Marohnić']
+  s.authors  = ['Mislav Marohnic']
   s.email    = 'mislav.marohnic@gmail.com'
   s.homepage = 'https://github.com/mislav/will_paginate/wiki'
   s.license  = 'MIT'
@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   # include only files in version control
   git_dir = File.expand_path('../.git', __FILE__)
   void = defined?(File::NULL) ? File::NULL :
-    RbConfig::CONFIG['host_os'] =~ /msdos|mswin|djgpp|mingw/ ? 'NUL' : '/dev/null'
+    Config::CONFIG['host_os'] =~ /msdos|mswin|djgpp|mingw/ ? 'NUL' : '/dev/null'
 
   if File.directory?(git_dir) and system "git --version >>#{void} 2>&1"
     s.files &= `git --git-dir='#{git_dir}' ls-files -z`.split("\0") 
