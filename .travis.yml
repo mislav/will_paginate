@@ -9,9 +9,9 @@ before_script:
 rvm:
   - 1.8.7
   - 1.9.3
-  - 2.1.8
-  - 2.2.4
-  - 2.3.0
+  - 2.1.9
+  - 2.2.5
+  - 2.3.1
 gemfile:
   - Gemfile
   - Gemfile.rails3.0
@@ -27,7 +27,7 @@ matrix:
       gemfile: Gemfile.rails-edge
     - rvm: 1.9.3
       gemfile: Gemfile.rails-edge
-    - rvm: 2.1.8
+    - rvm: 2.1.9
       gemfile: Gemfile.rails-edge
     - rvm: 1.8.7
       gemfile: Gemfile
@@ -39,5 +39,5 @@ matrix:
       gemfile: Gemfile.rails5.0
     - rvm: 1.9.3
       gemfile: Gemfile.rails5.0
-    - rvm: 2.1.8
+    - rvm: 2.1.9
       gemfile: Gemfile.rails5.0
