@@ -1,0 +1,18 @@
+ar:
+  will_paginate:
+    previous_label: "السابق &#8594;"
+    next_label: "&#8592; التالي"
+    page_gap: "&hellip;"
+
+    page_entries_info:
+      single_page:
+        zero:  "لا يوجد أية عناصر"
+        one:   "عنصر وحيد معروض"
+        other: "%{count} عنصر جميعها معروضة"
+      single_page_html:
+        zero:  "لا يوجد أية عناصر"
+        one:   "عنصر <b>وحيد</b> معروض"
+        other: "<b>%{count}</b> عنصر جميعها معروضة"
+
+      multi_page: "العناصر %{from} - %{to} من أصل %{count} بالمجمل"
+      multi_page_html: "العناصر <b>%{from}&nbsp;-&nbsp;%{to}</b> من أصل <b>%{count}</b> بالمجمل"
