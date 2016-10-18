@@ -132,7 +132,7 @@ module WillPaginate
 
       def add_current_page_param(url_params, page)
         unless param_name.index(/[^\w-]/)
-          url_params[param_name.to_sym] = page
+          url_params[param_name.to_sym] = page.to_s
         else
           page_param = parse_query_parameters("#{param_name}=#{page}")
           symbolized_update(url_params, page_param)
