@@ -146,7 +146,10 @@ module WillPaginate
     end
 
     module Pagination
+      # <b>DEPRECATED:</b> Please use <tt>page</tt> instead.
       def paginate(options)
+        warn "DEPRECATION WARNING: Pagination#paginate is deprecated. Please use Pagination#page instead. Called from: " + Kernel.caller.first
+
         options  = options.dup
         pagenum  = options.fetch(:page) { raise ArgumentError, ":page parameter required" }
         options.delete(:page)
