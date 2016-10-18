@@ -30,4 +30,8 @@ class Array
       pager.replace self[pager.offset, pager.per_page].to_a
     end
   end
+  
+  def page(options = {})
+    paginate(options = {})
+  end
 end
