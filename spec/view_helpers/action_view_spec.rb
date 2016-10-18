@@ -90,6 +90,23 @@ describe WillPaginate::ActionView do
     end
   end
 
+  it "should paginate with remote options" do
+    paginate({ :page => 2 }, :class => 'will_paginate', :previous_label => 'Prev', :next_label => 'Next', remote: true) do
+      assert_select 'a[href]', 4 do |elements|
+        # test rel attribute values:
+        assert_select elements[1], 'a', '1' do |link|
+          link.first['data-remote'].should == 'true'
+        end
+        assert_select elements.first, 'a', "Prev" do |link|
+          link.first['data-remote'].should == 'true'
+        end
+        assert_select elements.last, 'a', "Next" do |link|
+          link.first['data-remote'].should == 'true'
+        end
+      end
+    end
+  end
+
   it "should paginate using a custom renderer class" do
     paginate({}, :renderer => AdditionalLinkAttributesRenderer) do
       assert_select 'a[default=true]', 3

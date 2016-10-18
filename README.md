@@ -23,6 +23,9 @@ Post.paginate(:page => params[:page], :per_page => 30)
 
 ## render page links in the view:
 <%= will_paginate @posts %>
+
+## render remote page links in view:
+<%= will_paginate @posts, remote: true %>
 ```
 
 And that's it! You're done. You just need to add some CSS styles to [make those pagination links prettier][css].
