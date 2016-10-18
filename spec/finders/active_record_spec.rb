@@ -189,6 +189,14 @@ describe WillPaginate::ActiveRecord do
       Topic.select('title, content').page(1).total_entries.should == 4
     end
 
+    it "should count with select" do
+      Developer.select("COALESCE(salary,0.0) AS salary").page(1).total_entries.should == 11
+    end
+
+    it "should count with select" do
+      Developer.select("id, salary").page(1).total_entries.should == 11
+    end
+
     it "removes :reorder for count with group" do
       Project.group(:id).reorder(:id).page(1).total_entries
       $query_sql.last.should_not =~ /\ORDER\b/
