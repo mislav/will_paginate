@@ -13,7 +13,7 @@ module WillPaginate
   # This module provides few of these methods.
   module CollectionMethods
     def total_pages
-      total_entries.zero? ? 1 : (total_entries / per_page.to_f).ceil
+      total_entries.zero? ? 1 : (total_entries.size / per_page.to_f).ceil
     end
 
     # current_page - 1 or nil if there is no previous page
