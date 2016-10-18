@@ -64,6 +64,15 @@ describe WillPaginate::ActiveRecord do
         rel.total_entries.should == 1
       }.should run_queries(1)
     end
+    
+    it "casts values to int in relations" do
+      rel = Topic.find(1).replies.page("1").per_page("3")
+      rel.current_page.should == 1
+      rel.per_page.should == 3
+      lambda {
+        rel.total_entries.should == 2
+      }.should run_queries(1)
+    end
 
     it "supports the page() method" do
       rel = Developer.page('1').order('id')
