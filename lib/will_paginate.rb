@@ -2,6 +2,8 @@
 module WillPaginate
 end
 
+require 'will_paginate/array'
+
 if defined?(Rails::Railtie)
   require 'will_paginate/railtie'
 elsif defined?(Rails::Initializer)
