@@ -40,7 +40,9 @@ module WillPaginate
         :current_page => current_page,
         :per_page => per_page,
         :total_entries => total_entries,
-        :total_pages => total_pages
+        :total_pages => total_pages,
+        :previous_page => previous_page,
+        :next_page => next_page
       }
     end
   end
