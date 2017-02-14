@@ -23,12 +23,12 @@ describe WillPaginate::PageNumber do
       (num.is_a? Numeric).should be
     end
 
-    it "is a kind of Fixnum" do
+    it "Is a Ruby Fixnum/Integer" do
       (num.is_a? Fixnum).should be
     end
 
-    it "isn't directly a Fixnum" do
-      (num.instance_of? Fixnum).should_not be
+    it "isn't directly a Ruby Fixnum/Intege" do
+      (num.instance_of? (Fixnum == Integer ? Integer : Fixnum)).should_not be
     end
 
     it "passes the PageNumber=== type check" do |variable|
