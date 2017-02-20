@@ -46,7 +46,7 @@ New in Active Record 3:
 Post.where(:published => true).paginate(:page => params[:page]).order('id DESC')
 
 # the new, shorter page() method
-Post.page(params[:page]).order('created_at DESC')
+Post.where(:published => true).page(params[:page]).order('created_at DESC')
 ```
 
 See [the wiki][wiki] for more documentation. [Ask on the group][group] if you have usage questions. [Report bugs][issues] on GitHub.
