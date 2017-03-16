@@ -40,7 +40,7 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
   describe "visible page numbers" do
     it "should calculate windowed visible links" do
       prepare({ :page => 6, :total_pages => 11 }, :inner_window => 1, :outer_window => 1)
-      showing_pages 1, 2, :gap, 5, 6, 7, :gap, 10, 11
+      showing_pages 1, 2, :left_gap, 5, 6, 7, :right_gap, 10, 11
     end
   
     it "should eliminate small gaps" do
@@ -51,17 +51,17 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
     
     it "should support having no windows at all" do
       prepare({ :page => 4, :total_pages => 7 }, :inner_window => 0, :outer_window => 0)
-      showing_pages 1, :gap, 4, :gap, 7
+      showing_pages 1, :left_gap, 4, :right_gap, 7
     end
     
     it "should adjust upper limit if lower is out of bounds" do
       prepare({ :page => 1, :total_pages => 10 }, :inner_window => 2, :outer_window => 1)
-      showing_pages 1, 2, 3, 4, 5, :gap, 9, 10
+      showing_pages 1, 2, 3, 4, 5, :right_gap, 9, 10
     end
     
     it "should adjust lower limit if upper is out of bounds" do
       prepare({ :page => 10, :total_pages => 10 }, :inner_window => 2, :outer_window => 1)
-      showing_pages 1, 2, :gap, 6, 7, 8, 9, 10
+      showing_pages 1, 2, :left_gap, 6, 7, 8, 9, 10
     end
     
     def showing_pages(*pages)
