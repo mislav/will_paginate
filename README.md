@@ -49,10 +49,18 @@ Post.where(:published => true).paginate(:page => params[:page]).order('id DESC')
 Post.page(params[:page]).order('created_at DESC')
 ```
 
-See [the wiki][wiki] for more documentation. [Report bugs][issues] on GitHub.
+
+## On pagination of arbitrary arrays
+
+It is often suggested to `require 'will_paginate/array'` in order to paginate any arbitrary array, but changing a common class globally is often an anti-pattern which can lead to name clashes. Instead, one is encouraged to extend a particular object:
+
+```ruby
+array.extend(WillPaginate::ArrayMixin).paginate(page: page, per_page: per_page)
+```
+
+See [the wiki][wiki] for more documentation. [Ask on the group][group] if you have usage questions. [Report bugs][issues] on GitHub.
 
 Happy paginating.
-
 
 [wiki]: https://github.com/mislav/will_paginate/wiki
 [install]: https://github.com/mislav/will_paginate/wiki/Installation "will_paginate installation"

@@ -1,5 +1,6 @@
 require 'will_paginate/per_page'
 require 'will_paginate/page_number'
+require 'will_paginate/array_mixin'
 
 module WillPaginate
   # Any will_paginate-compatible collection should have these methods:
