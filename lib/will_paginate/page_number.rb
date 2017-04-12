@@ -40,7 +40,7 @@ module WillPaginate
     alias is_a? kind_of?
   end
 
-  # Ultrahax: makes `Fixnum === current_page` checks pass
+  # Ultrahax: makes `Integer === current_page` checks pass
   Numeric.extend Module.new {
     def ===(obj)
       obj.instance_of? PageNumber or super
