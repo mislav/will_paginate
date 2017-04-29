@@ -104,7 +104,7 @@ module WillPaginate
     # The default output contains HTML. Use ":html => false" for plain text.
     def page_entries_info(collection, options = {})
       model = options[:model]
-      model = collection.first.class unless model or collection.empty?
+      model = collection.first.class unless model or collection.total_entries.zero?
       model ||= 'entry'
       model_key = if model.respond_to? :model_name
                     model.model_name.i18n_key  # ActiveModel::Naming
