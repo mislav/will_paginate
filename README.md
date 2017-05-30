@@ -1,5 +1,7 @@
 # will_paginate
 
+[![Build Status](https://travis-ci.org/mislav/will_paginate.svg?branch=master)](https://travis-ci.org/mislav/will_paginate)
+
 will_paginate is a pagination library that integrates with Ruby on Rails, Sinatra, Merb, DataMapper and Sequel.
 
 Installation:

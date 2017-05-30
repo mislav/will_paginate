@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-rails_version = '~> 5.1.1'
+rails_version = '~> 4.0.13'
 
 gem 'activerecord', rails_version
 gem 'actionpack',   rails_version
@@ -15,6 +15,7 @@ gem 'dm-aggregates'
 gem 'dm-migrations'
 gem 'dm-sqlite-adapter'
 gem 'mongoid'
+gem 'addressable', '~> 2.4.0' # To be ruby < 2.0 compatible
 
 gem 'mysql2', '~> 0.4.6', :group => :mysql
 gem 'pg', '~> 0.18.4', :group => :pg
