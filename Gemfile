@@ -17,6 +17,11 @@ gem 'dm-sqlite-adapter'
 gem 'mongoid'
 gem 'nokogiri', '~> 1.6.0' unless RUBY_VERSION >= '2.1.0'
 
+if RUBY_VERSION < '2.0'
+  gem 'public_suffix', '~> 1.4.5.0'
+  gem 'addressable', '~> 2.3.0'
+end
+
 group :mysql do
   gem 'mysql', '~> 2.9'
   gem 'mysql2', '~> 0.3.10'
