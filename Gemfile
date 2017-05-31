@@ -15,6 +15,7 @@ gem 'dm-aggregates'
 gem 'dm-migrations'
 gem 'dm-sqlite-adapter'
 gem 'mongoid'
+gem 'nokogiri', '~> 1.6.0' unless RUBY_VERSION >= '2.1.0'
 
 group :mysql do
   gem 'mysql', '~> 2.9'
