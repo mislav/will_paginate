@@ -216,6 +216,8 @@ module WillPaginate
                 WHERE rownum <= #{pager.offset + pager.per_page}
               ) WHERE rnum >= #{pager.offset}
             SQL
+          elsif (self.connection.adapter_name =~ /^sqlserver/i)
+            query << " OFFSET #{pager.offset} ROWS FETCH NEXT #{pager.per_page} ROWS ONLY"
           else
             query << " LIMIT #{pager.per_page} OFFSET #{pager.offset}"
           end
