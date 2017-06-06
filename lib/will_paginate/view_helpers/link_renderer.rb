@@ -24,7 +24,7 @@ module WillPaginate
       # method as you see fit.
       def to_html
         html = pagination.map do |item|
-          item.is_a?(0.class) ?
+          item.is_a?(Integer) ?
             page_number(item) :
             send(item)
         end.join(@options[:link_separator])
@@ -88,7 +88,7 @@ module WillPaginate
       end
 
       def link(text, target, attributes = {})
-        if target.is_a?(0.class)
+        if target.is_a?(Integer)
           attributes[:rel] = rel_value(target)
           target = url(target)
         end
