@@ -48,6 +48,16 @@ Post.where(:published => true).paginate(:page => params[:page]).order('id DESC')
 # the new, shorter page() method
 Post.page(params[:page]).order('created_at DESC')
 ```
+For use with Sinatra
+
+In your app/controller
+
+``` 
+class ControllerName < Sinatra::Base
+
+  include WillPaginate::Sinatra::Helpers
+ ```
+
 
 See [the wiki][wiki] for more documentation. [Ask on the group][group] if you have usage questions. [Report bugs][issues] on GitHub.
 
