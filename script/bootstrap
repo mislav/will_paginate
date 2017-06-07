@@ -2,12 +2,15 @@
 # vi:ft=sh:
 set -e
 
-brew bundle
+if type -p brew >/dev/null; then
+  brew bundle --no-upgrade
+  export PATH="$(brew --prefix mysql@5.6)/bin:$PATH"
 
-while [ ! -e /tmp/mysql.sock ] && [ ! -e /var/run/mysql5/mysqld.sock ]; do
-  echo "Waiting for mysql to start up ..." >&2
-  sleep 1
-done
+  while [ ! -e /tmp/mysql.sock ] && [ ! -e /var/run/mysql5/mysqld.sock ]; do
+    echo "Waiting for mysql to start up ..." >&2
+    sleep 1
+  done
+fi
 
 mysql -u root -e 'CREATE DATABASE IF NOT EXISTS will_paginate;'
 psql --dbname will_paginate -c '' 2>/dev/null || createdb will_paginate

@@ -1,13 +1,11 @@
 require 'spec_helper'
 
-begin
+if !ENV['SKIP_NONRAILS_TESTS']
   require 'will_paginate/sequel'
   require File.expand_path('../sequel_test_connector', __FILE__)
-rescue LoadError, ArgumentError => error
-  warn "Error running Sequel specs: #{error.message}"
-  sequel_loaded = false
-else
   sequel_loaded = true
+else
+  sequel_loaded = false
 end
 
 describe Sequel::Dataset::Pagination, 'extension' do
