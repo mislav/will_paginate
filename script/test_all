@@ -9,7 +9,7 @@ rails_version="$(ruby -rubygems -e 'require "bundler"; puts Bundler.load.specs.f
 
 for db in sqlite3 mysql mysql2 postgres; do
   [[ "$rails_version" = 3.0 && $db = "mysql2" ]] && continue
-  [[ "$rails_version" > 4.0 && $db = "mysql" ]] && continue
+  [[ "$rails_version" > 4.2 && $db = "mysql" ]] && continue
 
   printf "\e[1;33m[DB] %s\e[m\n" "$db"
   spec_files="spec"
