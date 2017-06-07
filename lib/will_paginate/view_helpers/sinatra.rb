@@ -19,7 +19,7 @@ module WillPaginate
       def url(page)
         str = File.join(request.script_name.to_s, request.path_info)
         params = request.GET.merge(param_name.to_s => page.to_s)
-        params.update @options[:params] if @options[:params]
+        params.update stringify_param_keys(@options[:params]) if @options[:params]
         str << '?' << build_query(params)
       end
 
@@ -34,6 +34,10 @@ module WillPaginate
 
     def self.registered(app)
       app.helpers Helpers
+    end
+
+    def stringify_param_keys(params)
+      Hash[params.map { |k,v| [ k.to_s, v ] }]
     end
 
     ::Sinatra.register self
