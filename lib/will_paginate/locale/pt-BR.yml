@@ -15,7 +15,7 @@ pt-BR:
         other: "Mostrando <b>todos&nbsp;%{count}</b> %{model}"
 
       multi_page: "Mostrando %{model} %{from} - %{to} de %{count} no total"
-      multi_page_html: "Mostrando %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> de <b>%{count}</b> no total"
+      multi_page_html: "Mostrando <b>%{from}&nbsp;-&nbsp;%{to}</b> %{model}s, num total de <b>%{count}</b>"
 
     # models:
     #   entry:
