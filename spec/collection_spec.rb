@@ -22,11 +22,16 @@ describe WillPaginate::Collection do
   it "should be empty if out of bounds" do
     @simple.paginate(:page => 2, :per_page => 5).should be_empty
   end
-  
+
   it "should default to 1 as current page and 30 per-page" do
     result = (1..50).to_a.paginate
     result.current_page.should == 1
     result.size.should == 30
+  end
+
+  it "should give total_pages equals 1 when per_page is 0 and collection not empty" do
+    collection = @simple.paginate(:page => 1, :per_page => 0)
+    collection.total_pages.should == 1
   end
 
   it "should give total_entries precedence over actual size" do
@@ -57,13 +62,13 @@ describe WillPaginate::Collection do
       collection.previous_page.should be_nil
       collection.next_page.should == 2
     end
-    
+
     it "should have both prev/next pages" do
       collection = create(2, 1, 3)
       collection.previous_page.should == 1
       collection.next_page.should == 3
     end
-    
+
     it "should have next_page nil when on last page" do
       collection = create(3, 1, 3)
       collection.previous_page.should == 2
@@ -92,22 +97,22 @@ describe WillPaginate::Collection do
       collection = create { |p| p.replace array }
       collection.total_entries.should == 8
     end
-    
+
     it "should allow explicit total count to override guessed" do
       collection = create(2, 5, 10) { |p| p.replace array }
       collection.total_entries.should == 10
     end
-    
+
     it "should not be able to guess when collection is same as limit" do
       collection = create { |p| p.replace array(5) }
       collection.total_entries.should be_nil
     end
-    
+
     it "should not be able to guess when collection is empty" do
       collection = create { |p| p.replace array(0) }
       collection.total_entries.should be_nil
     end
-    
+
     it "should be able to guess when collection is empty and this is the first page" do
       collection = create(1) { |p| p.replace array(0) }
       collection.total_entries.should == 0
@@ -124,7 +129,7 @@ describe WillPaginate::Collection do
   end
 
   private
-  
+
     def create(page = 2, limit = 5, total = nil, &block)
       if block_given?
         described_class.create(page, limit, total, &block)
