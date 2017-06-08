@@ -1,1 +1,34 @@
+pt-BR:
+  will_paginate:
+    previous_label: "&#8592; Anteriro"
+    next_label: "Próximo &#8594;"
+    page_gap: "&hellip;"
+
+    page_entries_info:
+      single_page:
+        zero:  "Não %{model} encontrado"
+        one:   "Displaying 1 %{model}"
+        other: "Displaying all %{count} %{model}"
+      single_page_html:
+        zero:  "Não %{model} encontrado"
+        one:   "Displaying <b>1</b> %{model}"
+        other: "Displaying <b>all&nbsp;%{count}</b> %{model}"
+
+      multi_page: "Mostrando %{model} %{from} - %{to} de %{count} no total"
+      multi_page_html: "Mostrando %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> de <b>%{count}</b> no total"
+
+    # models:
+    #   entry:
+    #     zero:  entries
+    #     one:   entry
+    #     few:   entries
+    #     other: entries
+
+    # line_item:
+    #   page_entries_info:
+    #     single_page:
+    #       zero:  "Your shopping cart is empty"
+    #       one:   "Displaying one item in your cart"
+    #       other: "Displaying all %{count} items"
+    #     multi_page: "Displaying items %{from} - %{to} of %{count} in total"
 
