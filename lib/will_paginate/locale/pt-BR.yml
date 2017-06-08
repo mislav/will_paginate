@@ -27,8 +27,7 @@ pt-BR:
     # line_item:
     #   page_entries_info:
     #     single_page:
-    #       zero:  "Your shopping cart is empty"
+    #       zero:  "Seu carrinho de compras está vazio"
     #       one:   "Displaying one item in your cart"
     #       other: "Displaying all %{count} items"
     #     multi_page: "Displaying items %{from} - %{to} of %{count} in total"
-
