@@ -38,7 +38,6 @@ end
 module ActiverecordTestConnector
   extend self
   
-  attr_accessor :able_to_connect
   attr_accessor :connected
 
   FIXTURES_PATH = File.expand_path('../../fixtures', __FILE__)
@@ -49,18 +48,14 @@ module ActiverecordTestConnector
 
   # Set our defaults
   self.connected = false
-  self.able_to_connect = true
 
   def setup
-    unless self.connected || !self.able_to_connect
+    unless self.connected
       setup_connection
       load_schema
       add_load_path FIXTURES_PATH
       self.connected = true
     end
-  rescue Exception => e  # errors from ActiveRecord setup
-    $stderr.puts "\nSkipping ActiveRecord tests: #{e}\n\n"
-    self.able_to_connect = false
   end
 
   private
