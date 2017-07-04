@@ -16,10 +16,10 @@ See [installation instructions][install] on the wiki for more info.
 
 ``` ruby
 ## perform a paginated query:
-@posts = Post.paginate(:page => params[:page])
+@posts = Post.paginate(page: params[:page])
 
 # or, use an explicit "per page" limit:
-Post.paginate(:page => params[:page], :per_page => 30)
+Post.paginate(page: params[:page], per_page: 30)
 
 ## render page links in the view:
 <%= will_paginate @posts %>
@@ -43,7 +43,7 @@ New in Active Record 3:
 
 ``` ruby
 # paginate in Active Record now returns a Relation
-Post.where(:published => true).paginate(:page => params[:page]).order('id DESC')
+Post.where(published: true).paginate(page: params[:page]).order('id DESC')
 
 # the new, shorter page() method
 Post.page(params[:page]).order('created_at DESC')
