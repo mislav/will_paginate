@@ -43,7 +43,7 @@ module WillPaginate
     # Wrapper for rendering pagination links at both top and bottom of a block
     # of content.
     # 
-    #   <% paginated_section @posts do %>
+    #   <%= paginated_section @posts do %>
     #     <ol id="posts">
     #       <% for post in @posts %>
     #         <li> ... </li>
