@@ -13,7 +13,12 @@ module WillPaginate
     extend Forwardable
 
     def initialize(value, name)
-      value = Integer(value.to_i == 0 ? 1 : value)
+      value = Integer(if value.to_i.zero?
+                        1
+                      else
+                        value
+                      end
+              )
       if 'offset' == name ? (value < 0 or value > BIGINT) : value < 1
         raise RangeError, "invalid #{name}: #{value.inspect}"
       end
