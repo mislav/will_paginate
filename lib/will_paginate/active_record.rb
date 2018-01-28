@@ -67,7 +67,7 @@ module WillPaginate
 
       def total_entries
         @total_entries ||= begin
-          if loaded? and size < limit_value and (current_page == 1 or size > 0)
+          if loaded? && limit_value.is_a?(Integer) && size < limit_value && (current_page == 1 || size > 0)
             offset_value + size
           else
             @total_entries_queried = true
