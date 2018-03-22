@@ -30,4 +30,23 @@ class Array
       pager.replace self[pager.offset, pager.per_page].to_a
     end
   end
+
+  # Parameters:
+  # * <tt>:page</tt> - current page, defaults to 1
+  # * <tt>:total_entries</tt> - total number of items in the array, defaults to self.length
+  #
+  # Example:
+  #   arr = ['a', 'b', 'c']
+  #   arr.chunk_pagination(:page => 2, :total_entries => 10)  #->  [nil, nil, nil, 'a', 'b', 'c', nil, nil, nil, nil].paginate(:page => 2, :per_page => 3)
+  #   arr.chunk_pagination(:page => 3, :total_entries => 3)  #->  []
+  def chunk_pagination(options = {})
+    page = options[:page] ? options[:page].to_i : 1
+    per_page = self.length
+    total_entries = options[:total_entries] ? options[:total_entries].to_i : self.length
+    left_array = [nil]*(per_page * (page - 1))
+    right_array = total_entries > per_page * page ? [nil]*(total_entries - per_page * page) : []
+    self.unshift *left_array
+    self.push *right_array
+    self.paginate(:page => page, :per_page => per_page)
+  end
 end
