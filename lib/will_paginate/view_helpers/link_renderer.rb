@@ -42,9 +42,9 @@ module WillPaginate
     
       def page_number(page)
         if page == current_page
-          tag(:em, page, :class => 'current')
+          tag(:em, page, :class => 'current', title: ('Page ' + page.to_s) )
         else
-          link(page, page, :rel => rel_value(page))
+          link(page, page, :rel => rel_value(page), title: ('Page ' + page.to_s) )
         end
       end
       
@@ -65,9 +65,9 @@ module WillPaginate
       
       def previous_or_next_page(page, text, classname)
         if page
-          link(text, page, :class => classname)
+          link(text, page, :class => classname, title: (page_turn(text) + ' Page'))
         else
-          tag(:span, text, :class => classname + ' disabled')
+          tag(:span, text, :class => classname + ' disabled', title: (page_turn(text) + ' Page'))
         end
       end
       
@@ -82,6 +82,12 @@ module WillPaginate
       end
       
     private
+
+      def page_turn(text)
+        return 'Previous' if text.include?('Previous')
+        return 'Next' if text.include?('Next')
+        text
+      end
 
       def param_name
         @options[:param_name].to_s
