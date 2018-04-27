@@ -46,7 +46,7 @@ module WillPaginate
           exception
         end
 
-        if actual_exception.is_a?(WillPaginate::InvalidPage)
+        if exception.is_a?(WillPaginate::InvalidPage) || actual_exception.is_a?(WillPaginate::InvalidPage)
           Rack::Utils.status_code(:not_found)
         else
           original_method = method(:status_code_without_paginate)
