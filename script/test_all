@@ -7,9 +7,13 @@ export PATH="${PWD}/bin:$PATH"
 
 rails_version="$(ruby -rubygems -e 'require "bundler"; puts Bundler.load.specs.find {|s| s.name == "activerecord" }.version')"
 
+if [[ -n "$BUNDLE_GEMFILE" && "${BUNDLE_GEMFILE##*/}" != Gemfile ]]; then
+  export SKIP_NONRAILS_TESTS=1
+fi
+
 for db in sqlite3 mysql mysql2 postgres; do
   [[ "$rails_version" = 3.0 && $db = "mysql2" ]] && continue
-  [[ "$rails_version" > 5.0 && $db = "mysql" ]] && continue
+  [[ "$rails_version" > 4.2 && $db = "mysql" ]] && continue
 
   printf "\e[1;33m[DB] %s\e[m\n" "$db"
   spec_files="spec"
