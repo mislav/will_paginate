@@ -22,6 +22,7 @@ gemfile:
   - Gemfile.rails4.1
   - Gemfile.rails4.2
   - Gemfile.rails5.0
+  - Gemfile.rails5.1
   - Gemfile.rails-edge
 matrix:
   exclude:
