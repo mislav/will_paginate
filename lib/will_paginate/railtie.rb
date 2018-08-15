@@ -10,6 +10,10 @@ module WillPaginate
         require 'will_paginate/active_record'
       end
 
+      ActiveSupport.on_load :active_record do
+        require 'will_paginate/mongoid'
+      end
+
       ActiveSupport.on_load :action_controller do
         WillPaginate::Railtie.setup_actioncontroller
       end

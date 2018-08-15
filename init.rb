@@ -15,4 +15,8 @@ if defined? ActionView::Base
   require 'will_paginate/view_helpers/action_view'
 end
 
+if defined? Mongoid::Criteria
+  require 'will_paginate/mongoid'
+end
+
 WillPaginate::Railtie.add_locale_path config
