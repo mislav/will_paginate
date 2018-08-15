@@ -5,22 +5,22 @@ require File.expand_path('../activerecord_test_connector', __FILE__)
 ActiverecordTestConnector.setup
 
 describe WillPaginate::ActiveRecord do
-  
+
   extend ActiverecordTestConnector::FixtureSetup
-  
+
   fixtures :topics, :replies, :users, :projects, :developers_projects
-  
+
   it "should integrate with ActiveRecord::Base" do
     ActiveRecord::Base.should respond_to(:paginate)
   end
-  
+
   it "should paginate" do
     lambda {
       users = User.paginate(:page => 1, :per_page => 5).to_a
       users.length.should == 5
     }.should run_queries(2)
   end
-  
+
   it "should fail when encountering unknown params" do
     lambda {
       User.paginate :foo => 'bar', :page => 1, :per_page => 4
@@ -134,7 +134,7 @@ describe WillPaginate::ActiveRecord do
         topics.should_not be_empty
       }.should run_queries(1)
     end
-    
+
     it "support empty? for grouped queries" do
       topics = Topic.group(:project_id).paginate :page => 1, :per_page => 3
       lambda {
@@ -183,7 +183,7 @@ describe WillPaginate::ActiveRecord do
     it "should count with group" do
       Developer.group(:salary).page(1).total_entries.should == 4
     end
-    
+
     it "should count with select" do
       Topic.select('title, content').page(1).total_entries.should == 4
     end
@@ -197,7 +197,7 @@ describe WillPaginate::ActiveRecord do
       Developer.where("1 = 2").page(1).total_pages.should == 1
     end
   end
-  
+
   it "should not ignore :select parameter when it says DISTINCT" do
     users = User.select('DISTINCT salary').paginate :page => 2
     users.total_entries.should == 5
@@ -213,7 +213,7 @@ describe WillPaginate::ActiveRecord do
         sql = "select content from topics where content like '%futurama%'"
         topics = Topic.paginate_by_sql sql, :page => 1, :per_page => 1
         topics.total_entries.should == 1
-        topics.first.attributes.has_key?('title').should be_false
+        topics.first.attributes.has_key?('title').should be_falsey
       }.should run_queries(2)
     end
 
@@ -256,11 +256,11 @@ describe WillPaginate::ActiveRecord do
     options = { :page => 1 }
     options.expects(:delete).never
     options_before = options.dup
-    
+
     Topic.paginate(options)
     options.should == options_before
   end
-  
+
   it "should get first page of Topics with a single query" do
     lambda {
       result = Topic.paginate :page => nil
@@ -270,7 +270,7 @@ describe WillPaginate::ActiveRecord do
       result.size.should == 4
     }.should run_queries(1)
   end
-  
+
   it "should get second (inexistent) page of Topics, requiring 2 queries" do
     lambda {
       result = Topic.paginate :page => 2
@@ -278,7 +278,7 @@ describe WillPaginate::ActiveRecord do
       result.should be_empty
     }.should run_queries(2)
   end
-  
+
   describe "associations" do
     it "should paginate" do
       dhh = users(:david)
@@ -302,7 +302,7 @@ describe WillPaginate::ActiveRecord do
       lambda {
         dhh.projects.order('projects.id').limit(4).to_a
       }.should_not raise_error
-      
+
       result = dhh.projects.paginate(:page => 1, :per_page => 4).reorder('projects.id')
       result.should == expected_id_ordered
 
@@ -324,7 +324,7 @@ describe WillPaginate::ActiveRecord do
       }.should run_queries(1)
     end
   end
-  
+
   it "should paginate with joins" do
     result = nil
     join_sql = 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id'
