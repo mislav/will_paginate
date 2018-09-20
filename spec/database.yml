@@ -6,7 +6,7 @@ sqlite3:
 mysql: &mysql
   adapter: mysql
   database: will_paginate
-  username: 
+  username: root
   encoding: utf8
 <% if File.exist?("/var/run/mysql5/mysqld.sock") %>
   host: localhost

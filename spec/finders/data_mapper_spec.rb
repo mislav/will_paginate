@@ -1,13 +1,11 @@
 require 'spec_helper'
 
-begin
+if !ENV['SKIP_NONRAILS_TESTS']
   require 'will_paginate/data_mapper'
   require File.expand_path('../data_mapper_test_connector', __FILE__)
-rescue LoadError => error
-  warn "Error running DataMapper specs: #{error.message}"
-  datamapper_loaded = false
-else
   datamapper_loaded = true
+else
+  datamapper_loaded = false
 end
 
 describe WillPaginate::DataMapper do

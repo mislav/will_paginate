@@ -11,12 +11,14 @@ rvm:
   - 1.9.3
   - 2.1.8
   - 2.2.4
-  - 2.3.0
+  - 2.3.4
+  - 2.4.1
 gemfile:
   - Gemfile
   - Gemfile.rails3.0
   - Gemfile.rails3.1
   - Gemfile.rails3.2
+  - Gemfile.rails4.0
   - Gemfile.rails4.1
   - Gemfile.rails4.2
   - Gemfile.rails5.0
@@ -29,8 +31,18 @@ matrix:
       gemfile: Gemfile.rails-edge
     - rvm: 2.1.8
       gemfile: Gemfile.rails-edge
+    - rvm: 2.4.1
+      gemfile: Gemfile.rails3.0
+    - rvm: 2.4.1
+      gemfile: Gemfile.rails3.1
+    - rvm: 2.4.1
+      gemfile: Gemfile.rails3.2
+    - rvm: 2.4.1
+      gemfile: Gemfile.rails4.0
+    - rvm: 2.4.1
+      gemfile: Gemfile.rails4.1
     - rvm: 1.8.7
-      gemfile: Gemfile
+      gemfile: Gemfile.rails4.0
     - rvm: 1.8.7
       gemfile: Gemfile.rails4.1
     - rvm: 1.8.7
@@ -41,3 +53,9 @@ matrix:
       gemfile: Gemfile.rails5.0
     - rvm: 2.1.8
       gemfile: Gemfile.rails5.0
+    - rvm: 1.8.7
+      gemfile: Gemfile
+    - rvm: 1.9.3
+      gemfile: Gemfile
+    - rvm: 2.1.8
+      gemfile: Gemfile

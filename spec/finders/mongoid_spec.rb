@@ -1,18 +1,23 @@
 require 'spec_helper'
 
-begin
+if !ENV['SKIP_NONRAILS_TESTS']
+  if defined?(Rails)
+    old_rails = Rails
+    # Mongoid sees the `Rails` constant and then proceeds to `require "rails"`
+    # from its railtie. This tricks it into believing there is no Rails.
+    Object.send(:remove_const, :Rails)
+  end
   require 'will_paginate/mongoid'
-rescue LoadError => error
-  warn "Error running Mongoid specs: #{error.message}"
-  mongoid_loaded = false
-else
-  Mongoid.connect_to 'will_paginate_test'
+  Object.send(:const_set, :Rails, old_rails) if old_rails
 
+  Mongoid.connect_to 'will_paginate_test'
   class MongoidModel
     include Mongoid::Document
   end
 
   mongoid_loaded = true
+else
+  mongoid_loaded = false
 end
 
 describe WillPaginate::Mongoid do
