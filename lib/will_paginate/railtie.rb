@@ -12,6 +12,7 @@ module WillPaginate
 
       ActiveSupport.on_load :action_controller do
         WillPaginate::Railtie.setup_actioncontroller
+        require 'will_paginate/action_controller'
       end
 
       ActiveSupport.on_load :action_view do

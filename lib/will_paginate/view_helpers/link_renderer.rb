@@ -92,10 +92,34 @@ module WillPaginate
           attributes[:rel] = rel_value(target)
           target = url(target)
         end
+        return post_request_pagination(target, text) if @options[:method] == :post
         attributes[:href] = target
         tag(:a, text, attributes)
       end
-      
+
+      def post_request_pagination(target, text)
+        target = target.split('?')
+        action = target.first
+        params = target.drop(1).join
+        page = CGI::parse(params)['page'].first
+        attributes = { type: :hidden }
+        input_tags = [
+          tag(:button, text, type: :submit),
+          tag(:input, nil, attributes.merge(name: :page, value: page)),
+          tag(:input, nil, attributes.merge(name: :authenticity_token)),
+          tag(:input, nil, attributes.merge(name: :will_paginate, value: true))
+        ] << post_params
+        tag :form, input_tags.join, action: action, method: :post, style: 'display: inline-block'         
+      end
+
+      def post_params
+        return unless @options[:post_params]
+        @options[:post_params].map do | key, value |
+          next if key.to_s == 'page'
+          tag :input, nil, type: :hidden, name: key, value: value
+        end
+      end
+
       def tag(name, value, attributes = {})
         string_attributes = attributes.inject('') do |attrs, pair|
           unless pair.last.nil?

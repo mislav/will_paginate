@@ -34,6 +34,14 @@ You can customize the default "per_page" value:
 class Post
   self.per_page = 10
 end
+```
+
+will_paginate can also be set to use a POST request instead of GET: 
+
+``` ruby
+## render page links in the view:
+<%= will_paginate @posts, method: :post, post_params: { title: 'title' } %>
+```
 
 # set per_page globally
 WillPaginate.per_page = 10
