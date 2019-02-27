@@ -5,10 +5,10 @@ require 'active_record'
 
 module WillPaginate
   # = Paginating finders for ActiveRecord models
-  # 
+  #
   # WillPaginate adds +paginate+, +per_page+ and other methods to
   # ActiveRecord::Base class methods and associations.
-  # 
+  #
   # In short, paginating finders are equivalent to ActiveRecord finders; the
   # only difference is that we start with "paginate" instead of "find" and
   # that <tt>:page</tt> is required parameter:
@@ -83,7 +83,7 @@ module WillPaginate
           excluded = [:order, :limit, :offset, :reorder]
           excluded << :includes unless eager_loading?
           rel = self.except(*excluded)
-          column_name = (select_for_count(rel) || :all)
+          column_name = (select_for_count_with_relation(rel) || :all)
           rel.count(column_name)
         else
           super(*args)
@@ -136,8 +136,8 @@ module WillPaginate
         other.total_entries = nil if defined? @total_entries_queried
         other
       end
-      
-      def select_for_count(rel)
+
+      def select_for_count_with_relation(rel)
         if rel.select_values.present?
           select = rel.select_values.join(", ")
           select if select !~ /[,*]/
@@ -189,7 +189,7 @@ module WillPaginate
       # +per_page+.
       #
       # Example:
-      # 
+      #
       #   @developers = Developer.paginate_by_sql ['select * from developers where salary > ?', 80000],
       #                          :page => params[:page], :per_page => 3
       #
@@ -197,7 +197,7 @@ module WillPaginate
       # supply <tt>:total_entries</tt>. If you experience problems with this
       # generated SQL, you might want to perform the count manually in your
       # application.
-      # 
+      #
       def paginate_by_sql(sql, options)
         pagenum  = options.fetch(:page) { raise ArgumentError, ":page parameter required" } || 1
         per_page = options[:per_page] || self.per_page
