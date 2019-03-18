@@ -14,6 +14,8 @@ rvm:
   - 2.3.4
   - 2.4.1
   - 2.5.1
+addons:
+  postgresql: '9.4'
 gemfile:
   - Gemfile
   - Gemfile.rails3.0
