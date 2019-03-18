@@ -81,3 +81,5 @@ matrix:
       gemfile: Gemfile.rails-edge
     - rvm: 2.3.4
       gemfile: Gemfile.rails-edge
+    - rvm: 2.4.1
+      gemfile: Gemfile.rails-edge
