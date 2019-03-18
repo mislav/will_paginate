@@ -5,7 +5,7 @@ status=0
 
 export PATH="${PWD}/bin:$PATH"
 
-rails_version="$(ruby -rubygems -e 'require "bundler"; puts Bundler.load.specs.find {|s| s.name == "activerecord" }.version')"
+rails_version="$(ruby -r rubygems -e 'require "bundler"; puts Bundler.load.specs.find {|s| s.name == "activerecord" }.version')"
 
 if [[ -n "$BUNDLE_GEMFILE" && "${BUNDLE_GEMFILE##*/}" != Gemfile ]]; then
   export SKIP_NONRAILS_TESTS=1
