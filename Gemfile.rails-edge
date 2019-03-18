@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
 
-gem 'arel', github: 'rails/arel', branch: 'master'
+gem 'arel', git: 'https://github.com/rails/arel.git', branch: 'master'
 
-gem 'activerecord', :github => 'rails/rails', :branch => 'master'
-gem 'actionpack',   :github => 'rails/rails', :branch => 'master'
+gem 'activerecord', git: 'https://github.com/rails/rails.git', branch: 'master'
+gem 'actionpack',   git: 'https://github.com/rails/rails.git', branch: 'master'
 
 gem 'thread_safe'
 
@@ -12,7 +12,7 @@ gem 'mocha', '~> 0.9.8'
 
 gem 'sqlite3', '~> 1.3.6'
 
-gem 'mysql2', '~> 0.4.6', :group => :mysql
+gem 'mysql2', '~> 0.5.2', :group => :mysql
 gem 'pg', '~> 0.11', :group => :pg
 
 group :development do
