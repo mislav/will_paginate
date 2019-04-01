@@ -16,10 +16,10 @@ See [installation instructions][install] on the wiki for more info.
 
 ``` ruby
 ## perform a paginated query:
-@posts = Post.paginate(:page => params[:page])
+@posts = Post.paginate(page: params[:page])
 
 # or, use an explicit "per page" limit:
-Post.paginate(:page => params[:page], :per_page => 30)
+Post.paginate(page: params[:page], per_page: 30)
 
 ## render page links in the view:
 <%= will_paginate @posts %>
@@ -49,13 +49,12 @@ Post.where(:published => true).paginate(:page => params[:page]).order('id DESC')
 Post.page(params[:page]).order('created_at DESC')
 ```
 
-See [the wiki][wiki] for more documentation. [Ask on the group][group] if you have usage questions. [Report bugs][issues] on GitHub.
+See [the wiki][wiki] for more documentation. [Report bugs][issues] on GitHub.
 
 Happy paginating.
 
 
 [wiki]: https://github.com/mislav/will_paginate/wiki
 [install]: https://github.com/mislav/will_paginate/wiki/Installation "will_paginate installation"
-[group]: http://groups.google.com/group/will_paginate "will_paginate discussion and support group"
 [issues]: https://github.com/mislav/will_paginate/issues
 [css]: http://mislav.github.io/will_paginate/

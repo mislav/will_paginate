@@ -79,6 +79,13 @@ module ActiverecordTestConnector
     ActiveRecord::Base.configurations = { db => configuration }
     ActiveRecord::Base.establish_connection(db.to_sym)
     ActiveRecord::Base.default_timezone = :utc
+
+    case configuration['adapter']
+    when 'mysql'
+      fix_primary_key(ActiveRecord::ConnectionAdapters::MysqlAdapter)
+    when 'mysql2'
+      fix_primary_key(ActiveRecord::ConnectionAdapters::Mysql2Adapter)
+    end
   end
 
   def load_schema
@@ -90,7 +97,13 @@ module ActiverecordTestConnector
       $stdout = STDOUT
     end
   end
-  
+
+  def fix_primary_key(adapter_class)
+    if ActiveRecord::VERSION::STRING < "4.1"
+      adapter_class::NATIVE_DATABASE_TYPES[:primary_key] = "int(11) auto_increment PRIMARY KEY"
+    end
+  end
+
   module FixtureSetup
     def fixtures(*tables)
       table_names = tables.map { |t| t.to_s }

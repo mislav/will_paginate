@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+require "yaml"
+
+ci_config = File.expand_path('../../.travis.yml', __FILE__)
+data = YAML.load(File.read(ci_config))
+ruby_versions = data.fetch('rvm')
+gemfiles = data.fetch('gemfile')
+
+requirements = {
+  'Gemfile.rails3.0'   => Gem::Requirement.new('< 2.4'),
+  'Gemfile.rails3.1'   => Gem::Requirement.new('< 2.4'),
+  'Gemfile.rails3.2'   => Gem::Requirement.new('< 2.4'),
+  'Gemfile.rails4.0'   => Gem::Requirement.new(['< 2.4', '>= 1.9']),
+  'Gemfile.rails4.1'   => Gem::Requirement.new(['< 2.4', '>= 1.9']),
+  'Gemfile.rails4.2'   => Gem::Requirement.new('>= 1.9'),
+  'Gemfile.rails5.0'   => Gem::Requirement.new('>= 2.2'),
+  'Gemfile.rails5.1'   => Gem::Requirement.new('>= 2.2'),
+  'Gemfile'            => Gem::Requirement.new('>= 2.2'),
+  'Gemfile.rails-edge' => Gem::Requirement.new('>= 2.4.1'),
+}
+
+commands = {}
+
+commands['excludes'] = -> {
+  excludes = []
+  gemfiles.each do |gemfile|
+    req = requirements.fetch(gemfile)
+    ruby_versions.each do |version|
+      unless req.satisfied_by?(Gem::Version.new(version))
+        excludes << { 'rvm' => version, 'gemfile' => gemfile }
+      end
+    end
+  end
+
+  data.fetch('matrix')['exclude'] = excludes
+  File.open(ci_config, 'w') do |file|
+    yaml_str = YAML.dump(data)
+      .sub(/^---\n/, '')
+      .gsub(/^(\s*-)/, '  \1')
+      .gsub(/^(\s+gemfile:)/, '  \1')
+    file.write(yaml_str)
+  end
+}
+
+cmd = commands.fetch(ARGV[0]) do
+  $stderr.puts "available commands: #{commands.keys.join(', ')}"
+  exit 1
+end
+cmd.(*ARGV[1..-1])
