@@ -149,16 +149,22 @@ module WillPaginate
         per_page = options.delete(:per_page) || self.per_page
         total    = options.delete(:total_entries)
 
+        # [added by po for upwardaccounts/onward]
+        custom_offset = options.delete(:offset)
+
         if options.any?
           raise ArgumentError, "unsupported parameters: %p" % options.keys
         end
 
-        rel = limit(per_page.to_i).page(pagenum)
+        # [replaced by po for upwardaccounts/onward]
+        # rel = limit(per_page.to_i).page(pagenum)
+        rel = limit(per_page.to_i).page(pagenum, custom_offset)
+
         rel.total_entries = total.to_i          unless total.blank?
         rel
       end
 
-      def page(num)
+      def page(num, custom_offset = 0)
         rel = if ::ActiveRecord::Relation === self
           self
         elsif !defined?(::ActiveRecord::Scoping) or ::ActiveRecord::Scoping::ClassMethods.method_defined? :with_scope
@@ -172,7 +178,11 @@ module WillPaginate
         rel = rel.extending(RelationMethods)
         pagenum = ::WillPaginate::PageNumber(num.nil? ? 1 : num)
         per_page = rel.limit_value || self.per_page
-        rel = rel.offset(pagenum.to_offset(per_page).to_i)
+
+        # [replaced by po for upwardaccounts/onward]
+        # rel = rel.offset(pagenum.to_offset(per_page).to_i)
+        rel = rel.offset(pagenum.to_offset(per_page).to_i + custom_offset)
+
         rel = rel.limit(per_page) unless rel.limit_value
         rel.current_page = pagenum
         rel
