@@ -20,6 +20,5 @@ gem 'mysql2', '~> 0.5.2', :group => :mysql
 gem 'pg', '~> 0.18.4', :group => :pg
 
 group :development do
-  gem 'ruby-debug', :platforms => :mri_18
   gem 'debugger', :platforms => :mri_19
 end
