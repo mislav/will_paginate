@@ -16,7 +16,7 @@ requirements = {
   'Gemfile.rails5.0'   => Gem::Requirement.new('>= 2.2'),
   'Gemfile.rails5.1'   => Gem::Requirement.new('>= 2.2'),
   'Gemfile'            => Gem::Requirement.new('>= 2.2'),
-  'Gemfile.rails-edge' => Gem::Requirement.new('>= 2.4.1'),
+  'Gemfile.rails-edge' => Gem::Requirement.new('>= 2.5.0'),
 }
 
 commands = {}
