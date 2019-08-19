@@ -2,7 +2,10 @@ sudo: false
 bundler_args: "--standalone --binstubs --without development"
 cache: bundler
 script: script/test_all
-services: mongodb
+services:
+  - mongodb
+  - mysql
+  - postgresql
 before_script:
   - mysql -e 'create database will_paginate;'
   - psql -c 'create database will_paginate;' -U postgres
@@ -14,8 +17,6 @@ rvm:
   - 2.3.4
   - 2.4.1
   - 2.5.1
-addons:
-  postgresql: '9.4'
 gemfile:
   - Gemfile
   - Gemfile.rails3.0
