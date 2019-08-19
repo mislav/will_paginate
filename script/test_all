@@ -7,7 +7,11 @@ export PATH="${PWD}/bin:$PATH"
 
 rails_version="$(ruby -r rubygems -e 'require "bundler"; puts Bundler.load.specs.find {|s| s.name == "activerecord" }.version')"
 
-if [[ -n "$BUNDLE_GEMFILE" && "${BUNDLE_GEMFILE##*/}" != Gemfile ]]; then
+if [ -z "$BUNDLE_GEMFILE" ]; then
+  BUNDLE_GEMFILE="$(bundle config gemfile | grep BUNDLE_GEMFILE | head -1 | cut -d'"' -f2)"
+fi
+
+if [[ -n "$BUNDLE_GEMFILE" && "${BUNDLE_GEMFILE##*/}" != 'Gemfile.rails5.2' ]]; then
   export SKIP_NONRAILS_TESTS=1
 fi
 
