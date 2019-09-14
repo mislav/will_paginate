@@ -38,7 +38,7 @@ module WillPaginate
         alias_method :status_code, :status_code_with_paginate
       end
       def status_code_with_paginate(exception = @exception)
-        actual_exception = if exception.respond_to?(:cause)
+        actual_exception = if exception.respond_to?(:cause) && !exception.cause.nil?
           exception.cause
         elsif exception.respond_to?(:original_exception)
           exception.original_exception
