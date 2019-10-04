@@ -37,7 +37,6 @@ describe WillPaginate::PageNumber do
 
     it "passes the Numeric=== type check" do |variable|
       (Numeric === num).should be
-      (Integer === num).should be
     end
   end
 
