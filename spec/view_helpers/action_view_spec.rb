@@ -135,9 +135,13 @@ describe WillPaginate::ActionView do
       <a href="/foo/bar?page=2" class="next_page" rel="next">Next &#8594;</a></div>
     HTML
     expected.strip!.gsub!(/\s{2,}/, ' ')
-    expected_dom = parse_html_document(expected).root
+    expected_dom = parse_html_document(expected)
 
-    html_document.root.should == expected_dom
+    if expected_dom.respond_to?(:canonicalize)
+      html_document.canonicalize.should == expected_dom.canonicalize
+    else
+      html_document.root.should == expected_dom.root
+    end
   end
   
   it "should output escaped URLs" do

@@ -50,7 +50,7 @@ module ViewExampleGroup
   end
 
   def parse_html_document(html)
-    @html_document ||= if defined?(Rails::Dom::Testing::Assertions)
+    if defined?(Rails::Dom::Testing::Assertions)
       Nokogiri::HTML::Document.parse(html)
     else
       HTML::Document.new(html, true, false)
