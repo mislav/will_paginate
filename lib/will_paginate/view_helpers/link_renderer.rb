@@ -35,16 +35,20 @@ module WillPaginate
       # Returns the subset of +options+ this instance was initialized with that
       # represent HTML attributes for the container element of pagination links.
       def container_attributes
-        @container_attributes ||= @options.except(*(ViewHelpers.pagination_options.keys + [:renderer] - [:class]))
+        @container_attributes ||= {
+          :role => 'navigation',
+          :"aria-label" => @template.will_paginate_translate(:container_aria_label) { 'Pagination' }
+        }.update @options.except(*(ViewHelpers.pagination_options.keys + [:renderer] - [:class]))
       end
       
     protected
     
       def page_number(page)
+        aria_label = @template.will_paginate_translate(:page_aria_label, :page => page.to_i) { "Page #{page}" }
         if page == current_page
-          tag(:em, page, :class => 'current')
+          tag(:em, page, :class => 'current', :"aria-label" => aria_label, :"aria-current" => 'page')
         else
-          link(page, page, :rel => rel_value(page))
+          link(page, page, :rel => rel_value(page), :"aria-label" => aria_label)
         end
       end
       

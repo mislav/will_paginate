@@ -128,10 +128,10 @@ describe WillPaginate::ActionView do
   it "should match expected markup" do
     paginate
     expected = <<-HTML
-      <div class="pagination"><span class="previous_page disabled">&#8592; Previous</span>
-      <em class="current">1</em>
-      <a href="/foo/bar?page=2" rel="next">2</a>
-      <a href="/foo/bar?page=3">3</a>
+      <div class="pagination" role="navigation" aria-label="Pagination"><span class="previous_page disabled">&#8592; Previous</span>
+      <em class="current" aria-label="Page 1" aria-current="page">1</em>
+      <a href="/foo/bar?page=2" aria-label="Page 2" rel="next">2</a>
+      <a href="/foo/bar?page=3" aria-label="Page 3">3</a>
       <a href="/foo/bar?page=2" class="next_page" rel="next">Next &#8594;</a></div>
     HTML
     expected.strip!.gsub!(/\s{2,}/, ' ')
