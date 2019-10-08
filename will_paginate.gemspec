@@ -11,9 +11,17 @@ Gem::Specification.new do |s|
   
   s.authors  = ['Mislav Marohnić']
   s.email    = 'mislav.marohnic@gmail.com'
-  s.homepage = 'https://github.com/mislav/will_paginate/wiki'
+  s.homepage = 'https://github.com/mislav/will_paginate'
   s.license  = 'MIT'
   
+  s.metadata = {
+    'bug_tracker_uri'   => 'https://github.com/mislav/will_paginate/issues',
+    'changelog_uri'     => "https://github.com/mislav/will_paginate/releases/tag/v#{s.version}",
+    'documentation_uri' => "https://www.rubydoc.info/gems/will_paginate/#{s.version}",
+    'source_code_uri'   => "https://github.com/mislav/will_paginate/tree/v#{s.version}",
+    'wiki_uri'          => 'https://github.com/mislav/will_paginate/wiki'
+  }
+
   s.rdoc_options = ['--main', 'README.md', '--charset=UTF-8']
   s.extra_rdoc_files = ['README.md', 'LICENSE']
   
