@@ -6,7 +6,7 @@ module WillPaginate
   module InvalidPage; end
 
   # integer representing a page number
-  class PageNumber < DelegateClass(Integer)
+  class PageNumber < Numeric
     # a value larger than this is not supported in SQL queries
     BIGINT = 9223372036854775807
 
@@ -18,13 +18,17 @@ module WillPaginate
         raise RangeError, "invalid #{name}: #{value.inspect}"
       end
       @name = name
-      super(value)
+      @value = value
     rescue ArgumentError, TypeError, RangeError => error
       error.extend InvalidPage
       raise error
     end
 
-    alias_method :to_i, :__getobj__
+    def to_i
+      @value
+    end
+
+    def_delegators :@value, :coerce, :==, :<=>, :to_s, :+, :-, :*, :/
 
     def inspect
       "#{@name} #{to_i}"
@@ -39,13 +43,6 @@ module WillPaginate
     end
     alias is_a? kind_of?
   end
-
-  # Ultrahax: makes `Integer === current_page` checks pass
-  Numeric.extend Module.new {
-    def ===(obj)
-      obj.instance_of? PageNumber or super
-    end
-  }
 
   # An idemptotent coercion method
   def self.PageNumber(value, name = 'page')
