@@ -14,7 +14,8 @@ Routes.draw do
   get 'ibocorp(/:page)' => 'ibocorp#index',
         :constraints => { :page => /\d+/ }, :defaults => { :page => 1 }
 
-  get ':controller(/:action(/:id(.:format)))'
+  get 'foo/bar' => 'foo#bar'
+  get 'baz/list' => 'baz#list'
 end
 
 describe WillPaginate::ActionView do
@@ -38,7 +39,14 @@ describe WillPaginate::ActionView do
   attr_reader :assigns, :controller, :request
   
   def render(locals)
-    @view = ActionView::Base.new([], @assigns, @controller)
+    lookup_context = []
+    if defined? ActionView::LookupContext
+      lookup_context = ActionView::LookupContext.new(lookup_context)
+    end
+
+    klass = ActionView::Base
+    klass = klass.with_empty_template_cache if klass.respond_to?(:with_empty_template_cache)
+    @view = klass.new(lookup_context, @assigns, @controller)
     @view.request = @request
     @view.singleton_class.send(:include, @controller._routes.url_helpers)
     @view.render(:inline => @template, :locals => locals)
