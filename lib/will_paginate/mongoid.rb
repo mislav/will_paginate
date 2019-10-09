@@ -8,6 +8,8 @@ module WillPaginate
         extend CollectionMethods
         @current_page = WillPaginate::PageNumber(options[:page] || @current_page || 1)
         @page_multiplier = current_page - 1
+        @total_entries = options.delete(:total_entries)
+
         pp = (options[:per_page] || per_page || WillPaginate.per_page).to_i
         limit(pp).skip(@page_multiplier * pp)
       end
