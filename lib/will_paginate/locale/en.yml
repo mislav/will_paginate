@@ -3,6 +3,8 @@ en:
     previous_label: "&#8592; Previous"
     next_label: "Next &#8594;"
     page_gap: "&hellip;"
+    container_aria_label: "Pagination"
+    page_aria_label: "Page %{page}"
 
     page_entries_info:
       single_page:
