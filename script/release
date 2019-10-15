@@ -1,0 +1,22 @@
+#!/bin/sh
+set -euo pipefail
+
+SKIP_NONRAILS_TESTS=1 bundle exec rspec spec
+
+changelog() {
+  local previous_tag="$(git describe --tags HEAD^ --abbrev=0)"
+  git log --no-merges --format='* %s%n%w(0,2,2)%+b' --reverse "${previous_tag}..HEAD^" "$@"
+}
+
+gem build *.gemspec | awk '/(Name|Version|File): /{print $2}' | xargs | while read name version gemfile; do
+  tagname="v${version}"
+  git commit -m "${name} ${version}" -- lib/will_paginate/version.rb
+  git tag "$tagname"
+  git push origin HEAD "$tagname"
+  gem push "$gemfile"
+  rm -rf "$gemfile"
+  { echo "${name} ${version}"
+    echo
+    changelog -- lib
+  } | hub release create -F- --edit "$tagname"
+done
