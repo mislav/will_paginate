@@ -28,7 +28,7 @@ module WillPaginate
       @value
     end
 
-    def_delegators :@value, :coerce, :==, :<=>, :to_s, :+, :-, :*, :/
+    def_delegators :@value, :coerce, :==, :<=>, :to_s, :+, :-, :*, :/, :to_json
 
     def inspect
       "#{@name} #{to_i}"

@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'will_paginate/page_number'
+require 'json'
 
 describe WillPaginate::PageNumber do
   describe "valid" do
@@ -37,6 +38,14 @@ describe WillPaginate::PageNumber do
 
     it "passes the Numeric=== type check" do |variable|
       (Numeric === num).should be
+    end
+
+    it "fails the Numeric=== type check" do |variable|
+      (Integer === num).should_not be
+    end
+
+    it "serializes as JSON number" do
+      JSON.dump(page: num).should eq('{"page":12}')
     end
   end
 
