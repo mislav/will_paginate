@@ -105,9 +105,7 @@ module WillPaginate
       # overloaded to be pagination-aware
       def empty?
         if !loaded? and offset_value
-          result = count
-          result = result.size if result.respond_to?(:size) and !result.is_a?(Integer)
-          result <= offset_value
+          total_entries <= offset_value
         else
           super
         end

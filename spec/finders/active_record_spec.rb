@@ -163,6 +163,13 @@ describe WillPaginate::ActiveRecord do
       topics.total_entries.should == 999
     end
 
+    it "overrides empty? count call with a total_entries fixed value" do
+      lambda {
+        topics = Topic.paginate :page => 1, :per_page => 3, :total_entries => 999
+        topics.should_not be_empty
+      }.should run_queries(0)
+    end
+
     it "removes :include for count" do
       lambda {
         developers = Developer.paginate(:page => 1, :per_page => 1).includes(:projects)
@@ -271,12 +278,12 @@ describe WillPaginate::ActiveRecord do
     }.should run_queries(1)
   end
   
-  it "should get second (inexistent) page of Topics, requiring 2 queries" do
+  it "should get second (inexistent) page of Topics, requiring 1 query" do
     lambda {
       result = Topic.paginate :page => 2
       result.total_pages.should == 1
       result.should be_empty
-    }.should run_queries(2)
+    }.should run_queries(1)
   end
   
   describe "associations" do
