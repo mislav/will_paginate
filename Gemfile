@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-rails_version = '~> 6.0.0'
+rails_version = '~> 6.0.2'
 
 gem 'activerecord', rails_version
 gem 'actionpack',   rails_version
