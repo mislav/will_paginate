@@ -12,7 +12,7 @@ requirements = {
   'Gemfile.rails3.2'   => Gem::Requirement.new('< 2.4'),
   'Gemfile.rails4.0'   => Gem::Requirement.new(['< 2.4', '>= 1.9']),
   'Gemfile.rails4.1'   => Gem::Requirement.new(['< 2.4', '>= 1.9']),
-  'Gemfile.rails4.2'   => Gem::Requirement.new('>= 1.9'),
+  'Gemfile.rails4.2'   => Gem::Requirement.new(['>= 1.9', '< 2.7']),
   'Gemfile.rails5.0'   => Gem::Requirement.new('>= 2.2'),
   'Gemfile.rails5.1'   => Gem::Requirement.new('>= 2.2'),
   'Gemfile.rails5.2'   => Gem::Requirement.new('>= 2.2'),

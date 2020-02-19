@@ -82,6 +82,8 @@ matrix:
       gemfile: Gemfile.rails4.1
     - rvm: 2.7.0
       gemfile: Gemfile.rails4.1
+    - rvm: 2.7.0
+      gemfile: Gemfile.rails4.2
     - rvm: 1.9.3
       gemfile: Gemfile.rails5.0
     - rvm: 2.1.8
