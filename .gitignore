@@ -1,4 +1,5 @@
 Gemfile*.lock
+Brewfile.lock.json
 .bundle
 doc
 *.gem
