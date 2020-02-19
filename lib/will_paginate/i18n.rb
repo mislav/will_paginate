@@ -8,10 +8,10 @@ module WillPaginate
       Dir["#{locale_dir}/*.{rb,yml}"]
     end
 
-    def will_paginate_translate(keys, options = {})
+    def will_paginate_translate(keys, options = {}, &block)
       if defined? ::I18n
         defaults = Array(keys).dup
-        defaults << Proc.new if block_given?
+        defaults << block if block_given?
         ::I18n.translate(defaults.shift, options.merge(:default => defaults, :scope => :will_paginate))
       else
         key = Array === keys ? keys.first : keys
