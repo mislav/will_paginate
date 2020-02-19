@@ -4,7 +4,7 @@ set -e
 
 if type -p brew >/dev/null; then
   brew bundle --no-upgrade
-  export PATH="$(brew --prefix mysql@5.6)/bin:$PATH"
+  export PATH="$(brew --prefix mysql@5.7)/bin:$PATH"
 
   while [ ! -e /tmp/mysql.sock ] && [ ! -e /var/run/mysql5/mysqld.sock ]; do
     echo "Waiting for mysql to start up ..." >&2
