@@ -15,6 +15,9 @@ if [[ -n "$BUNDLE_GEMFILE" && "${BUNDLE_GEMFILE##*/}" != 'Gemfile' ]]; then
   export SKIP_NONRAILS_TESTS=1
 fi
 
+errlog="$(mktemp)"
+trap "rm -f '$errlog'" EXIT
+
 for db in sqlite3 mysql mysql2 postgres; do
   [[ "$rails_version" = 3.0 && $db = "mysql2" ]] && continue
   [[ "$rails_version" > 4.2 && $db = "mysql" ]] && continue
@@ -23,7 +26,8 @@ for db in sqlite3 mysql mysql2 postgres; do
   spec_files="spec"
   [[ $db != "sqlite3" ]] && spec_files="spec/finders/active_record_spec.rb"
   echo "rspec $spec_files"
-  DB="$db" rspec -r fake_rubygems "$spec_files" || status="$?"
+  DB="$db" rspec -r fake_rubygems "$spec_files" 2>>"$errlog" || status="$?"
 done
 
+grep -v "$PWD/vendor/" "$errlog" >&2
 exit $status
