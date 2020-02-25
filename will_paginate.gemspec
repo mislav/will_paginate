@@ -5,6 +5,7 @@ require File.expand_path('../lib/will_paginate/version', __FILE__)
 Gem::Specification.new do |s|
   s.name    = 'will_paginate'
   s.version = WillPaginate::VERSION::STRING
+  s.required_ruby_version = '>= 2.0'
   
   s.summary = "Pagination plugin for web frameworks and other apps"
   s.description = "will_paginate provides a simple API for performing paginated queries with Active Record, DataMapper and Sequel, and includes helpers for rendering pagination links in Rails, Sinatra, Hanami, and Merb web apps."

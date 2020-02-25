@@ -10,7 +10,6 @@ before_script:
   - mysql -e 'create database will_paginate;'
   - psql -c 'create database will_paginate;' -U postgres
 rvm:
-  - 1.9.3
   - 2.1.8
   - 2.2.7
   - 2.3.8
@@ -32,8 +31,6 @@ gemfile:
   - Gemfile.rails-edge
 matrix:
   exclude:
-    - rvm: 1.9.3
-      gemfile: Gemfile
     - rvm: 2.1.8
       gemfile: Gemfile
     - rvm: 2.2.7
@@ -84,20 +81,12 @@ matrix:
       gemfile: Gemfile.rails4.1
     - rvm: 2.7.0
       gemfile: Gemfile.rails4.2
-    - rvm: 1.9.3
-      gemfile: Gemfile.rails5.0
     - rvm: 2.1.8
       gemfile: Gemfile.rails5.0
-    - rvm: 1.9.3
-      gemfile: Gemfile.rails5.1
     - rvm: 2.1.8
       gemfile: Gemfile.rails5.1
-    - rvm: 1.9.3
-      gemfile: Gemfile.rails5.2
     - rvm: 2.1.8
       gemfile: Gemfile.rails5.2
-    - rvm: 1.9.3
-      gemfile: Gemfile.rails-edge
     - rvm: 2.1.8
       gemfile: Gemfile.rails-edge
     - rvm: 2.2.7
