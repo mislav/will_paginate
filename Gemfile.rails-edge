@@ -14,7 +14,3 @@ gem 'sqlite3', '~> 1.4.0'
 
 gem 'mysql2', '~> 0.5.2', :group => :mysql
 gem 'pg', '~> 0.11', :group => :pg
-
-group :development do
-  gem 'debugger', :platforms => :mri_19
-end

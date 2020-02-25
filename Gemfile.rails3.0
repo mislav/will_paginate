@@ -17,7 +17,3 @@ group :mysql do
   gem 'activerecord-mysql2-adapter'
 end
 gem 'pg', '< 0.18', :group => :pg
-
-group :development do
-  gem 'debugger', :platforms => :mri_19
-end

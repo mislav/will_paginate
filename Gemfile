@@ -18,7 +18,3 @@ gem 'dm-aggregates'
 gem 'dm-migrations'
 gem 'dm-sqlite-adapter'
 gem 'mongoid', '~> 7.0.4'
-
-group :development do
-  gem 'debugger', :platforms => :mri_19
-end
