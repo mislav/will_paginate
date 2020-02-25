@@ -1,4 +1,3 @@
-require 'delegate'
 require 'forwardable'
 
 module WillPaginate
