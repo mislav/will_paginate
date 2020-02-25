@@ -59,11 +59,11 @@ module WillPaginate
     end
 
     module ControllerRescuePatch
-      def rescue_from(*args, &block)
+      def rescue_from(*args, **kwargs, &block)
         if idx = args.index(WillPaginate::InvalidPage)
           args[idx] = args[idx].name
         end
-        super(*args, &block)
+        super(*args, **kwargs, &block)
       end
     end
   end
