@@ -42,5 +42,5 @@ RSpec.configure do |config|
   }
 
   config.mock_with :mocha
-  config.backtrace_clean_patterns << /view_example_group/
+  config.backtrace_exclusion_patterns << /view_example_group/
 end
