@@ -5,7 +5,7 @@ SKIP_NONRAILS_TESTS=1 bundle exec rspec spec
 
 changelog() {
   local previous_tag="$(git describe --tags HEAD^ --abbrev=0)"
-  git log --no-merges --format='* %s%n%w(0,2,2)%+b' --reverse "${previous_tag}..HEAD^" "$@"
+  git log --first-parent --format='* %s%n%w(0,2,2)%+b' --reverse "${previous_tag}..HEAD^" "$@"
 }
 
 gem build *.gemspec | awk '/(Name|Version|File): /{print $2}' | xargs | while read name version gemfile; do
