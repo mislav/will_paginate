@@ -80,7 +80,7 @@ module WillPaginate
           defaults = nil
           key = keys
         end
-        translate(key, options.merge(:default => defaults, :scope => :will_paginate))
+        translate(key, **options.merge(:default => defaults, :scope => :will_paginate))
       else
         super
       end

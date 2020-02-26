@@ -220,7 +220,7 @@ describe WillPaginate::ActiveRecord do
         sql = "select content from topics where content like '%futurama%'"
         topics = Topic.paginate_by_sql sql, :page => 1, :per_page => 1
         topics.total_entries.should == 1
-        topics.first.attributes.has_key?('title').should be_false
+        topics.first.attributes.has_key?('title').should be(false)
       }.should run_queries(2)
     end
 

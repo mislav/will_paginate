@@ -7,14 +7,10 @@ gem 'actionpack',   git: 'https://github.com/rails/rails.git', branch: 'master'
 
 gem 'thread_safe'
 
-gem 'rspec', '~> 2.7.0'
+gem 'rspec', '~> 2.99'
 gem 'mocha', '~> 0.9.8'
 
 gem 'sqlite3', '~> 1.4.0'
 
 gem 'mysql2', '~> 0.5.2', :group => :mysql
 gem 'pg', '~> 0.11', :group => :pg
-
-group :development do
-  gem 'debugger', :platforms => :mri_19
-end

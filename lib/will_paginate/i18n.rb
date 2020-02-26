@@ -12,7 +12,7 @@ module WillPaginate
       if defined? ::I18n
         defaults = Array(keys).dup
         defaults << block if block_given?
-        ::I18n.translate(defaults.shift, options.merge(:default => defaults, :scope => :will_paginate))
+        ::I18n.translate(defaults.shift, **options.merge(:default => defaults, :scope => :will_paginate))
       else
         key = Array === keys ? keys.first : keys
         yield key, options

@@ -10,6 +10,8 @@ if !ENV['SKIP_NONRAILS_TESTS']
   require 'will_paginate/mongoid'
   Object.send(:const_set, :Rails, old_rails) if old_rails
 
+  Mongo::Logger.logger.level = Logger::INFO
+
   Mongoid.connect_to 'will_paginate_test'
   class MongoidModel
     include Mongoid::Document
