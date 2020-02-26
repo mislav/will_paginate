@@ -115,7 +115,8 @@ module WillPaginate
         url_params = @base_url_params.dup
         add_current_page_param(url_params, page)
 
-        @template.url_for(url_params)
+				h = Rails.application.routes.url_helpers
+        h.url_for(url_params)
       end
 
       def merge_get_params(url_params)
