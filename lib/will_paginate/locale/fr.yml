@@ -1,0 +1,35 @@
+fr:
+  will_paginate:
+    previous_label: "&#8592; Précédent"
+    next_label: "Suivant &#8594;"
+    page_gap: "&hellip;"
+    container_aria_label: "Pagination"
+    page_aria_label: "Page %{page}"
+
+    page_entries_info:
+      single_page:
+        zero:  "Aucun %{model} trouvé"
+        one:   "Affichage de 1 %{model}"
+        other: "Affichage de tous les %{count} %{model}"
+      single_page_html:
+        zero:  "Aucun %{model} trouvé"
+        one:   "Affichage de <b>1</b> %{model}"
+        other: "Affichage de <b>tous&nbsp;%{count}</b> %{model}"
+
+      multi_page: "Affichage de %{model} %{from} - %{to} de %{count} au total"
+      multi_page_html: "Affichage de %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> de <b>%{count}</b> au total"
+
+    # models:
+    #   entry:
+    #     zero:  entrées
+    #     one:   entrée
+    #     few:   entrées
+    #     other: entrées
+
+    # line_item:
+    #   page_entries_info:
+    #     single_page:
+    #       zero:  "Votre panier d'achat est vide"
+    #       one:   "Affichage d'un item dans votre panier d'achat"
+    #       other: "Affichage de tous les %{count} items"
+    #     multi_page: "Affichage de tous les items %{from} - %{to} de %{count} au total"
