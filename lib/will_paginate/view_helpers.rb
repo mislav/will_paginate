@@ -42,7 +42,7 @@ module WillPaginate
 
     # Returns HTML representing page links for a WillPaginate::Collection-like object.
     # In case there is no more than one page in total, nil is returned.
-    # 
+    #
     # ==== Options
     # * <tt>:class</tt> -- CSS class name for the generated DIV (default: "pagination")
     # * <tt>:previous_label</tt> -- default: "« Previous"
@@ -61,7 +61,7 @@ module WillPaginate
     #
     # All options not recognized by will_paginate will become HTML attributes on the container
     # element for pagination links (the DIV). For example:
-    # 
+    #
     #   <%= will_paginate @posts, :style => 'color:blue' %>
     #
     # will result in:
@@ -123,13 +123,15 @@ module WillPaginate
 
       model_count = collection.total_pages > 1 ? 5 : collection.size
       defaults = ["models.#{model_key}"]
-      defaults << Proc.new { |_, opts|
+      defaults << Proc.new { |opt1, opt2|
+        # we need this hack to support ruby 2.1
+        count = (opt2 && opt2.respond_to?(:[]) && opt2[:count]) || (opt1 && opt1.respond_to?(:[]) && opt1[:count])
         if model.respond_to? :model_name
-          model.model_name.human(:count => opts[:count])
+          model.model_name.human(:count => count)
         else
           name = model_key.to_s.tr('_', ' ')
           raise "can't pluralize model name: #{model.inspect}" unless name.respond_to? :pluralize
-          opts[:count] == 1 ? name : name.pluralize
+          count == 1 ? name : name.pluralize
         end
       }
       model_name = will_paginate_translate defaults, :count => model_count
