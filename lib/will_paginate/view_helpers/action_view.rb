@@ -3,10 +3,10 @@ require 'will_paginate/view_helpers/link_renderer'
 
 module WillPaginate
   # = ActionView helpers
-  # 
+  #
   # This module serves for availability in ActionView templates. It also adds a new
   # view helper: +paginated_section+.
-  # 
+  #
   # == Using the helper without arguments
   # If the helper is called without passing in the collection object, it will
   # try to read from the instance variable inferred by the controller name.
@@ -42,7 +42,7 @@ module WillPaginate
 
     # Wrapper for rendering pagination links at both top and bottom of a block
     # of content.
-    # 
+    #
     #   <%= paginated_section @posts do %>
     #     <ol id="posts">
     #       <% for post in @posts %>
@@ -74,7 +74,7 @@ module WillPaginate
     def will_paginate_translate(keys, options = {})
       if respond_to? :translate
         if Array === keys
-          defaults = keys.dup
+          defaults = keys.map { |d| options && options[:count] && d.respond_to?(:call) ? d.call(options) : d }
           key = defaults.shift
         else
           defaults = nil
