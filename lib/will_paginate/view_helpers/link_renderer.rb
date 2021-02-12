@@ -71,7 +71,7 @@ module WillPaginate
         if page
           link(text, page, :class => classname)
         else
-          tag(:span, text, :class => classname + ' disabled')
+          tag(:span, text, :class => classname + ' disabled', :"aria-disabled" => true)
         end
       end
       
