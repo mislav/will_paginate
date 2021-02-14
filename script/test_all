@@ -1,20 +1,24 @@
 #!/usr/bin/env bash
 set -e
 
+binstubs_path="bin"
+if [[ -n $TRAVIS && $BUNDLE_GEMFILE == */* ]]; then
+  binstubs_path="${BUNDLE_GEMFILE%/*}/bin"
+fi
+export PATH="${binstubs_path}:$PATH"
+
+if [[ $BUNDLE_GEMFILE == *non-rails* ]]; then
+  echo "bin/rspec spec-non-rails"
+  exec rspec spec-non-rails
+fi
+
+rails_version="$(ruby -r rubygems -e '
+  require "bundler"
+  activerecord = Bundler.load.specs.find { |s| s.name == "activerecord" }
+  puts activerecord.version
+')"
+
 status=0
-
-export PATH="${PWD}/bin:$PATH"
-
-rails_version="$(ruby -r rubygems -e 'require "bundler"; puts Bundler.load.specs.find {|s| s.name == "activerecord" }.version')"
-
-if [ -z "$BUNDLE_GEMFILE" ]; then
-  BUNDLE_GEMFILE="$(bundle config gemfile | grep BUNDLE_GEMFILE | head -1 | cut -d'"' -f2)"
-fi
-
-if [[ -n "$BUNDLE_GEMFILE" && "${BUNDLE_GEMFILE##*/}" != 'Gemfile' ]]; then
-  export SKIP_NONRAILS_TESTS=1
-fi
-
 errlog="$(mktemp)"
 trap "rm -f '$errlog'" EXIT
 
@@ -23,11 +27,9 @@ for db in sqlite3 mysql mysql2 postgres; do
   [[ "$rails_version" > 4.2 && $db = "mysql" ]] && continue
 
   printf "\e[1;33m[DB] %s\e[m\n" "$db"
-  spec_files="spec"
-  [[ $db != "sqlite3" ]] && spec_files="spec/finders/active_record_spec.rb"
-  echo "rspec $spec_files"
-  DB="$db" rspec -r fake_rubygems "$spec_files" 2>>"$errlog" || status="$?"
+  echo "bin/rspec spec"
+  DB="$db" rspec -r fake_rubygems spec 2>>"$errlog" || status="$?"
 done
 
-grep -v "$PWD/vendor/" "$errlog" >&2
+grep -vF "$PWD/vendor/" "$errlog" >&2 || true
 exit $status

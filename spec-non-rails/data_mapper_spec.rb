@@ -1,14 +1,19 @@
-require 'spec_helper'
+require_relative './spec_helper'
+require 'will_paginate/data_mapper'
+require_relative './data_mapper_test_connector'
 
-if !ENV['SKIP_NONRAILS_TESTS']
-  require 'will_paginate/data_mapper'
-  require File.expand_path('../data_mapper_test_connector', __FILE__)
-  datamapper_loaded = true
-else
-  datamapper_loaded = false
-end
+describe "WillPaginate::DataMapper" do
 
-describe WillPaginate::DataMapper do
+  before(:all) do
+    DataMapper.setup :default, 'sqlite3::memory:'
+    [Animal, Ownership, Human].each do |klass|
+      klass.auto_migrate!
+    end
+
+    Animal.create(:name => 'Dog', :notes => 'a friend of all')
+    Animal.create(:name => 'Cat', :notes => 'a friend or foe')
+    Animal.create(:name => 'Lion', :notes => 'some roar')
+  end
 
   it "has per_page" do
     Animal.per_page.should == 30
@@ -79,10 +84,8 @@ describe WillPaginate::DataMapper do
   end
 
   it "overrides total_entries count with a fixed value" do
-    lambda {
-      animals = Animal.paginate :page => 1, :per_page => 3, :total_entries => 999
-      animals.total_entries.should == 999
-    }.should run_queries(0)
+    animals = Animal.paginate :page => 1, :per_page => 3, :total_entries => 999
+    animals.total_entries.should == 999
   end
 
   it "supports a non-int for total_entries" do
@@ -111,4 +114,4 @@ describe WillPaginate::DataMapper do
     human.pet = Animal.first
   end
 
-end if datamapper_loaded
+end

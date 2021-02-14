@@ -1,10 +1,5 @@
 require 'rspec'
 require 'view_helpers/view_example_group'
-begin
-  require 'ruby-debug'
-rescue LoadError
-  # no debugger available
-end
 
 Dir[File.expand_path('../matchers/*_matcher.rb', __FILE__)].each { |matcher| require matcher }
 
