@@ -370,6 +370,16 @@ describe WillPaginate::ActionView do
     end
   end
 
+  # TODO: re-enable once Rails 6.1.2 ships
+  xit "page_entries_info" do
+    @template = "<%= page_entries_info collection, options %>"
+    output = render(
+      collection: WillPaginate::Collection.new(1, 1, 3),
+      options: {html: false},
+    )
+    output.should == "Displaying entries 1 - 0 of 3 in total"
+  end
+
   private
 
   def translation(data)
