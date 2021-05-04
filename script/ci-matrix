@@ -1,25 +1,19 @@
 #!/usr/bin/env ruby
 require "yaml"
 
-ci_config = File.expand_path('../../.travis.yml', __FILE__)
+ci_config = File.expand_path('../../.github/workflows/test.yml', __FILE__)
 data = YAML.load(File.read(ci_config))
-ruby_versions = data.fetch('rvm')
-gemfiles = data.fetch('gemfile')
+matrix = data.dig('jobs', 'test-rails', 'strategy', 'matrix')
+ruby_versions = matrix.fetch('ruby')
+gemfiles = matrix.fetch('gemfile')
 
 requirements = {
-  'environments/Gemfile.rails3.0.rb'    => '< 2.4',
-  'environments/Gemfile.rails3.1.rb'    => '< 2.4',
-  'environments/Gemfile.rails3.2.rb'    => '< 2.4',
-  'environments/Gemfile.rails4.0.rb'    => ['< 2.4', '>= 1.9'],
-  'environments/Gemfile.rails4.1.rb'    => ['< 2.4', '>= 1.9'],
-  'environments/Gemfile.rails4.2.rb'    => ['>= 1.9', '< 2.7'],
-  'environments/Gemfile.rails5.0.rb'    => '>= 2.2',
-  'environments/Gemfile.rails5.1.rb'    => '>= 2.2',
-  'environments/Gemfile.rails5.2.rb'    => '>= 2.2',
+  'environments/Gemfile.rails5.0.rb'    => ['>= 2.2', '< 3.0'],
+  'environments/Gemfile.rails5.1.rb'    => ['>= 2.2', '< 3.0'],
+  'environments/Gemfile.rails5.2.rb'    => ['>= 2.2', '< 3.0'],
   'environments/Gemfile.rails6.0.rb'    => '>= 2.5',
   'Gemfile'                             => '>= 2.5',
   'environments/Gemfile.rails-edge.rb'  => '>= 2.7',
-  'environments/Gemfile.non-rails.rb'   => '>= 2.5',
 }
 
 commands = {}
@@ -30,17 +24,14 @@ commands['excludes'] = -> {
     req = Gem::Requirement.new(requirements.fetch(gemfile))
     ruby_versions.each do |version|
       unless req.satisfied_by?(Gem::Version.new(version))
-        excludes << { 'rvm' => version, 'gemfile' => gemfile }
+        excludes << { 'ruby' => version, 'gemfile' => gemfile }
       end
     end
   end
 
-  data.fetch('matrix')['exclude'] = excludes
+  matrix['exclude'] = excludes
   File.open(ci_config, 'w') do |file|
     yaml_str = YAML.dump(data)
-      .sub(/^---\n/, '')
-      .gsub(/^(\s*-)/, '  \1')
-      .gsub(/^(\s+gemfile:)/, '  \1')
     file.write(yaml_str)
   end
 }

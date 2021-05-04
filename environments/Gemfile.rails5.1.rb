@@ -11,4 +11,4 @@ gem 'mocha', '~> 0.9.8'
 gem 'sqlite3', '~> 1.3.6'
 
 gem 'mysql2', '~> 0.5.2', :group => :mysql
-gem 'pg', '~> 0.18.4', :group => :pg
+gem 'pg', '~> 1.2.3', :group => :pg

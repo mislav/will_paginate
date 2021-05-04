@@ -6,4 +6,4 @@ How to set up your environment for running tests:
 
 2. Run `script/test_all`
 
-   This ensures that the Active Record part of the suite is run across `sqlite3`, `mysql`/`mysql2`, and `postgres` database adapters.
+   This ensures that the Active Record part of the suite is run across `sqlite3`, `mysql`, and `postgres` database adapters.

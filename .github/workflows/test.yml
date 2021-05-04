@@ -1,0 +1,120 @@
+---
+name: Test Suite
+'on':
+- push
+- pull_request
+jobs:
+  test-rails:
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby:
+        - '2.4'
+        - '2.5'
+        - '2.6'
+        - '2.7'
+        - '3.0'
+        gemfile:
+        - Gemfile
+        - environments/Gemfile.rails5.0.rb
+        - environments/Gemfile.rails5.1.rb
+        - environments/Gemfile.rails5.2.rb
+        - environments/Gemfile.rails6.0.rb
+        - environments/Gemfile.rails-edge.rb
+        exclude:
+        - ruby: '2.4'
+          gemfile: Gemfile
+        - ruby: '3.0'
+          gemfile: environments/Gemfile.rails5.0.rb
+        - ruby: '3.0'
+          gemfile: environments/Gemfile.rails5.1.rb
+        - ruby: '3.0'
+          gemfile: environments/Gemfile.rails5.2.rb
+        - ruby: '2.4'
+          gemfile: environments/Gemfile.rails6.0.rb
+        - ruby: '2.4'
+          gemfile: environments/Gemfile.rails-edge.rb
+        - ruby: '2.5'
+          gemfile: environments/Gemfile.rails-edge.rb
+        - ruby: '2.6'
+          gemfile: environments/Gemfile.rails-edge.rb
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: will_paginate
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+        ports:
+        - 3306:3306
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_DB: will_paginate
+          POSTGRES_PASSWORD: postgres
+        ports:
+        - 5432:5432
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "${{ matrix.ruby }}"
+        bundler-cache: true
+    - name: Run tests
+      env:
+        MYSQL_HOST: 127.0.0.1
+        MYSQL_PORT: 3306
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+      run: |
+        docker-wait() {
+          local container
+          container="$(docker ps -q -f ancestor=$1)"
+          timeout 90s bash -c "until docker exec $container $2; do sleep 5; done"
+        }
+
+        docker-wait postgres:11 "pg_isready"
+        docker-wait mysql:5.7 "mysqladmin ping"
+
+        bundler binstubs rspec-core
+        script/test_all
+  test-nonrails:
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby:
+        - '2.4'
+        - '2.5'
+        - '2.6'
+        - '2.7'
+        - '3.0'
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_GEMFILE: environments/Gemfile.non-rails.rb
+    services:
+      mongodb:
+        image: mongo:4.2
+        ports:
+        - 27017:27017
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "${{ matrix.ruby }}"
+        bundler-cache: true
+    - name: Run tests
+      run: |
+        docker-wait() {
+          local container
+          container="$(docker ps -q -f ancestor=$1)"
+          timeout 90s bash -c "until docker exec $container $2; do sleep 5; done"
+        }
+
+        docker-wait mongo:4.2 "mongo --quiet"
+
+        bundler binstubs rspec-core
+        script/test_all

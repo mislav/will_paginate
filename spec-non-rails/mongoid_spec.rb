@@ -8,8 +8,15 @@ describe WillPaginate::Mongoid do
   end
 
   before(:all) do
-    Mongo::Logger.logger.level = Logger::INFO
-    Mongoid.connect_to 'will_paginate_test'
+    Mongoid.configure do |config|
+      mongodb_host = ENV["MONGODB_HOST"] || "localhost"
+      mongodb_port = ENV["MONGODB_PORT"] || "27017"
+      config.clients.default = {
+        hosts: ["#{mongodb_host}:#{mongodb_port}"],
+        database: "will_paginate_test",
+      }
+      config.log_level = :warn
+    end
 
     MongoidModel.delete_all
     4.times { MongoidModel.create! }
