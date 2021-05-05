@@ -1,5 +1,5 @@
 sudo: false
-bundler_args: "--standalone --binstubs --without development"
+bundler_args: "--binstubs"
 cache: bundler
 script: script/test_all
 services:
@@ -10,88 +10,110 @@ before_script:
   - mysql -e 'create database will_paginate;'
   - psql -c 'create database will_paginate;' -U postgres
 rvm:
-  - 2.1.8
-  - 2.2.7
-  - 2.3.8
-  - 2.4.5
-  - 2.5.3
-  - 2.6.3
-  - 2.7.0
+  - '2.1'
+  - '2.2'
+  - '2.3'
+  - '2.4'
+  - '2.5'
+  - '2.6'
+  - '2.7'
 gemfile:
   - Gemfile
-  - Gemfile.rails3.0
-  - Gemfile.rails3.1
-  - Gemfile.rails3.2
-  - Gemfile.rails4.0
-  - Gemfile.rails4.1
-  - Gemfile.rails4.2
-  - Gemfile.rails5.0
-  - Gemfile.rails5.1
-  - Gemfile.rails5.2
-  - Gemfile.rails-edge
+  - environments/Gemfile.rails3.0.rb
+  - environments/Gemfile.rails3.1.rb
+  - environments/Gemfile.rails3.2.rb
+  - environments/Gemfile.rails4.0.rb
+  - environments/Gemfile.rails4.1.rb
+  - environments/Gemfile.rails4.2.rb
+  - environments/Gemfile.rails5.0.rb
+  - environments/Gemfile.rails5.1.rb
+  - environments/Gemfile.rails5.2.rb
+  - environments/Gemfile.rails6.0.rb
+  - environments/Gemfile.rails-edge.rb
+  - environments/Gemfile.non-rails.rb
 matrix:
   exclude:
-    - rvm: 2.1.8
+    - rvm: '2.1'
       gemfile: Gemfile
-    - rvm: 2.2.7
+    - rvm: '2.2'
       gemfile: Gemfile
-    - rvm: 2.3.8
+    - rvm: '2.3'
       gemfile: Gemfile
-    - rvm: 2.4.5
+    - rvm: '2.4'
       gemfile: Gemfile
-    - rvm: 2.4.5
-      gemfile: Gemfile.rails3.0
-    - rvm: 2.5.3
-      gemfile: Gemfile.rails3.0
-    - rvm: 2.6.3
-      gemfile: Gemfile.rails3.0
-    - rvm: 2.7.0
-      gemfile: Gemfile.rails3.0
-    - rvm: 2.4.5
-      gemfile: Gemfile.rails3.1
-    - rvm: 2.5.3
-      gemfile: Gemfile.rails3.1
-    - rvm: 2.6.3
-      gemfile: Gemfile.rails3.1
-    - rvm: 2.7.0
-      gemfile: Gemfile.rails3.1
-    - rvm: 2.4.5
-      gemfile: Gemfile.rails3.2
-    - rvm: 2.5.3
-      gemfile: Gemfile.rails3.2
-    - rvm: 2.6.3
-      gemfile: Gemfile.rails3.2
-    - rvm: 2.7.0
-      gemfile: Gemfile.rails3.2
-    - rvm: 2.4.5
-      gemfile: Gemfile.rails4.0
-    - rvm: 2.5.3
-      gemfile: Gemfile.rails4.0
-    - rvm: 2.6.3
-      gemfile: Gemfile.rails4.0
-    - rvm: 2.7.0
-      gemfile: Gemfile.rails4.0
-    - rvm: 2.4.5
-      gemfile: Gemfile.rails4.1
-    - rvm: 2.5.3
-      gemfile: Gemfile.rails4.1
-    - rvm: 2.6.3
-      gemfile: Gemfile.rails4.1
-    - rvm: 2.7.0
-      gemfile: Gemfile.rails4.1
-    - rvm: 2.7.0
-      gemfile: Gemfile.rails4.2
-    - rvm: 2.1.8
-      gemfile: Gemfile.rails5.0
-    - rvm: 2.1.8
-      gemfile: Gemfile.rails5.1
-    - rvm: 2.1.8
-      gemfile: Gemfile.rails5.2
-    - rvm: 2.1.8
-      gemfile: Gemfile.rails-edge
-    - rvm: 2.2.7
-      gemfile: Gemfile.rails-edge
-    - rvm: 2.3.8
-      gemfile: Gemfile.rails-edge
-    - rvm: 2.4.5
-      gemfile: Gemfile.rails-edge
+    - rvm: '2.4'
+      gemfile: environments/Gemfile.rails3.0.rb
+    - rvm: '2.5'
+      gemfile: environments/Gemfile.rails3.0.rb
+    - rvm: '2.6'
+      gemfile: environments/Gemfile.rails3.0.rb
+    - rvm: '2.7'
+      gemfile: environments/Gemfile.rails3.0.rb
+    - rvm: '2.4'
+      gemfile: environments/Gemfile.rails3.1.rb
+    - rvm: '2.5'
+      gemfile: environments/Gemfile.rails3.1.rb
+    - rvm: '2.6'
+      gemfile: environments/Gemfile.rails3.1.rb
+    - rvm: '2.7'
+      gemfile: environments/Gemfile.rails3.1.rb
+    - rvm: '2.4'
+      gemfile: environments/Gemfile.rails3.2.rb
+    - rvm: '2.5'
+      gemfile: environments/Gemfile.rails3.2.rb
+    - rvm: '2.6'
+      gemfile: environments/Gemfile.rails3.2.rb
+    - rvm: '2.7'
+      gemfile: environments/Gemfile.rails3.2.rb
+    - rvm: '2.4'
+      gemfile: environments/Gemfile.rails4.0.rb
+    - rvm: '2.5'
+      gemfile: environments/Gemfile.rails4.0.rb
+    - rvm: '2.6'
+      gemfile: environments/Gemfile.rails4.0.rb
+    - rvm: '2.7'
+      gemfile: environments/Gemfile.rails4.0.rb
+    - rvm: '2.4'
+      gemfile: environments/Gemfile.rails4.1.rb
+    - rvm: '2.5'
+      gemfile: environments/Gemfile.rails4.1.rb
+    - rvm: '2.6'
+      gemfile: environments/Gemfile.rails4.1.rb
+    - rvm: '2.7'
+      gemfile: environments/Gemfile.rails4.1.rb
+    - rvm: '2.7'
+      gemfile: environments/Gemfile.rails4.2.rb
+    - rvm: '2.1'
+      gemfile: environments/Gemfile.rails5.0.rb
+    - rvm: '2.1'
+      gemfile: environments/Gemfile.rails5.1.rb
+    - rvm: '2.1'
+      gemfile: environments/Gemfile.rails5.2.rb
+    - rvm: '2.1'
+      gemfile: environments/Gemfile.rails6.0.rb
+    - rvm: '2.2'
+      gemfile: environments/Gemfile.rails6.0.rb
+    - rvm: '2.3'
+      gemfile: environments/Gemfile.rails6.0.rb
+    - rvm: '2.4'
+      gemfile: environments/Gemfile.rails6.0.rb
+    - rvm: '2.1'
+      gemfile: environments/Gemfile.rails-edge.rb
+    - rvm: '2.2'
+      gemfile: environments/Gemfile.rails-edge.rb
+    - rvm: '2.3'
+      gemfile: environments/Gemfile.rails-edge.rb
+    - rvm: '2.4'
+      gemfile: environments/Gemfile.rails-edge.rb
+    - rvm: '2.5'
+      gemfile: environments/Gemfile.rails-edge.rb
+    - rvm: '2.6'
+      gemfile: environments/Gemfile.rails-edge.rb
+    - rvm: '2.1'
+      gemfile: environments/Gemfile.non-rails.rb
+    - rvm: '2.2'
+      gemfile: environments/Gemfile.non-rails.rb
+    - rvm: '2.3'
+      gemfile: environments/Gemfile.non-rails.rb
+    - rvm: '2.4'
+      gemfile: environments/Gemfile.non-rails.rb

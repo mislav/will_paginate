@@ -1,15 +1,15 @@
-require 'spec_helper'
+require_relative './spec_helper'
+require 'sequel'
+require 'will_paginate/sequel'
 
-if !ENV['SKIP_NONRAILS_TESTS']
-  require 'will_paginate/sequel'
-  require File.expand_path('../sequel_test_connector', __FILE__)
-  sequel_loaded = true
-else
-  sequel_loaded = false
+Sequel.sqlite.create_table :cars do
+  primary_key :id, :integer, :auto_increment => true
+  column :name, :text
+  column :notes, :text
 end
 
 describe Sequel::Dataset::Pagination, 'extension' do
-  
+
   class Car < Sequel::Model
     self.dataset = dataset.extension(:pagination)
   end
@@ -63,4 +63,4 @@ describe Sequel::Dataset::Pagination, 'extension' do
     end
   end
 
-end if sequel_loaded
+end

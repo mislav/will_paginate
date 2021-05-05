@@ -1,7 +1,8 @@
 #!/bin/sh
 set -euo pipefail
 
-SKIP_NONRAILS_TESTS=1 bundle exec rspec spec
+bin/rspec spec
+BUNDLE_GEMFILE=environments/Gemfile.non-rails.rb bin/rspec spec-non-rails
 
 changelog() {
   local previous_tag="$(git describe --tags HEAD^ --abbrev=0)"

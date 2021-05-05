@@ -4,7 +4,9 @@ set -e
 
 if type -p brew >/dev/null; then
   brew bundle --no-upgrade
-  export PATH="$(brew --prefix mysql@5.7)/bin:$PATH"
+  mysql_prefix="$(brew --prefix mysql@5.7)"
+  openssl_prefix="$(brew --prefix openssl@1.1)"
+  bundle config set --local build.mysql2 --with-mysql-config="${mysql_prefix}/bin/mysql_config" --with-ldflags="-L${openssl_prefix}/lib"
 
   while [ ! -e /tmp/mysql.sock ] && [ ! -e /var/run/mysql5/mysqld.sock ]; do
     echo "Waiting for mysql to start up ..." >&2
@@ -15,4 +17,6 @@ fi
 mysql -u root -e 'CREATE DATABASE IF NOT EXISTS will_paginate;'
 psql --dbname will_paginate -c '' 2>/dev/null || createdb will_paginate
 
-bundle install --binstubs --path "${PWD}/vendor/bundle"
+bundle config set path "$PWD/vendor/bundle"
+bundle install
+bundle binstubs rspec-core
