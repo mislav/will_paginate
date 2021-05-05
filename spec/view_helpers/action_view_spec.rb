@@ -1,6 +1,5 @@
 # encoding: utf-8
 require 'spec_helper'
-require 'active_support/rescuable' # needed for Ruby 1.9.1
 require 'action_controller'
 require 'action_view'
 require 'will_paginate/view_helpers/action_view'
@@ -23,6 +22,8 @@ describe WillPaginate::ActionView do
   before(:all) do
     I18n.load_path.concat WillPaginate::I18n.load_path
     I18n.enforce_available_locales = false
+
+    ActionController::Parameters.permit_all_parameters = false
   end
 
   before(:each) do
@@ -40,9 +41,7 @@ describe WillPaginate::ActionView do
   
   def render(locals)
     lookup_context = []
-    if defined? ActionView::LookupContext
-      lookup_context = ActionView::LookupContext.new(lookup_context)
-    end
+    lookup_context = ActionView::LookupContext.new(lookup_context)
 
     klass = ActionView::Base
     klass = klass.with_empty_template_cache if klass.respond_to?(:with_empty_template_cache)
@@ -464,11 +463,7 @@ class DummyRequest
 
   def params(more = nil)
     @params.update(more) if more
-    if defined?(ActionController::Parameters)
-      ActionController::Parameters.new(@params)
-    else
-      @params
-    end
+    ActionController::Parameters.new(@params)
   end
   
   def host_with_port
@@ -483,8 +478,4 @@ class DummyRequest
   def protocol
     'http:'
   end
-end
-
-if defined?(ActionController::Parameters)
-  ActionController::Parameters.permit_all_parameters = false
 end

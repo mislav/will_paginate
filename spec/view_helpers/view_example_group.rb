@@ -1,30 +1,13 @@
 require 'active_support'
 require 'stringio'
-begin
-  $stderr = StringIO.new
-  require 'minitest/unit'
-rescue LoadError
-  # Fails on Ruby 1.8, but it's OK since we only need MiniTest::Assertions
-  # on Rails 4 which doesn't support 1.8 anyway.
-ensure
-  $stderr = STDERR
-end
-
-begin
-  require 'rails/dom/testing/assertions'
-rescue LoadError
-  require 'action_dispatch/testing/assertions'
-end
+require 'minitest/assertions'
+require 'rails/dom/testing/assertions'
 require 'will_paginate/array'
 
 module ViewExampleGroup
   
-  if defined?(Rails::Dom::Testing::Assertions)
-    include Rails::Dom::Testing::Assertions::SelectorAssertions
-  else
-    include ActionDispatch::Assertions::SelectorAssertions
-  end
-  include MiniTest::Assertions if defined? MiniTest
+  include Rails::Dom::Testing::Assertions::SelectorAssertions
+  include Minitest::Assertions
 
   def assert(value, message)
     raise message unless value
@@ -50,11 +33,7 @@ module ViewExampleGroup
   end
 
   def parse_html_document(html)
-    if defined?(Rails::Dom::Testing::Assertions)
-      Nokogiri::HTML::Document.parse(html)
-    else
-      HTML::Document.new(html, true, false)
-    end
+    Nokogiri::HTML::Document.parse(html)
   end
 
   def html_document
@@ -124,23 +103,3 @@ RSpec.configure do |config|
     :file_path => %r{spec/view_helpers/}
   }
 end
-
-module HTML
-  Node.class_eval do
-    def inner_text
-      children.map(&:inner_text).join('')
-    end
-  end
-  
-  Text.class_eval do
-    def inner_text
-      self.to_s
-    end
-  end
-
-  Tag.class_eval do
-    def inner_text
-      childless?? '' : super
-    end
-  end
-end if defined?(HTML)

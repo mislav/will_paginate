@@ -2,7 +2,7 @@
 set -e
 
 binstubs_path="bin"
-if [[ -n $TRAVIS && $BUNDLE_GEMFILE == */* ]]; then
+if [[ -n $CI && $BUNDLE_GEMFILE == */* ]]; then
   binstubs_path="${BUNDLE_GEMFILE%/*}/bin"
 fi
 export PATH="${binstubs_path}:$PATH"
@@ -12,24 +12,10 @@ if [[ $BUNDLE_GEMFILE == *non-rails* ]]; then
   exec rspec spec-non-rails
 fi
 
-rails_version="$(ruby -r rubygems -e '
-  require "bundler"
-  activerecord = Bundler.load.specs.find { |s| s.name == "activerecord" }
-  puts activerecord.version
-')"
-
 status=0
-errlog="$(mktemp)"
-trap "rm -f '$errlog'" EXIT
-
-for db in sqlite3 mysql mysql2 postgres; do
-  [[ "$rails_version" = 3.0 && $db = "mysql2" ]] && continue
-  [[ "$rails_version" > 4.2 && $db = "mysql" ]] && continue
-
+for db in sqlite3 mysql postgres; do
   printf "\e[1;33m[DB] %s\e[m\n" "$db"
   echo "bin/rspec spec"
-  DB="$db" rspec -r fake_rubygems spec 2>>"$errlog" || status="$?"
+  DB="$db" rspec spec || status="$?"
 done
-
-grep -vF "$PWD/vendor/" "$errlog" >&2 || true
 exit $status

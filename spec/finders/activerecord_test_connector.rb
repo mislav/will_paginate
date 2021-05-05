@@ -1,19 +1,7 @@
 require 'active_record'
 require 'active_record/fixtures'
-require 'active_support/multibyte' # needed for Ruby 1.9.1
 require 'stringio'
 require 'erb'
-
-# https://travis-ci.org/mislav/will_paginate/jobs/99999001
-require 'active_support/core_ext/string/conversions'
-class String
-  alias to_datetime_without_patch to_datetime
-  def to_datetime
-    to_datetime_without_patch
-  rescue ArgumentError
-    return nil
-  end
-end
 
 $query_count = 0
 $query_sql = []
@@ -41,10 +29,6 @@ module ActiverecordTestConnector
   attr_accessor :connected
 
   FIXTURES_PATH = File.expand_path('../../fixtures', __FILE__)
-
-  Fixtures = defined?(ActiveRecord::FixtureSet) ? ActiveRecord::FixtureSet :
-             defined?(ActiveRecord::Fixtures) ? ActiveRecord::Fixtures :
-             ::Fixtures
 
   # Set our defaults
   self.connected = false
@@ -79,13 +63,6 @@ module ActiverecordTestConnector
     ActiveRecord::Base.configurations = { db => configuration }
     ActiveRecord::Base.establish_connection(db.to_sym)
     ActiveRecord::Base.default_timezone = :utc
-
-    case configuration['adapter']
-    when 'mysql'
-      fix_primary_key(ActiveRecord::ConnectionAdapters::MysqlAdapter)
-    when 'mysql2'
-      fix_primary_key(ActiveRecord::ConnectionAdapters::Mysql2Adapter)
-    end
   end
 
   def load_schema
@@ -98,37 +75,27 @@ module ActiverecordTestConnector
     end
   end
 
-  def fix_primary_key(adapter_class)
-    if ActiveRecord::VERSION::STRING < "4.1"
-      adapter_class::NATIVE_DATABASE_TYPES[:primary_key] = "int(11) auto_increment PRIMARY KEY"
-    end
-  end
-
   module FixtureSetup
     def fixtures(*tables)
       table_names = tables.map { |t| t.to_s }
 
-      fixtures = Fixtures.create_fixtures ActiverecordTestConnector::FIXTURES_PATH, table_names
+      fixtures = ActiveRecord::FixtureSet.create_fixtures(ActiverecordTestConnector::FIXTURES_PATH, table_names)
       @@loaded_fixtures = {}
       @@fixture_cache = {}
 
       unless fixtures.nil?
-        if fixtures.instance_of?(Fixtures)
-          @@loaded_fixtures[fixtures.table_name] = fixtures
-        else
-          fixtures.each { |f| @@loaded_fixtures[f.table_name] = f }
-        end
+        fixtures.each { |f| @@loaded_fixtures[f.table_name] = f }
       end
 
       table_names.each do |table_name|
-        define_method(table_name) do |*fixtures|
+        define_method(table_name) do |*names|
           @@fixture_cache[table_name] ||= {}
 
-          instances = fixtures.map do |fixture|
-            if @@loaded_fixtures[table_name][fixture.to_s]
-              @@fixture_cache[table_name][fixture] ||= @@loaded_fixtures[table_name][fixture.to_s].find
+          instances = names.map do |name|
+            if @@loaded_fixtures[table_name][name.to_s]
+              @@fixture_cache[table_name][name] ||= @@loaded_fixtures[table_name][name.to_s].find
             else
-              raise StandardError, "No fixture with name '#{fixture}' found for table '#{table_name}'"
+              raise StandardError, "No fixture with name '#{name}' found for table '#{table_name}'"
             end
           end
 
