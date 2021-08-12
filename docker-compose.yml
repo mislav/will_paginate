@@ -1,0 +1,21 @@
+---
+version: '2.1'
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+    - MYSQL_DATABASE=will_paginate
+    - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    ports:
+    - 3307:3306
+  postgres:
+    image: postgres:11
+    environment:
+    - POSTGRES_DB=will_paginate
+    - POSTGRES_PASSWORD=postgres 
+    ports:
+    - 5433:5432
+  mongodb:
+    image: mongo:4.2
+    ports:
+    - 27018:27017
