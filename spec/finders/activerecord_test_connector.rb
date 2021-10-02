@@ -80,7 +80,11 @@ module ActiverecordTestConnector
     
     ActiveRecord::Base.configurations = { db => configuration }
     ActiveRecord::Base.establish_connection(db.to_sym)
-    ActiveRecord::Base.default_timezone = :utc
+    if ActiveRecord.respond_to?(:default_timezone=)
+      ActiveRecord.default_timezone = :utc
+    else
+      ActiveRecord::Base.default_timezone = :utc
+    end
   end
 
   def load_schema
