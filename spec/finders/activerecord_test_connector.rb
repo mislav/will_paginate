@@ -43,10 +43,28 @@ module ActiverecordTestConnector
   end
 
   private
+
+  module Autoloader
+    def const_missing(name)
+      super
+    rescue NameError
+      file = File.join(FIXTURES_PATH, name.to_s.underscore)
+      if File.exist?("#{file}.rb")
+        require file
+        const_get(name)
+      else
+        raise $!
+      end
+    end
+  end
   
   def add_load_path(path)
-    dep = defined?(ActiveSupport::Dependencies) ? ActiveSupport::Dependencies : ::Dependencies
-    dep.autoload_paths.unshift path
+    if ActiveSupport::Dependencies.respond_to?(:autoloader=)
+      Object.singleton_class.include Autoloader
+    else
+      dep = defined?(ActiveSupport::Dependencies) ? ActiveSupport::Dependencies : ::Dependencies
+      dep.autoload_paths.unshift path
+    end
   end
 
   def setup_connection
