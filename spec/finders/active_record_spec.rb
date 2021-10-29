@@ -421,4 +421,36 @@ describe WillPaginate::ActiveRecord do
       Project.page(307445734561825862)
     }.should raise_error(WillPaginate::InvalidPage, "invalid offset: 9223372036854775830")
   end
+
+  describe "#size" do
+    context "when there are remaining items" do
+      it "should check correct size in the first page" do
+        user = User.paginate(:page => 1, :per_page => 5)
+  
+        user.size.should == 5
+      end
+  
+      it "should check correct size in the last page" do
+        user = User.paginate(:page => 3, :per_page => 5)
+  
+        user.size.should == 3
+      end
+    end
+  
+    context "when there are no remaining items" do
+      before(:all) { User.last(3).each(&:destroy) }
+  
+      it "should check correct size in the first page" do
+        user = User.paginate(:page => 1, :per_page => 5)
+  
+        user.size.should == 5
+      end
+  
+      it "should check correct size in the last page" do
+        user = User.paginate(:page => 2, :per_page => 5)
+  
+        user.size.should == 5
+      end
+    end
+  end
  end

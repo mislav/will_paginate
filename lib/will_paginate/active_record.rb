@@ -96,7 +96,9 @@ module WillPaginate
       # workaround for Active Record 3.0
       def size
         if !loaded? and limit_value and group_values.empty?
-          [super, limit_value].min
+          remaining_entries = total_entries - ((current_page - 1) * per_page)
+
+          [super, limit_value, remaining_entries].min
         else
           super
         end
