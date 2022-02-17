@@ -12,7 +12,8 @@ requirements = {
   'environments/Gemfile.rails5.1.rb'    => ['>= 2.2', '< 3.0'],
   'environments/Gemfile.rails5.2.rb'    => ['>= 2.2', '< 3.0'],
   'environments/Gemfile.rails6.0.rb'    => '>= 2.5',
-  'Gemfile'                             => '>= 2.5',
+  'environments/Gemfile.rails6.1.rb'    => '>= 2.5',
+  'Gemfile'                             => '>= 2.7',
   'environments/Gemfile.rails-edge.rb'  => '>= 2.7',
 }
 

@@ -2,6 +2,19 @@ require 'active_record'
 require 'active_record/fixtures'
 require 'stringio'
 require 'erb'
+require 'time'
+require 'date'
+require 'yaml'
+
+# monkeypatch needed for Ruby 3.1 & Rails 6.0
+YAML.module_eval do
+  class << self
+    alias_method :_load_orig, :load
+    def load(yaml_str)
+      _load_orig(yaml_str, permitted_classes: [Symbol, Date, Time])
+    end
+  end
+end if YAML.method(:load).parameters.include?([:key, :permitted_classes])
 
 $query_count = 0
 $query_sql = []
