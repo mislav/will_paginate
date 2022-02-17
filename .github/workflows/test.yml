@@ -24,6 +24,10 @@ jobs:
         exclude:
         - ruby: '2.4'
           gemfile: Gemfile
+        - ruby: '2.5'
+          gemfile: Gemfile
+        - ruby: '2.6'
+          gemfile: Gemfile
         - ruby: '3.0'
           gemfile: environments/Gemfile.rails5.0.rb
         - ruby: '3.0'
