@@ -14,12 +14,14 @@ jobs:
         - '2.6'
         - '2.7'
         - '3.0'
+        - '3.1'
         gemfile:
         - Gemfile
         - environments/Gemfile.rails5.0.rb
         - environments/Gemfile.rails5.1.rb
         - environments/Gemfile.rails5.2.rb
         - environments/Gemfile.rails6.0.rb
+        - environments/Gemfile.rails6.1.rb
         - environments/Gemfile.rails-edge.rb
         exclude:
         - ruby: '2.4'
