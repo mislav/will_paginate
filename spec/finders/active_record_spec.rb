@@ -18,7 +18,7 @@ RSpec.describe WillPaginate::ActiveRecord do
     expect {
       users = User.paginate(:page => 1, :per_page => 5).to_a
       expect(users.length).to eq(5)
-    }.to run_queries(2)
+    }.to execute(2).queries
   end
   
   it "should fail when encountering unknown params" do
@@ -34,11 +34,11 @@ RSpec.describe WillPaginate::ActiveRecord do
         rel = Developer.paginate(:page => 1)
         expect(rel.per_page).to eq(10)
         expect(rel.current_page).to eq(1)
-      }.to run_queries(0)
+      }.to execute(0).queries
 
       expect {
         expect(rel.total_pages).to eq(2)
-      }.to run_queries(1)
+      }.to execute(1).queries
     end
 
     it "should keep per-class per_page number" do
@@ -55,13 +55,13 @@ RSpec.describe WillPaginate::ActiveRecord do
       rel = Topic.paginate(:page => 2, :per_page => 3)
       expect {
         expect(rel.total_entries).to eq(4)
-      }.to run_queries(1)
+      }.to execute(1).queries
       rel = rel.mentions_activerecord
       expect(rel.current_page).to eq(2)
       expect(rel.per_page).to eq(3)
       expect {
         expect(rel.total_entries).to eq(1)
-      }.to run_queries(1)
+      }.to execute(1).queries
     end
 
     it "supports the page() method" do
@@ -110,14 +110,14 @@ RSpec.describe WillPaginate::ActiveRecord do
       expect {
         topics = Topic.paginate :page => 2, :per_page => 3
         expect(topics.total_entries).to eq(4)
-      }.to run_queries(1)
+      }.to execute(1).queries
     end
 
     it "should guess that there are no records" do
       expect {
         topics = Topic.where(:project_id => 999).paginate :page => 1, :per_page => 3
         expect(topics.total_entries).to eq(0)
-      }.to run_queries(1)
+      }.to execute(1).queries
     end
 
     it "forgets count in sub-relations" do
@@ -125,28 +125,28 @@ RSpec.describe WillPaginate::ActiveRecord do
         topics = Topic.paginate :page => 1, :per_page => 3
         expect(topics.total_entries).to eq(4)
         expect(topics.where('1 = 1').total_entries).to eq(4)
-      }.to run_queries(2)
+      }.to execute(2).queries
     end
 
     it "supports empty? method" do
       topics = Topic.paginate :page => 1, :per_page => 3
       expect {
         expect(topics).not_to be_empty
-      }.to run_queries(1)
+      }.to execute(1).queries
     end
     
     it "support empty? for grouped queries" do
       topics = Topic.group(:project_id).paginate :page => 1, :per_page => 3
       expect {
         expect(topics).not_to be_empty
-      }.to run_queries(1)
+      }.to execute(1).queries
     end
 
     it "supports `size` for grouped queries" do
       topics = Topic.group(:project_id).paginate :page => 1, :per_page => 3
       expect {
         expect(topics.size).to eq({nil=>2, 1=>2})
-      }.to run_queries(1)
+      }.to execute(1).queries
     end
 
     it "overrides total_entries count with a fixed value" do
@@ -155,7 +155,7 @@ RSpec.describe WillPaginate::ActiveRecord do
         expect(topics.total_entries).to eq(999)
         # value is kept even in sub-relations
         expect(topics.where('1 = 1').total_entries).to eq(999)
-      }.to run_queries(0)
+      }.to execute(0).queries
     end
 
     it "supports a non-int for total_entries" do
@@ -167,7 +167,7 @@ RSpec.describe WillPaginate::ActiveRecord do
       expect {
         topics = Topic.paginate :page => 1, :per_page => 3, :total_entries => 999
         expect(topics).not_to be_empty
-      }.to run_queries(0)
+      }.to execute(0).queries
     end
 
     it "removes :include for count" do
@@ -175,7 +175,7 @@ RSpec.describe WillPaginate::ActiveRecord do
         developers = Developer.paginate(:page => 1, :per_page => 1).includes(:projects)
         expect(developers.total_entries).to eq(11)
         expect($query_sql.last).not_to match(/\bJOIN\b/)
-      }.to run_queries(1)
+      }.to execute(1).queries
     end
 
     it "keeps :include for count when they are referenced in :conditions" do
@@ -221,7 +221,7 @@ RSpec.describe WillPaginate::ActiveRecord do
         topics = Topic.paginate_by_sql sql, :page => 1, :per_page => 1
         expect(topics.total_entries).to eq(1)
         expect(topics.first.attributes.has_key?('title')).to be(false)
-      }.to run_queries(2)
+      }.to execute(2).queries
     end
 
     it "should respect total_entries setting" do
@@ -229,7 +229,7 @@ RSpec.describe WillPaginate::ActiveRecord do
         sql = "select content from topics"
         topics = Topic.paginate_by_sql sql, :page => 1, :per_page => 1, :total_entries => 999
         expect(topics.total_entries).to eq(999)
-      }.to run_queries(1)
+      }.to execute(1).queries
     end
 
     it "defaults to page 1" do
@@ -245,7 +245,7 @@ RSpec.describe WillPaginate::ActiveRecord do
         sql = "select id, title, content from topics order by topics.title"
         topics = Topic.paginate_by_sql sql, :page => 1, :per_page => 2
         expect(topics.first).to eq(expected)
-      }.to run_queries(2)
+      }.to execute(2).queries
 
       expect($query_sql.last).to include('COUNT')
       expect($query_sql.last).not_to include('order by topics.title')
@@ -275,7 +275,7 @@ RSpec.describe WillPaginate::ActiveRecord do
       expect(result.current_page).to eq(1)
       expect(result.total_pages).to eq(1)
       expect(result.size).to eq(4)
-    }.to run_queries(1)
+    }.to execute(1).queries
   end
   
   it "should get second (inexistent) page of Topics, requiring 1 query" do
@@ -283,7 +283,7 @@ RSpec.describe WillPaginate::ActiveRecord do
       result = Topic.paginate :page => 2
       expect(result.total_pages).to eq(1)
       expect(result).to be_empty
-    }.to run_queries(1)
+    }.to execute(1).queries
   end
   
   describe "associations" do
@@ -299,7 +299,7 @@ RSpec.describe WillPaginate::ActiveRecord do
         }
         expect(result.to_a).to eq(expected_name_ordered)
         expect(result.total_entries).to eq(2)
-      }.to run_queries(2)
+      }.to execute(2).queries
 
       # with explicit order
       result = dhh.projects.paginate(:page => 1).reorder('projects.id')
@@ -328,7 +328,7 @@ RSpec.describe WillPaginate::ActiveRecord do
       expect {
         result = project.replies.only_recent.paginate(:page => 1)
         expect(result).to eq(expected)
-      }.to run_queries(1)
+      }.to execute(1).queries
     end
   end
   
@@ -343,14 +343,14 @@ RSpec.describe WillPaginate::ActiveRecord do
       developer_names = result.map(&:name)
       expect(developer_names).to include('David')
       expect(developer_names).to include('Jamis')
-    }.to run_queries(1)
+    }.to execute(1).queries
 
     expect {
       expected = result.to_a
       result = Developer.where('developers_projects.project_id = 1').joins(join_sql).paginate(:page => 1)
       expect(result).to eq(expected)
       expect(result.total_entries).to eq(2)
-    }.to run_queries(1)
+    }.to execute(1).queries
   end
 
   it "should paginate with group" do
@@ -358,7 +358,7 @@ RSpec.describe WillPaginate::ActiveRecord do
     expect {
       result = Developer.select('salary').order('salary').group('salary').
         paginate(:page => 1, :per_page => 10).to_a
-    }.to run_queries(1)
+    }.to execute(1).queries
 
     expected = users(:david, :jamis, :dev_10, :poor_jamis).map(&:salary).sort
     expect(result.map(&:salary)).to eq(expected)
@@ -383,7 +383,7 @@ RSpec.describe WillPaginate::ActiveRecord do
         result = ignore_deprecation { project.developers.poor.paginate :page => 1, :per_page => 1 }
         expect(result.size).to eq(1)
         expect(result.total_entries).to eq(1)
-      }.to run_queries(2)
+      }.to execute(2).queries
     end
 
     it "should paginate on hmt association" do
@@ -394,7 +394,7 @@ RSpec.describe WillPaginate::ActiveRecord do
         result = project.replies.recent.paginate :page => 1, :per_page => 1
         expect(result).to eq(expected)
         expect(result.total_entries).to eq(1)
-      }.to run_queries(2)
+      }.to execute(2).queries
     end
 
     it "should paginate on has_many association" do
@@ -405,7 +405,7 @@ RSpec.describe WillPaginate::ActiveRecord do
         result = project.topics.mentions_activerecord.paginate :page => 1, :per_page => 1
         expect(result).to eq(expected)
         expect(result.total_entries).to eq(1)
-      }.to run_queries(2)
+      }.to execute(2).queries
     end
   end
 
