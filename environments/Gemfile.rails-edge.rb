@@ -5,8 +5,8 @@ gem 'actionpack',   git: 'https://github.com/rails/rails.git', branch: 'main'
 
 gem 'thread_safe'
 
-gem 'rspec', '~> 2.99'
-gem 'mocha', '~> 0.9.8'
+gem 'rspec', '~> 3.12'
+gem 'mocha', '~> 2.0'
 
 gem 'sqlite3', '~> 1.4.0'
 

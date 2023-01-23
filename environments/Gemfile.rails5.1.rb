@@ -5,8 +5,8 @@ rails_version = '~> 5.1.7'
 gem 'activerecord', rails_version
 gem 'actionpack',   rails_version
 
-gem 'rspec', '~> 2.99'
-gem 'mocha', '~> 0.9.8'
+gem 'rspec', '~> 3.12'
+gem 'mocha', '~> 2.0'
 
 gem 'sqlite3', '~> 1.3.6'
 

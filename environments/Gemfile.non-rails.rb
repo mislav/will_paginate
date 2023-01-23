@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-gem 'rspec', '~> 2.99'
-gem 'mocha', '~> 0.9.8'
+gem 'rspec', '~> 3.12'
+gem 'mocha', '~> 2.0'
 
 gem 'sqlite3', '~> 1.4.0'
 
