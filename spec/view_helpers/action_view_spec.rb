@@ -17,7 +17,7 @@ Routes.draw do
   get 'baz/list' => 'baz#list'
 end
 
-describe WillPaginate::ActionView do
+RSpec.describe WillPaginate::ActionView do
 
   before(:all) do
     I18n.load_path.concat WillPaginate::I18n.load_path
@@ -57,14 +57,14 @@ describe WillPaginate::ActionView do
     paginate do |pagination|
       assert_select 'a[href]', 3 do |elements|
         validate_page_numbers [2,3,2], elements
-        text(elements[2]).should == 'Next →'
+        expect(text(elements[2])).to eq('Next →')
       end
       assert_select 'span', 1 do |spans|
-        spans[0]['class'].should == 'previous_page disabled'
-        text(spans[0]).should == '← Previous'
+        expect(spans[0]['class']).to eq('previous_page disabled')
+        expect(text(spans[0])).to eq('← Previous')
       end
       assert_select 'em.current', '1'
-      text(pagination[0]).should == '← Previous 1 2 3 Next →'
+      expect(text(pagination[0])).to eq('← Previous 1 2 3 Next →')
     end
   end
 
@@ -78,7 +78,7 @@ describe WillPaginate::ActionView do
   end
 
   it "should render nothing when there is only 1 page" do
-    paginate(:per_page => 30).should be_empty
+    expect(paginate(:per_page => 30)).to be_empty
   end
 
   it "should paginate with options" do
@@ -86,12 +86,12 @@ describe WillPaginate::ActionView do
       assert_select 'a[href]', 4 do |elements|
         validate_page_numbers [1,1,3,3], elements
         # test rel attribute values:
-        text(elements[0]).should == 'Prev'
-        elements[0]['rel'].should == 'prev'
-        text(elements[1]).should == '1'
-        elements[1]['rel'].should == 'prev'
-        text(elements[3]).should == 'Next'
-        elements[3]['rel'].should == 'next'
+        expect(text(elements[0])).to eq('Prev')
+        expect(elements[0]['rel']).to eq('prev')
+        expect(text(elements[1])).to eq('1')
+        expect(elements[1]['rel']).to eq('prev')
+        expect(text(elements[3])).to eq('Next')
+        expect(elements[3]['rel']).to eq('next')
       end
       assert_select '.current', '2'
     end
@@ -137,9 +137,9 @@ describe WillPaginate::ActionView do
     expected_dom = parse_html_document(expected)
 
     if expected_dom.respond_to?(:canonicalize)
-      html_document.canonicalize.should == expected_dom.canonicalize
+      expect(html_document.canonicalize).to eq(expected_dom.canonicalize)
     else
-      html_document.root.should == expected_dom.root
+      expect(html_document.root).to eq(expected_dom.root)
     end
   end
   
@@ -150,7 +150,7 @@ describe WillPaginate::ActionView do
     assert_select 'a[href]', 1 do |links|
       query = links.first['href'].split('?', 2)[1]
       parts = query.gsub('&amp;', '&').split('&').sort
-      parts.should == %w(page=2 tag=%3Cbr%3E)
+      expect(parts).to eq(%w(page=2 tag=%3Cbr%3E))
     end
   end
   
@@ -313,9 +313,9 @@ describe WillPaginate::ActionView do
     @template = '<%= will_paginate options %>'
     controller.controller_name = 'developers'
     
-    lambda {
+    expect {
       paginate(nil)
-    }.should raise_error(ActionView::TemplateError, /@developers/)
+    }.to raise_error(ActionView::TemplateError, /@developers/)
   end
 
   ## i18n
@@ -346,7 +346,7 @@ describe WillPaginate::ActionView do
 
     assert_select 'a[href]', 4 do |links|
       urls = links.map {|l| l['href'] }.uniq
-      urls.should == ['/dummy/page/1', '/dummy/page/3']
+      expect(urls).to eq(['/dummy/page/1', '/dummy/page/3'])
     end
   end
 
@@ -365,7 +365,7 @@ describe WillPaginate::ActionView do
 
     assert_select 'a[href]', 4 do |links|
       urls = links.map {|l| l['href'] }.uniq
-      urls.should == ['/dummy/page/1', '/dummy/page/3']
+      expect(urls).to eq(['/dummy/page/1', '/dummy/page/3'])
     end
   end
 
@@ -376,7 +376,7 @@ describe WillPaginate::ActionView do
       collection: WillPaginate::Collection.new(1, 1, 3),
       options: {html: false},
     )
-    output.should == "Displaying entries 1 - 0 of 3 in total"
+    expect(output).to eq("Displaying entries 1 - 0 of 3 in total")
   end
 
   private

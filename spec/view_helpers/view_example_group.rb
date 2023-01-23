@@ -51,10 +51,10 @@ module ViewExampleGroup
   def validate_page_numbers(expected, links, param_name = :page)
     param_pattern = /\W#{Regexp.escape(param_name.to_s)}=([^&]*)/
     
-    links.map { |el|
+    expect(links.map { |el|
       unescape_href(el) =~ param_pattern
       $1 ? $1.to_i : $1
-    }.should == expected
+    }).to eq(expected)
   end
 
   def assert_links_match(pattern, links = nil, numbers = nil)
@@ -66,20 +66,20 @@ module ViewExampleGroup
     
     links.each do |el|
       href = unescape_href(el)
-      href.should =~ pattern
+      expect(href).to match(pattern)
       if numbers
         href =~ pattern
         pages << ($1.nil?? nil : $1.to_i)
       end
     end
 
-    pages.should == numbers if numbers
+    expect(pages).to eq(numbers) if numbers
   end
 
   def assert_no_links_match(pattern)
     assert_select 'div.pagination a[href]' do |elements|
       elements.each do |el|
-        unescape_href(el).should_not =~ pattern
+        expect(unescape_href(el)).not_to match(pattern)
       end
     end
   end
@@ -99,7 +99,5 @@ module ViewExampleGroup
 end
 
 RSpec.configure do |config|
-  config.include ViewExampleGroup, :type => :view, :example_group => {
-    :file_path => %r{spec/view_helpers/}
-  }
+  config.include ViewExampleGroup, :type => :view, :file_path => %r{spec/view_helpers/}
 end
