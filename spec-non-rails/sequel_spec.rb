@@ -8,18 +8,18 @@ Sequel.sqlite.create_table :cars do
   column :notes, :text
 end
 
-describe Sequel::Dataset::Pagination, 'extension' do
+RSpec.describe Sequel::Dataset::Pagination, 'extension' do
 
   class Car < Sequel::Model
     self.dataset = dataset.extension(:pagination)
   end
 
   it "should have the #paginate method" do
-    Car.dataset.should respond_to(:paginate)
+    expect(Car.dataset).to respond_to(:paginate)
   end
 
   it "should NOT have the #paginate_by_sql method" do
-    Car.dataset.should_not respond_to(:paginate_by_sql)
+    expect(Car.dataset).not_to respond_to(:paginate_by_sql)
   end
 
   describe 'pagination' do
@@ -32,34 +32,34 @@ describe Sequel::Dataset::Pagination, 'extension' do
     it "should imitate WillPaginate::Collection" do
       result = Car.dataset.paginate(1, 2)
       
-      result.should_not be_empty
-      result.size.should == 2
-      result.length.should == 2
-      result.total_entries.should == 3
-      result.total_pages.should == 2
-      result.per_page.should == 2
-      result.current_page.should == 1
+      expect(result).not_to be_empty
+      expect(result.size).to eq(2)
+      expect(result.length).to eq(2)
+      expect(result.total_entries).to eq(3)
+      expect(result.total_pages).to eq(2)
+      expect(result.per_page).to eq(2)
+      expect(result.current_page).to eq(1)
     end
     
     it "should perform" do
-      Car.dataset.paginate(1, 2).all.should == [Car[1], Car[2]]
+      expect(Car.dataset.paginate(1, 2).all).to eq([Car[1], Car[2]])
     end
 
     it "should be empty" do
       result = Car.dataset.paginate(3, 2)
-      result.should be_empty
+      expect(result).to be_empty
     end
     
     it "should perform with #select and #order" do
       result = Car.select(Sequel.lit("name as foo")).order(:name).paginate(1, 2).all
-      result.size.should == 2
-      result.first.values[:foo].should == "Aston Martin"
+      expect(result.size).to eq(2)
+      expect(result.first.values[:foo]).to eq("Aston Martin")
     end
 
     it "should perform with #filter" do
       results = Car.filter(:name => 'Shelby').paginate(1, 2).all
-      results.size.should == 1
-      results.first.should == Car.find(:name => 'Shelby')
+      expect(results.size).to eq(1)
+      expect(results.first).to eq(Car.find(:name => 'Shelby'))
     end
   end
 
