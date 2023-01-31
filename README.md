@@ -1,6 +1,6 @@
 # will_paginate
 
-will_paginate is a pagination library that integrates with Ruby on Rails, Sinatra, Hanami::View, Merb, DataMapper and Sequel.
+will_paginate is a pagination library that integrates with Ruby on Rails, Sinatra, Hanami::View, and Sequel.
 
 ``` ruby
 gem 'will_paginate', '~> 3.3'
