@@ -15,6 +15,7 @@ jobs:
         - '2.7'
         - '3.0'
         - '3.1'
+        - '3.2'
         gemfile:
         - Gemfile
         - environments/Gemfile.rails5.0.rb
@@ -34,13 +35,19 @@ jobs:
           gemfile: environments/Gemfile.rails5.0.rb
         - ruby: '3.1'
           gemfile: environments/Gemfile.rails5.0.rb
+        - ruby: '3.2'
+          gemfile: environments/Gemfile.rails5.0.rb
         - ruby: '3.0'
           gemfile: environments/Gemfile.rails5.1.rb
         - ruby: '3.1'
+          gemfile: environments/Gemfile.rails5.1.rb
+        - ruby: '3.2'
           gemfile: environments/Gemfile.rails5.1.rb
         - ruby: '3.0'
           gemfile: environments/Gemfile.rails5.2.rb
         - ruby: '3.1'
+          gemfile: environments/Gemfile.rails5.2.rb
+        - ruby: '3.2'
           gemfile: environments/Gemfile.rails5.2.rb
         - ruby: '2.4'
           gemfile: environments/Gemfile.rails6.0.rb
@@ -71,7 +78,7 @@ jobs:
         ports:
         - 5432:5432
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: "${{ matrix.ruby }}"
@@ -106,6 +113,8 @@ jobs:
         - '2.6'
         - '2.7'
         - '3.0'
+        - '3.1'
+        - '3.2'
     runs-on: ubuntu-latest
     env:
       BUNDLE_GEMFILE: environments/Gemfile.non-rails.rb
@@ -115,7 +124,7 @@ jobs:
         ports:
         - 27017:27017
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: "${{ matrix.ruby }}"
