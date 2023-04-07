@@ -69,7 +69,7 @@ module WillPaginate
       
       def previous_or_next_page(page, text, classname)
         if page
-          link(text, page, :class => classname)
+          link(text, page, :class => classname, :'aria-label' => "#{classname.split('_').first} page")
         else
           tag(:span, text, :class => classname + ' disabled')
         end
