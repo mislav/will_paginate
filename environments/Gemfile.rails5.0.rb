@@ -13,3 +13,6 @@ gem 'sqlite3', '~> 1.3.6'
 
 gem 'mysql2', '~> 0.5.2', :group => :mysql
 gem 'pg', '~> 1.2.3', :group => :pg
+
+# ruby 2.4 compat re: nokogiri
+gem 'loofah', '< 2.21.0'
