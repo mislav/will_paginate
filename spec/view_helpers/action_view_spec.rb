@@ -220,11 +220,13 @@ RSpec.describe WillPaginate::ActionView do
     assert_no_links_match /p0wned/
   end
   
-  it "should not preserve parameters on POST" do
+  it "should only preserve query parameters on POST" do
     request.post
     request.params :foo => 'bar'
+    request.query_parameters = { :hello => 'world' }
     paginate
     assert_no_links_match /foo=bar/
+    assert_links_match /hello=world/
   end
   
   it "should add additional parameters to links" do
@@ -464,6 +466,18 @@ class DummyRequest
   def params(more = nil)
     @params.update(more) if more
     ActionController::Parameters.new(@params)
+  end
+
+  def query_parameters
+    if get?
+      params
+    else
+      ActionController::Parameters.new(@query_parameters)
+    end
+  end
+
+  def query_parameters=(more)
+    @query_parameters = more.with_indifferent_access
   end
   
   def host_with_port
