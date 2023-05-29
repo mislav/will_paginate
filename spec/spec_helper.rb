@@ -14,7 +14,11 @@ RSpec.configure do |config|
     end
 
     def ignore_deprecation
-      ActiveSupport::Deprecation.silence { yield }
+      if ActiveSupport::Deprecation.respond_to?(:silence)
+        ActiveSupport::Deprecation.silence { yield }
+      else
+        yield
+      end
     end
   }
 
