@@ -59,19 +59,21 @@ module WillPaginate
       
       def previous_page
         num = @collection.current_page > 1 && @collection.current_page - 1
-        previous_or_next_page(num, @options[:previous_label], 'previous_page')
+        aria_label = @template.will_paginate_translate(:previous_aria_label) { "Previous page" }
+        previous_or_next_page(num, @options[:previous_label], 'previous_page', aria_label)
       end
       
       def next_page
         num = @collection.current_page < total_pages && @collection.current_page + 1
-        previous_or_next_page(num, @options[:next_label], 'next_page')
+        aria_label = @template.will_paginate_translate(:next_aria_label) { "Next page" }
+        previous_or_next_page(num, @options[:next_label], 'next_page', aria_label)
       end
       
-      def previous_or_next_page(page, text, classname)
+      def previous_or_next_page(page, text, classname, aria_label = nil)
         if page
-          link(text, page, :class => classname)
+          link(text, page, :class => classname, :'aria-label' => aria_label)
         else
-          tag(:span, text, :class => classname + ' disabled')
+          tag(:span, text, :class => classname + ' disabled', :'aria-label' => aria_label)
         end
       end
       
