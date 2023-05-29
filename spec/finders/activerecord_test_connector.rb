@@ -6,6 +6,11 @@ require 'time'
 require 'date'
 require 'yaml'
 
+# forward compatibility with Rails 7 (needed for time expressions within fixtures)
+class Time
+  alias_method :to_fs, :to_s
+end unless Time.new.respond_to?(:to_fs)
+
 # monkeypatch needed for Ruby 3.1 & Rails 6.0
 YAML.module_eval do
   class << self
