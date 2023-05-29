@@ -3,7 +3,7 @@
 will_paginate is a pagination library that integrates with Ruby on Rails, Sinatra, Hanami::View, and Sequel.
 
 ``` ruby
-gem 'will_paginate', '~> 3.3'
+gem 'will_paginate', '~> 4.0'
 ```
 
 See [installation instructions][install] on the wiki for more info.
