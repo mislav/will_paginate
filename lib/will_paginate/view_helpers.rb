@@ -69,9 +69,6 @@ module WillPaginate
     #   <div class="pagination" style="color:blue"> ... </div>
     #
     def will_paginate(collection, options = {})
-      # early exit if there is nothing to render
-      return nil unless collection.total_pages > 1
-
       options = WillPaginate::ViewHelpers.pagination_options.merge(options)
 
       options[:previous_label] ||= will_paginate_translate(:previous_label) { '&#8592; Previous' }
