@@ -33,7 +33,7 @@ class Post
   self.per_page = 10
 end
 
-# set per_page globally
+# set per_page globally (If this setting is left unspecified the default value is 30)
 WillPaginate.per_page = 10
 ```
 
