@@ -66,6 +66,10 @@ jobs:
           gemfile: environments/Gemfile.rails-edge.rb
         - ruby: '2.6'
           gemfile: environments/Gemfile.rails-edge.rb
+        - ruby: '2.7'
+          gemfile: environments/Gemfile.rails-edge.rb
+        - ruby: '3.0'
+          gemfile: environments/Gemfile.rails-edge.rb
     runs-on: ubuntu-latest
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
