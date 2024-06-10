@@ -41,10 +41,10 @@ New in Active Record 3:
 
 ``` ruby
 # paginate in Active Record now returns a Relation
-Post.where(:published => true).paginate(:page => params[:page]).order('id DESC')
+Post.where(published: true).paginate(page: params[:page]).order(id: :desc)
 
 # the new, shorter page() method
-Post.page(params[:page]).order('created_at DESC')
+Post.page(params[:page]).order(created_at: :desc)
 ```
 
 See [the wiki][wiki] for more documentation. [Report bugs][issues] on GitHub.
