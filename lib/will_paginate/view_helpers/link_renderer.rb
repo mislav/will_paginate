@@ -103,13 +103,12 @@ module WillPaginate
       end
       
       def tag(name, value, attributes = {})
-        string_attributes = attributes.inject(''.dup) do |attrs, pair|
+        string_attributes = attributes.map do |pair|
           unless pair.last.nil?
-            attrs << %( #{pair.first}="#{CGI::escapeHTML(pair.last.to_s)}")
+            %( #{pair.first}="#{CGI::escapeHTML(pair.last.to_s)}")
           end
-          attrs
         end
-        "<#{name}#{string_attributes}>#{value}</#{name}>"
+        "<#{name}#{string_attributes.compact.join("")}>#{value}</#{name}>"
       end
 
       def rel_value(page)
