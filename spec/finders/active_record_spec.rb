@@ -5,22 +5,22 @@ require File.expand_path('../activerecord_test_connector', __FILE__)
 ActiverecordTestConnector.setup
 
 RSpec.describe WillPaginate::ActiveRecord do
-  
+
   extend ActiverecordTestConnector::FixtureSetup
-  
+
   fixtures :topics, :replies, :users, :projects, :developers_projects
-  
+
   it "should integrate with ActiveRecord::Base" do
     expect(ActiveRecord::Base).to respond_to(:paginate)
   end
-  
+
   it "should paginate" do
     expect {
       users = User.paginate(:page => 1, :per_page => 5).to_a
       expect(users.length).to eq(5)
     }.to execute(2).queries
   end
-  
+
   it "should fail when encountering unknown params" do
     expect {
       User.paginate :foo => 'bar', :page => 1, :per_page => 4
@@ -134,7 +134,7 @@ RSpec.describe WillPaginate::ActiveRecord do
         expect(topics).not_to be_empty
       }.to execute(1).queries
     end
-    
+
     it "support empty? for grouped queries" do
       topics = Topic.group(:project_id).paginate :page => 1, :per_page => 3
       expect {
@@ -190,7 +190,7 @@ RSpec.describe WillPaginate::ActiveRecord do
     it "should count with group" do
       expect(Developer.group(:salary).page(1).total_entries).to eq(4)
     end
-    
+
     it "should count with select" do
       expect(Topic.select('title, content').page(1).total_entries).to eq(4)
     end
@@ -203,8 +203,17 @@ RSpec.describe WillPaginate::ActiveRecord do
     it "should not have zero total_pages when the result set is empty" do
       expect(Developer.where("1 = 2").page(1).total_pages).to eq(1)
     end
+
+    it "should calculate total_pages after calling merge with unscoped limit" do
+      expect {
+        paginated_projects = Project.all.paginate(:page => 1, :per_page => 3)
+        unscoped_activerecord_topics = Topic.mentions_activerecord.unscope(:limit)
+        result = paginated_projects.joins(:topics).merge(unscoped_activerecord_topics)
+        expect(result.total_pages).to eq(1)
+      }.not_to raise_error
+    end
   end
-  
+
   it "should not ignore :select parameter when it says DISTINCT" do
     users = User.select('DISTINCT salary').paginate :page => 2
     expect(users.total_entries).to eq(5)
@@ -263,11 +272,11 @@ RSpec.describe WillPaginate::ActiveRecord do
     options = { :page => 1 }
     options.expects(:delete).never
     options_before = options.dup
-    
+
     Topic.paginate(options)
     expect(options).to eq(options_before)
   end
-  
+
   it "should get first page of Topics with a single query" do
     expect {
       result = Topic.paginate :page => nil
@@ -277,7 +286,7 @@ RSpec.describe WillPaginate::ActiveRecord do
       expect(result.size).to eq(4)
     }.to execute(1).queries
   end
-  
+
   it "should get second (inexistent) page of Topics, requiring 1 query" do
     expect {
       result = Topic.paginate :page => 2
@@ -285,7 +294,7 @@ RSpec.describe WillPaginate::ActiveRecord do
       expect(result).to be_empty
     }.to execute(1).queries
   end
-  
+
   describe "associations" do
     it "should paginate" do
       dhh = users(:david)
@@ -309,7 +318,7 @@ RSpec.describe WillPaginate::ActiveRecord do
       expect {
         dhh.projects.order('projects.id').limit(4).to_a
       }.not_to raise_error
-      
+
       result = dhh.projects.paginate(:page => 1, :per_page => 4).reorder('projects.id')
       expect(result).to eq(expected_id_ordered)
 
@@ -331,7 +340,7 @@ RSpec.describe WillPaginate::ActiveRecord do
       }.to execute(1).queries
     end
   end
-  
+
   it "should paginate with joins" do
     result = nil
     join_sql = 'LEFT JOIN developers_projects ON users.id = developers_projects.developer_id'
