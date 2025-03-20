@@ -18,17 +18,17 @@ RSpec.describe WillPaginate::ViewHelpers do
   end
 
   include WillPaginate::ViewHelpers
-  
+
   describe "will_paginate" do
     it "should render" do
       collection = WillPaginate::Collection.new(1, 2, 4)
       renderer   = mock 'Renderer'
       renderer.expects(:prepare).with(collection, instance_of(Hash), self)
       renderer.expects(:to_html).returns('<PAGES>')
-      
+
       expect(will_paginate(collection, :renderer => renderer)).to eq('<PAGES>')
     end
-    
+
     it "should return nil for single-page collections" do
       collection = mock 'Collection', :total_pages => 1
       expect(will_paginate(collection)).to be_nil
@@ -60,14 +60,14 @@ RSpec.describe WillPaginate::ViewHelpers do
       end
     end
   end
-  
+
   describe "page_entries_info" do
     before :all do
       @array = ('a'..'z').to_a
     end
 
     def info(params, options = {})
-      collection = Hash === params ? @array.paginate(params) : params
+      collection = Hash === params ? @array.paginate(**params) : params
       page_entries_info collection, {:html => false}.merge(options)
     end
 
@@ -111,7 +111,7 @@ RSpec.describe WillPaginate::ViewHelpers do
       expect(info(('a'..'d').to_a.paginate(:page => 1, :per_page => 5))).to eq("Displaying all 4 strings")
       expect(info(['a'].paginate(:page => 1, :per_page => 5))).to eq("Displaying 1 string")
     end
-  
+
     it "should display 'no entries found' for empty collections" do
       expect(info([].paginate(:page => 1, :per_page => 5))).to eq("No entries found")
     end

@@ -21,7 +21,7 @@ class Array
   # This method was originally {suggested by Desi
   # McAdam}[http://www.desimcadam.com/archives/8] and later proved to be the
   # most useful method of will_paginate library.
-  def paginate(options = {})
+  def paginate(**options)
     page     = options[:page] || 1
     per_page = options[:per_page] || WillPaginate.per_page
     total    = options[:total_entries] || self.length
