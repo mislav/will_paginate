@@ -67,14 +67,28 @@ module WillPaginate
 
       def total_entries
         @total_entries ||= begin
-          if loaded? and size < limit_value and (current_page == 1 or size > 0)
+          if loaded? && size < limit_value && (current_page == 1 || size > 0)
             offset_value + size
           else
             @total_entries_queried = true
-            result = count
-            result = result.size if result.respond_to?(:size) and !result.is_a?(Integer)
-            result
+            if @total_entries_lambda
+              @total_entries_lambda.call
+            else
+              result = count
+              result = result.size if result.respond_to?(:size) && !result.is_a?(Integer)
+              result
+            end
           end
+        end
+      end
+
+      def total_entries=(value)
+        if value.respond_to?(:call)
+          @total_entries_lambda = value
+          @total_entries = nil
+        else
+          @total_entries_lambda = nil
+          @total_entries = value.blank? ? nil : value.to_i
         end
       end
 
@@ -152,7 +166,7 @@ module WillPaginate
         end
 
         rel = limit(per_page.to_i).page(pagenum)
-        rel.total_entries = total.to_i          unless total.blank?
+        rel.total_entries = total unless total.blank?
         rel
       end
 

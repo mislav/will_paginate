@@ -421,4 +421,27 @@ RSpec.describe WillPaginate::ActiveRecord do
       Project.page(307445734561825862)
     }.to raise_error(WillPaginate::InvalidPage, "invalid offset: 9223372036854775830")
   end
- end
+
+  describe "total_entries with lambda" do
+    it "executes the lambda when needed" do
+      lambda_called = false
+      total_entries_lambda = -> { lambda_called = true; 100 }
+
+      topics = Topic.paginate :page => 1, :per_page => 3, :total_entries => total_entries_lambda
+
+      expect(topics.total_entries).to eq(100)
+      expect(lambda_called).to be true
+    end
+
+    it "does not execute the lambda when optimization applies" do
+      lambda_called = false
+      total_entries_lambda = -> { lambda_called = true; 100 }
+
+      topics = Topic.paginate :page => 1, :per_page => 10, :total_entries => total_entries_lambda
+
+      # Assuming the first batch size is smaller than the limit (10)
+      expect(topics.size).to be < 10
+      expect(lambda_called).to be false
+    end
+  end
+end
