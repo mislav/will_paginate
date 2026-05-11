@@ -1,22 +1,14 @@
 source 'https://rubygems.org'
 
-rails_version = '~> 4.0.0'
+# We test against other Rails versions, too. See `environments/`
+rails_version = '~> 7.1.3'
 
 gem 'activerecord', rails_version
 gem 'actionpack',   rails_version
 
-gem 'rspec', '~> 2.6.0'
-gem 'mocha', '~> 0.9.8'
+gem 'rspec', '~> 3.12'
+gem 'mocha', '~> 2.0'
 
-gem 'sqlite3', '~> 1.3.6'
-
-group :mysql do
-  gem 'mysql', '~> 2.9'
-  gem 'mysql2', '~> 0.3.10'
-end
-gem 'pg', '~> 0.11', :group => :pg
-
-group :development do
-  gem 'ruby-debug', :platforms => :mri_18
-  gem 'debugger', :platforms => :mri_19
-end
+gem 'sqlite3', '~> 1.5.0'
+gem 'mysql2', '~> 0.5.2', :group => :mysql
+gem 'pg', '~> 1.2', :group => :pg

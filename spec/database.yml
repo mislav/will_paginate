@@ -4,22 +4,26 @@ sqlite3:
   timeout: 500
 
 mysql:
-  adapter: mysql
-  database: will_paginate
-  username: 
-  encoding: utf8
-  socket: <%= ENV["BOXEN_MYSQL_SOCKET"] %>
-
-mysql2:
   adapter: mysql2
   database: will_paginate
-  username: 
+  username: <%= ENV["MYSQL_USER"] || "root" %>
   encoding: utf8
-  socket: <%= ENV["BOXEN_MYSQL_SOCKET"] %>
+<% if ENV["MYSQL_PORT"] %>
+  host: <%= ENV["MYSQL_HOST"] %>
+  port: <%= ENV["MYSQL_PORT"] %>
+<% elsif File.exist?("/var/run/mysql5/mysqld.sock") %>
+  host: localhost
+  socket: /var/run/mysql5/mysqld.sock
+<% elsif File.exist? "/tmp/mysql.sock" %>
+  host: localhost
+  socket: /tmp/mysql.sock
+<% end %>
 
 postgres:
   adapter: postgresql
   database: will_paginate
-  username: <%= "postgres" if ENV["TRAVIS"] %>
   min_messages: warning
-  port: <%= ENV["BOXEN_POSTGRESQL_PORT"] %>
+  username: <%= ENV["POSTGRES_USER"] %>
+  password: <%= ENV["POSTGRES_PASSWORD"] %>
+  host: <%= ENV["POSTGRES_HOST"] %>
+  port: <%= ENV["POSTGRES_PORT"] %>

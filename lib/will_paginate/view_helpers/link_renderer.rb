@@ -24,7 +24,7 @@ module WillPaginate
       # method as you see fit.
       def to_html
         html = pagination.map do |item|
-          item.is_a?(Fixnum) ?
+          item.is_a?(Integer) ?
             page_number(item) :
             send(item)
         end.join(@options[:link_separator])
@@ -35,16 +35,20 @@ module WillPaginate
       # Returns the subset of +options+ this instance was initialized with that
       # represent HTML attributes for the container element of pagination links.
       def container_attributes
-        @container_attributes ||= @options.except(*(ViewHelpers.pagination_options.keys + [:renderer] - [:class]))
+        @container_attributes ||= {
+          :role => 'navigation',
+          :"aria-label" => @template.will_paginate_translate(:container_aria_label) { 'Pagination' }
+        }.update @options.except(*(ViewHelpers.pagination_options.keys + [:renderer] - [:class]))
       end
       
     protected
     
       def page_number(page)
-        unless page == current_page
-          link(page, page, :rel => rel_value(page))
+        aria_label = @template.will_paginate_translate(:page_aria_label, :page => page.to_i) { "Page #{page}" }
+        if page == current_page
+          tag(:em, page, :class => 'current', :"aria-label" => aria_label, :"aria-current" => 'page')
         else
-          tag(:em, page, :class => 'current')
+          link(page, page, :rel => rel_value(page), :"aria-label" => aria_label)
         end
       end
       
@@ -55,19 +59,21 @@ module WillPaginate
       
       def previous_page
         num = @collection.current_page > 1 && @collection.current_page - 1
-        previous_or_next_page(num, @options[:previous_label], 'previous_page')
+        aria_label = @template.will_paginate_translate(:previous_aria_label) { "Previous page" }
+        previous_or_next_page(num, @options[:previous_label], 'previous_page', aria_label)
       end
       
       def next_page
         num = @collection.current_page < total_pages && @collection.current_page + 1
-        previous_or_next_page(num, @options[:next_label], 'next_page')
+        aria_label = @template.will_paginate_translate(:next_aria_label) { "Next page" }
+        previous_or_next_page(num, @options[:next_label], 'next_page', aria_label)
       end
       
-      def previous_or_next_page(page, text, classname)
+      def previous_or_next_page(page, text, classname, aria_label = nil)
         if page
-          link(text, page, :class => classname)
+          link(text, page, :class => classname, :'aria-label' => aria_label)
         else
-          tag(:span, text, :class => classname + ' disabled')
+          tag(:span, text, :class => classname + ' disabled', :'aria-label' => aria_label)
         end
       end
       
@@ -88,7 +94,7 @@ module WillPaginate
       end
 
       def link(text, target, attributes = {})
-        if target.is_a? Fixnum
+        if target.is_a?(Integer)
           attributes[:rel] = rel_value(target)
           target = url(target)
         end
@@ -97,29 +103,28 @@ module WillPaginate
       end
       
       def tag(name, value, attributes = {})
-        string_attributes = attributes.inject('') do |attrs, pair|
+        string_attributes = attributes.map do |pair|
           unless pair.last.nil?
-            attrs << %( #{pair.first}="#{CGI::escapeHTML(pair.last.to_s)}")
+            %( #{pair.first}="#{CGI::escapeHTML(pair.last.to_s)}")
           end
-          attrs
         end
-        "<#{name}#{string_attributes}>#{value}</#{name}>"
+        "<#{name}#{string_attributes.compact.join("")}>#{value}</#{name}>"
       end
 
       def rel_value(page)
         case page
-        when @collection.current_page - 1; 'prev' + (page == 1 ? ' start' : '')
+        when @collection.current_page - 1; 'prev'
         when @collection.current_page + 1; 'next'
-        when 1; 'start'
         end
       end
 
-      def symbolized_update(target, other)
-        other.each do |key, value|
+      def symbolized_update(target, other, blacklist = nil)
+        other.each_pair do |key, value|
           key = key.to_sym
           existing = target[key]
-          
-          if value.is_a?(Hash) and (existing.is_a?(Hash) or existing.nil?)
+          next if blacklist && blacklist.include?(key)
+
+          if value.respond_to?(:each_pair) and (existing.is_a?(Hash) or existing.nil?)
             symbolized_update(existing || (target[key] = {}), value)
           else
             target[key] = value

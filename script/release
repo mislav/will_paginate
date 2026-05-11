@@ -1,0 +1,13 @@
+#!/bin/sh
+set -euo pipefail
+
+eval "$(gem build *.gemspec | awk '/(Name|Version|File): /{print tolower($1) $2}' | sed 's/:/=/')"
+
+git commit -m "${name} ${version}" -- lib/will_paginate/version.rb
+git tag "v${version}"
+git push origin HEAD "v${version}"
+
+gem push "$file"
+rm -rf "$file"
+
+gh release create "v${version}" --title "${name} ${version}" --generate-notes

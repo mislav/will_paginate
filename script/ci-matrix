@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+require "yaml"
+
+ci_config = File.expand_path('../../.github/workflows/test.yml', __FILE__)
+data = YAML.load(File.read(ci_config))
+matrix = data.dig('jobs', 'test-rails', 'strategy', 'matrix')
+ruby_versions = matrix.fetch('ruby')
+gemfiles = matrix.fetch('gemfile')
+
+requirements = {
+  'environments/Gemfile.rails5.0.rb'    => ['>= 2.2', '< 3.0'],
+  'environments/Gemfile.rails5.1.rb'    => ['>= 2.2', '< 3.0'],
+  'environments/Gemfile.rails5.2.rb'    => ['>= 2.2', '< 3.0'],
+  'environments/Gemfile.rails6.0.rb'    => '>= 2.5',
+  'environments/Gemfile.rails6.1.rb'    => '>= 2.5',
+  'Gemfile'                             => '>= 2.7',
+  'environments/Gemfile.rails-edge.rb'  => '>= 3.1',
+}
+
+commands = {}
+
+commands['excludes'] = -> {
+  excludes = []
+  gemfiles.each do |gemfile|
+    req = Gem::Requirement.new(requirements.fetch(gemfile))
+    ruby_versions.each do |version|
+      unless req.satisfied_by?(Gem::Version.new(version))
+        excludes << { 'ruby' => version, 'gemfile' => gemfile }
+      end
+    end
+  end
+
+  matrix['exclude'] = excludes
+  File.open(ci_config, 'w') do |file|
+    yaml_str = YAML.dump(data)
+    file.write(yaml_str)
+  end
+}
+
+cmd = commands.fetch(ARGV[0]) do
+  $stderr.puts "available commands: #{commands.keys.join(', ')}"
+  exit 1
+end
+cmd.(*ARGV[1..-1])

@@ -2,39 +2,39 @@ require 'spec_helper'
 require 'will_paginate/view_helpers/link_renderer_base'
 require 'will_paginate/collection'
 
-describe WillPaginate::ViewHelpers::LinkRendererBase do
+RSpec.describe WillPaginate::ViewHelpers::LinkRendererBase do
   
   before do
     @renderer = described_class.new
   end
   
   it "should raise error when unprepared" do
-    lambda {
+    expect {
       @renderer.pagination
-    }.should raise_error
+    }.to raise_error(NoMethodError)
   end
   
   it "should prepare with collection and options" do
     prepare({})
-    @renderer.send(:current_page).should == 1
+    expect(@renderer.send(:current_page)).to eq(1)
   end
   
   it "should have total_pages accessor" do
     prepare :total_pages => 42
-    @renderer.send(:total_pages).should == 42
+    expect(@renderer.send(:total_pages)).to eq(42)
   end
   
   it "should clear old cached values when prepared" do
     prepare(:total_pages => 1)
-    @renderer.send(:total_pages).should == 1
+    expect(@renderer.send(:total_pages)).to eq(1)
     # prepare with different object:
     prepare(:total_pages => 2)
-    @renderer.send(:total_pages).should == 2
+    expect(@renderer.send(:total_pages)).to eq(2)
   end
   
   it "should have pagination definition" do
     prepare({ :total_pages => 1 }, :page_links => true)
-    @renderer.pagination.should == [:previous_page, 1, :next_page]
+    expect(@renderer.pagination).to eq([:previous_page, 1, :next_page])
   end
   
   describe "visible page numbers" do
@@ -66,7 +66,7 @@ describe WillPaginate::ViewHelpers::LinkRendererBase do
     
     def showing_pages(*pages)
       pages = pages.first.to_a if Array === pages.first or Range === pages.first
-      @renderer.send(:windowed_page_numbers).should == pages
+      expect(@renderer.send(:windowed_page_numbers)).to eq(pages)
     end
   end
   

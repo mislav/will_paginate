@@ -1,0 +1,12 @@
+#!/bin/bash
+# vi:ft=sh:
+set -e
+
+brew install libpq
+brew install --skip-post-install mysql@5.7
+
+bundle config --local build.mysql2 -- "$(ruby -r rbconfig -e 'puts RbConfig::CONFIG["configure_args"]' | xargs -n1 | grep with-openssl-dir)"
+bundle config --local build.pg -- --with-pg-config=$(brew --prefix libpq)/bin/pg_config
+bundle config --local path "$PWD/vendor/bundle"
+bundle install
+bundle binstubs rspec-core

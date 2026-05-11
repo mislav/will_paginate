@@ -10,7 +10,7 @@ module WillPaginate::Deprecation
     private
 
     def rails_logger
-      defined?(Rails) && Rails.logger
+      defined?(Rails.logger) && Rails.logger
     end
 
     def origin_of_call(stack)
@@ -31,8 +31,8 @@ module WillPaginate::Deprecation
       super
     end
 
-    def deprecate_key(*keys)
-      message = block_given? ? Proc.new : keys.pop
+    def deprecate_key(*keys, &block)
+      message = block_given? ? block : keys.pop
       Array(keys).each { |key| @deprecated[key] = message }
     end
 

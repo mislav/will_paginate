@@ -43,7 +43,7 @@ module WillPaginate
     # Wrapper for rendering pagination links at both top and bottom of a block
     # of content.
     # 
-    #   <% paginated_section @posts do %>
+    #   <%= paginated_section @posts do %>
     #     <ol id="posts">
     #       <% for post in @posts %>
     #         <li> ... </li>
@@ -80,7 +80,7 @@ module WillPaginate
           defaults = nil
           key = keys
         end
-        translate(key, options.merge(:default => defaults, :scope => :will_paginate))
+        translate(key, **options.merge(:default => defaults, :scope => :will_paginate))
       else
         super
       end
@@ -98,6 +98,8 @@ module WillPaginate
 
     class LinkRenderer < ViewHelpers::LinkRenderer
       protected
+
+      GET_PARAMS_BLACKLIST = [:script_name, :original_script_name]
 
       def default_url_params
         {}
@@ -117,8 +119,12 @@ module WillPaginate
       end
 
       def merge_get_params(url_params)
-        if @template.respond_to? :request and @template.request and @template.request.get?
-          symbolized_update(url_params, @template.params)
+        if @template.respond_to?(:request) and @template.request
+          if @template.request.get?
+            symbolized_update(url_params, @template.params, GET_PARAMS_BLACKLIST)
+          elsif @template.request.respond_to?(:query_parameters)
+            symbolized_update(url_params, @template.request.query_parameters, GET_PARAMS_BLACKLIST)
+          end
         end
         url_params
       end

@@ -30,7 +30,7 @@ module WillPaginate
         window_from = current_page - inner_window
         window_to = current_page + inner_window
         
-        # adjust lower or upper limit if other is out of bounds
+        # adjust lower or upper limit if either is out of bounds
         if window_to > total_pages
           window_from -= window_to - total_pages
           window_to = total_pages

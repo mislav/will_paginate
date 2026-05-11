@@ -1,15 +1,11 @@
-class QueryCountMatcher
-  def initialize(num)
-    @expected_count = num
-  end
-
-  def matches?(block)
+RSpec::Matchers.define :execute do |expected_count|
+  match do |block|
     run(block)
 
-    if @expected_count.respond_to? :include?
-      @expected_count.include? @count
+    if expected_count.respond_to? :include?
+      expected_count.include? @count
     else
-      @count == @expected_count
+      @count == expected_count
     end
   end
 
@@ -22,15 +18,14 @@ class QueryCountMatcher
     @count = $query_count
   end
 
-  def performed_queries
-    @queries
+  chain(:queries) {}
+  supports_block_expectations
+
+  failure_message do
+    "expected #{expected_count} queries, got #{@count}\n#{@queries.join("\n")}"
   end
 
-  def failure_message
-    "expected #{@expected_count} queries, got #{@count}\n#{@queries.join("\n")}"
-  end
-
-  def negative_failure_message
-    "expected query count not to be #{@expected_count}"
+  failure_message_when_negated do
+    "expected query count not to be #{expected_count}"
   end
 end

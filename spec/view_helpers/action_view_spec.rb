@@ -1,5 +1,5 @@
+# encoding: utf-8
 require 'spec_helper'
-require 'active_support/rescuable' # needed for Ruby 1.9.1
 require 'action_controller'
 require 'action_view'
 require 'will_paginate/view_helpers/action_view'
@@ -13,13 +13,17 @@ Routes.draw do
   get 'ibocorp(/:page)' => 'ibocorp#index',
         :constraints => { :page => /\d+/ }, :defaults => { :page => 1 }
 
-  get ':controller(/:action(/:id(.:format)))'
+  get 'foo/bar' => 'foo#bar'
+  get 'baz/list' => 'baz#list'
 end
 
-describe WillPaginate::ActionView do
+RSpec.describe WillPaginate::ActionView do
 
   before(:all) do
     I18n.load_path.concat WillPaginate::I18n.load_path
+    I18n.enforce_available_locales = false
+
+    ActionController::Parameters.permit_all_parameters = false
   end
 
   before(:each) do
@@ -36,7 +40,12 @@ describe WillPaginate::ActionView do
   attr_reader :assigns, :controller, :request
   
   def render(locals)
-    @view = ActionView::Base.new([], @assigns, @controller)
+    lookup_context = []
+    lookup_context = ActionView::LookupContext.new(lookup_context)
+
+    klass = ActionView::Base
+    klass = klass.with_empty_template_cache if klass.respond_to?(:with_empty_template_cache)
+    @view = klass.new(lookup_context, @assigns, @controller)
     @view.request = @request
     @view.singleton_class.send(:include, @controller._routes.url_helpers)
     @view.render(:inline => @template, :locals => locals)
@@ -48,12 +57,14 @@ describe WillPaginate::ActionView do
     paginate do |pagination|
       assert_select 'a[href]', 3 do |elements|
         validate_page_numbers [2,3,2], elements
-        assert_select elements.last, ':last-child', "Next &#8594;"
+        expect(text(elements[2])).to eq('Next →')
       end
-      assert_select 'span', 1
-      assert_select 'span.disabled:first-child', '&#8592; Previous'
+      assert_select 'span', 1 do |spans|
+        expect(spans[0]['class']).to eq('previous_page disabled')
+        expect(text(spans[0])).to eq('← Previous')
+      end
       assert_select 'em.current', '1'
-      pagination.first.inner_text.should == '&#8592; Previous 1 2 3 Next &#8594;'
+      expect(text(pagination[0])).to eq('← Previous 1 2 3 Next →')
     end
   end
 
@@ -67,7 +78,7 @@ describe WillPaginate::ActionView do
   end
 
   it "should render nothing when there is only 1 page" do
-    paginate(:per_page => 30).should be_empty
+    expect(paginate(:per_page => 30)).to be_empty
   end
 
   it "should paginate with options" do
@@ -75,15 +86,12 @@ describe WillPaginate::ActionView do
       assert_select 'a[href]', 4 do |elements|
         validate_page_numbers [1,1,3,3], elements
         # test rel attribute values:
-        assert_select elements[1], 'a', '1' do |link|
-          link.first['rel'].should == 'prev start'
-        end
-        assert_select elements.first, 'a', "Prev" do |link|
-          link.first['rel'].should == 'prev start'
-        end
-        assert_select elements.last, 'a', "Next" do |link|
-          link.first['rel'].should == 'next'
-        end
+        expect(text(elements[0])).to eq('Prev')
+        expect(elements[0]['rel']).to eq('prev')
+        expect(text(elements[1])).to eq('1')
+        expect(elements[1]['rel']).to eq('prev')
+        expect(text(elements[3])).to eq('Next')
+        expect(elements[3]['rel']).to eq('next')
       end
       assert_select '.current', '2'
     end
@@ -118,17 +126,20 @@ describe WillPaginate::ActionView do
 
   it "should match expected markup" do
     paginate
-    expected = <<-HTML
-      <div class="pagination"><span class="previous_page disabled">&#8592; Previous</span>
-      <em class="current">1</em>
-      <a href="/foo/bar?page=2" rel="next">2</a>
-      <a href="/foo/bar?page=3">3</a>
-      <a href="/foo/bar?page=2" class="next_page" rel="next">Next &#8594;</a></div>
+    expected = <<-HTML.strip.gsub(/\s{2,}/, ' ')
+      <div class="pagination" role="navigation" aria-label="Pagination"><span class="previous_page disabled" aria-label="Previous page">&#8592; Previous</span>
+      <em class="current" aria-label="Page 1" aria-current="page">1</em>
+      <a href="/foo/bar?page=2" aria-label="Page 2" rel="next">2</a>
+      <a href="/foo/bar?page=3" aria-label="Page 3">3</a>
+      <a href="/foo/bar?page=2" class="next_page" rel="next" aria-label="Next page">Next &#8594;</a></div>
     HTML
-    expected.strip!.gsub!(/\s{2,}/, ' ')
-    expected_dom = HTML::Document.new(expected).root
-    
-    html_document.root.should == expected_dom
+    expected_dom = parse_html_document(expected)
+
+    if expected_dom.respond_to?(:canonicalize)
+      expect(html_document.canonicalize).to eq(expected_dom.canonicalize)
+    else
+      expect(html_document.root).to eq(expected_dom.root)
+    end
   end
   
   it "should output escaped URLs" do
@@ -137,7 +148,8 @@ describe WillPaginate::ActionView do
     
     assert_select 'a[href]', 1 do |links|
       query = links.first['href'].split('?', 2)[1]
-      query.split('&amp;').sort.should == %w(page=2 tag=%3Cbr%3E)
+      parts = query.gsub('&amp;', '&').split('&').sort
+      expect(parts).to eq(%w(page=2 tag=%3Cbr%3E))
     end
   end
   
@@ -199,12 +211,21 @@ describe WillPaginate::ActionView do
     assert_no_links_match /99/
     assert_no_links_match /ftp/
   end
+
+  it "doesn't allow tampering with script_name" do
+    request.params :script_name => 'p0wned', :original_script_name => 'p0wned'
+    paginate
+    assert_links_match %r{^/foo/bar}
+    assert_no_links_match /p0wned/
+  end
   
-  it "should not preserve parameters on POST" do
+  it "should only preserve query parameters on POST" do
     request.post
     request.params :foo => 'bar'
+    request.query_parameters = { :hello => 'world' }
     paginate
     assert_no_links_match /foo=bar/
+    assert_links_match /hello=world/
   end
   
   it "should add additional parameters to links" do
@@ -248,7 +269,7 @@ describe WillPaginate::ActionView do
   end
 
   it "should paginate with custom route page parameter" do
-    request.symbolized_path_parameters.update :controller => 'dummy', :action => nil
+    request.symbolized_path_parameters.update :controller => 'dummy', :action => 'index'
     paginate :per_page => 2 do
       assert_select 'a[href]', 6 do |links|
         assert_links_match %r{/page/(\d+)$}, links, [2, 3, 4, 5, 6, 2]
@@ -266,7 +287,7 @@ describe WillPaginate::ActionView do
   end
 
   it "should paginate with custom route and first page number implicit" do
-    request.symbolized_path_parameters.update :controller => 'ibocorp', :action => nil
+    request.symbolized_path_parameters.update :controller => 'ibocorp', :action => 'index'
     paginate :page => 2, :per_page => 2 do
       assert_select 'a[href]', 7 do |links|
         assert_links_match %r{/ibocorp(?:/(\d+))?$}, links, [nil, nil, 3, 4, 5, 6, 3]
@@ -293,9 +314,9 @@ describe WillPaginate::ActionView do
     @template = '<%= will_paginate options %>'
     controller.controller_name = 'developers'
     
-    lambda {
+    expect {
       paginate(nil)
-    }.should raise_error(ActionView::TemplateError, /@developers/)
+    }.to raise_error(ActionView::TemplateError, /@developers/)
   end
 
   ## i18n
@@ -326,7 +347,7 @@ describe WillPaginate::ActionView do
 
     assert_select 'a[href]', 4 do |links|
       urls = links.map {|l| l['href'] }.uniq
-      urls.should == ['/dummy/page/1', '/dummy/page/3']
+      expect(urls).to eq(['/dummy/page/1', '/dummy/page/3'])
     end
   end
 
@@ -345,8 +366,18 @@ describe WillPaginate::ActionView do
 
     assert_select 'a[href]', 4 do |links|
       urls = links.map {|l| l['href'] }.uniq
-      urls.should == ['/dummy/page/1', '/dummy/page/3']
+      expect(urls).to eq(['/dummy/page/1', '/dummy/page/3'])
     end
+  end
+
+  # TODO: re-enable once Rails 6.1.4 ships
+  it "page_entries_info" do
+    @template = "<%= page_entries_info collection, options %>"
+    output = render(
+      collection: WillPaginate::Collection.new(1, 1, 3),
+      options: {html: false},
+    )
+    expect(output).to eq("Displaying entries 1 - 0 of 3 in total")
   end
 
   private
@@ -354,6 +385,11 @@ describe WillPaginate::ActionView do
   def translation(data)
     I18n.available_locales # triggers loading existing translations
     I18n.backend.store_translations(:en, data)
+  end
+
+  # Normalizes differences between HTML::Document and Nokogiri::HTML
+  def text(node)
+    node.inner_text.gsub('&#8594;', '→').gsub('&#8592;', '←')
   end
 end
 
@@ -376,7 +412,7 @@ class DummyController
   include Routes.url_helpers
   
   def initialize
-    @request = DummyRequest.new
+    @request = DummyRequest.new(self)
   end
 
   def params
@@ -399,12 +435,17 @@ class DummyRequest
   attr_accessor :symbolized_path_parameters
   alias :path_parameters :symbolized_path_parameters
   
-  def initialize
+  def initialize(controller)
+    @controller = controller
     @get = true
-    @params = {}
+    @params = {}.with_indifferent_access
     @symbolized_path_parameters = { :controller => 'foo', :action => 'bar' }
   end
-  
+
+  def routes
+    @controller._routes
+  end
+
   def get?
     @get
   end
@@ -423,7 +464,19 @@ class DummyRequest
 
   def params(more = nil)
     @params.update(more) if more
-    @params
+    ActionController::Parameters.new(@params)
+  end
+
+  def query_parameters
+    if get?
+      params
+    else
+      ActionController::Parameters.new(@query_parameters)
+    end
+  end
+
+  def query_parameters=(more)
+    @query_parameters = more.with_indifferent_access
   end
   
   def host_with_port
