@@ -114,7 +114,7 @@ module WillPaginate
 
       if options.fetch(:html, true)
         b, eb = '<b>', '</b>'
-        sp = '&nbsp;'
+        sp = '&#x00A0;'
         html_key = '_html'
       else
         b = eb = html_key = ''

@@ -4,7 +4,7 @@ en:
     previous_aria_label: "Previous page"
     next_label: "Next &#8594;"
     next_aria_label: "Next page"
-    page_gap: "&hellip;"
+    page_gap: "&#x2026;"
     container_aria_label: "Pagination"
     page_aria_label: "Page %{page}"
 
@@ -16,10 +16,10 @@ en:
       single_page_html:
         zero:  "No %{model} found"
         one:   "Displaying <b>1</b> %{model}"
-        other: "Displaying <b>all&nbsp;%{count}</b> %{model}"
+        other: "Displaying <b>all&#x00A0;%{count}</b> %{model}"
 
       multi_page: "Displaying %{model} %{from} - %{to} of %{count} in total"
-      multi_page_html: "Displaying %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> of <b>%{count}</b> in total"
+      multi_page_html: "Displaying %{model} <b>%{from}&#x00A0;-&#x00A0;%{to}</b> of <b>%{count}</b> in total"
 
     # models:
     #   entry:
